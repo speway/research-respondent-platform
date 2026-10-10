@@ -293,3 +293,25 @@ production build, 17/17 HTTP and all three actual Chromium scripts: exit 0,
 zero skips. This follow-up must be saved/deployed and its official commit/CI
 read back before referring to the final Preview as including the context guard.
 No additional resources, participant values or live submissions were used.
+
+Final checked application source (including the context guard):
+`385ff58363e4859c587ce5bea10014a98f730f90`.
+CI https://github.com/speway/research-respondent-platform/actions/runs/38075783934
+SUCCESS; actual job readback confirmed every step including all three standard
+Chromium workflows. Final protected Preview `dpl_8TJ8nGC3eKg3ncmjU3TQWi7P6v8K`
+is READY, target null, pinned to this source:
+https://research-respondent-platform-cq60fyy2n-spw1.vercel.app/workbench .
+Authorized workbench/manifest/observation-schema/health fetches all returned 200;
+manifest retains `hostedBackgroundWorker:false`, upload/submission false;
+health retains integrity ok, 4 migrations/no drift, durable false, sign-in false.
+Actual Cloud Browser rendered the final empty-source panel and all six menu
+items without application registration fields. Official owner access is temporary
+and its bearer URL is not committed. Sensitive-route checks were not retried.
+
+PR #11 is ready for review and based on PR #10; main still
+`dabed376d36080bc31e466f6907c7172faab2e06`. No merge, production deployment,
+paid provisioning, source upload or live response submission occurred. Final
+documentation-head CI outcome will be recorded in the PR body after completion,
+without triggering a further documentation commit solely to record that commit's
+own CI. Next tasks remain the owner-approved one-run cloud audit, durable
+protected queue/source/receipt integration, and a consented full live form test.
