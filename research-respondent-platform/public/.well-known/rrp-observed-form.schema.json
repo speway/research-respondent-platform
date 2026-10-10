@@ -61,6 +61,7 @@
               "paragraph",
               "number",
               "single_choice",
+              "multiple_choice",
               "dropdown",
               "unsupported"
             ]
@@ -77,6 +78,32 @@
               "minLength": 1,
               "maxLength": 20000
             }
+          },
+          "matrix": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 20000
+              },
+              "title": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 20000
+              },
+              "row": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 20000
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "row"
+            ],
+            "additionalProperties": false
           },
           "min": {
             "type": "number"

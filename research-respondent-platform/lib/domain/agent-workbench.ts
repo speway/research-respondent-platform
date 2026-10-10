@@ -5,11 +5,13 @@ const label = z.string().min(1).max(20000).refine((s) => !!s.trim(), "Пусто
 const formUrl = z.string().refine(validFormUrl, "Нужна HTTPS-ссылка Google Forms.");
 const questionSchema = z.object({
   id: label, section: z.string().max(20000), text: label,
-  kind: z.enum(["text", "paragraph", "number", "single_choice", "dropdown", "unsupported"]),
+  kind: z.enum(["text", "paragraph", "number", "single_choice", "multiple_choice", "dropdown", "unsupported"]),
   required: z.boolean(), options: z.array(label).max(1000).default([]),
+  matrix: z.object({ id: label, title: label, row: label }).strict().optional(),
   min: z.number().finite().optional(), max: z.number().finite().optional(),
 }).strict().superRefine((q, ctx) => {
-  if (["single_choice", "dropdown"].includes(q.kind) && (!q.options.length || new Set(q.options).size !== q.options.length)) ctx.addIssue({ code: "custom", message: "Нужны уникальные буквальные варианты ответа." });
+  if (["single_choice", "multiple_choice", "dropdown"].includes(q.kind) && (!q.options.length || new Set(q.options).size !== q.options.length)) ctx.addIssue({ code: "custom", message: "Нужны уникальные буквальные варианты ответа." });
+  if (q.matrix && !["single_choice", "multiple_choice"].includes(q.kind)) ctx.addIssue({ code: "custom", message: "Матрица должна содержать варианты ответа." });
   if (q.min !== undefined && q.max !== undefined && q.min > q.max) ctx.addIssue({ code: "custom", message: "Минимум больше максимума." });
 });
 export const observationSchema = z.object({
@@ -68,6 +70,21 @@ export function applyObservation(workspace: Workspace, input: unknown) {
   const mappings = automaticMappings(workspace.dataset.headers, observation);
   return { workspace: { ...workspace, fields: mappings.map(({ question, column, required }) => ({ question, column, required })) }, observation, mappings };
 }
+/** Reuse the already supplied source and criteria; a new recipient always invalidates its map. */
+export function workspaceForTarget(workspace: Workspace, url: unknown): Workspace {
+  const nextUrl = formUrl.parse(url);
+  if (!workspace.dataset || workspace.idColumn === null || !workspace.reference.trim() || !workspace.purpose.trim()) throw new Error("Сначала настройте базу, ID, источник и цель задания.");
+  return { ...workspace, formUrl: nextUrl, fields: [] };
+}
+/** Flat imports keep the original cell. Multi-select cells must be explicit JSON arrays,
+ * never split on commas (an option can itself contain a comma). */
+export function selectedOptions(value: Cell | undefined): string[] | null {
+  if (typeof value !== "string") return null;
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) && parsed.length > 0 && parsed.every((v) => typeof v === "string" && !!v.trim()) && new Set(parsed).size === parsed.length ? parsed : null;
+  } catch { return null; }
+}
 const absent = (v: Cell | undefined) => v === null || v === undefined || (typeof v === "string" && !v.trim());
 export function agentProblems(workspace: Workspace, observation: FormObservation | null): string[] {
   if (!observation) return [...preparationProblems(workspace), "Агент ещё не прочитал видимые вопросы формы."];
@@ -82,6 +99,10 @@ export function agentProblems(workspace: Workspace, observation: FormObservation
       const value = row.values[column];
       if (absent(value)) continue;
       if (["single_choice", "dropdown"].includes(q.kind) && !q.options.includes(String(value))) problems.push(`Строка ${row.line}, ${questionLabel(q)}: ответ не совпадает с вариантом формы.`);
+      if (q.kind === "multiple_choice") {
+        const choices = selectedOptions(value);
+        if (!choices || choices.some((v) => !q.options.includes(v))) problems.push(`Строка ${row.line}, ${questionLabel(q)}: нужен JSON-массив уникальных буквальных вариантов.`);
+      }
       if (q.kind === "number" && (typeof value === "boolean" || !Number.isFinite(Number(value)) || (q.min !== undefined && Number(value) < q.min) || (q.max !== undefined && Number(value) > q.max))) problems.push(`Строка ${row.line}, ${questionLabel(q)}: число вне правил формы.`);
     }
   }
@@ -95,8 +116,9 @@ export function buildAgentPlan(workspace: Workspace, observation: FormObservatio
     execution: { externalSubmission: false, verifyEveryField: true, reobserveEverySection: true, retrySubmission: false, authorization: "explicit_recipient_and_participants", successEvidence: "visible_response_recorded" },
     respondents: selectedRows(workspace).map((row) => ({ participantRef: String(row.values[workspace.idColumn!]),
       actions: observation.questions.map((q, i) => ({ questionId: q.id, section: q.section, question: q.text, kind: q.kind,
-        action: absent(row.values[workspace.fields[i]!.column!]) ? "skip_optional" : q.kind === "single_choice" ? "select_radio" : q.kind === "dropdown" ? "select_option" : "fill",
+        action: absent(row.values[workspace.fields[i]!.column!]) ? "skip_optional" : q.kind === "single_choice" ? "select_radio" : q.kind === "multiple_choice" ? "select_checkboxes" : q.kind === "dropdown" ? "select_option" : "fill",
         value: row.values[workspace.fields[i]!.column!] ?? null,
+        ...(q.kind === "multiple_choice" ? { selectedOptions: selectedOptions(row.values[workspace.fields[i]!.column!]) } : {}),
         source: { row: row.line, column: workspace.dataset!.headers[workspace.fields[i]!.column!], sha256: workspace.checksum } })),
     })),
   };
