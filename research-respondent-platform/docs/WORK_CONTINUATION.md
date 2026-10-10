@@ -2,6 +2,14 @@
 
 > **Current operational handoff (2026-10-10).** This file supersedes stale repository/deployment status inside `docs/CHATGPT_HANDOFF.md`. No unexecuted test or release is described as successful.
 
+## Tracked GitHub issues
+
+- **P0:** https://github.com/speway/research-respondent-platform/issues/2 — restore seven failing pipeline integration tests.
+- **P1:** https://github.com/speway/research-respondent-platform/issues/3 — migration status regression, missing UI routes, authorization checks.
+- **P2:** https://github.com/speway/research-respondent-platform/issues/4 — durable database and safe Vercel preview.
+
+Start with Issue #2. The cleanup PR is https://github.com/speway/research-respondent-platform/pull/1; it is a draft and should remain unmerged until the acceptance checks pass.
+
 ## Latest verified GitHub Actions result (2026-10-10 UTC)
 
 - CI run: https://github.com/speway/research-respondent-platform/actions/runs/38049379130
