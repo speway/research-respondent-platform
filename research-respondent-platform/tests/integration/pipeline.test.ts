@@ -604,7 +604,8 @@ test("a study, protocol version and criterion are created and the stored rule pa
   // The same JSON must round-trip through the strict runtime parser.
   const reparsed = parseRule(JSON.parse(consentCriterion.rule_json));
   assert.deepEqual(reparsed, parsed);
-  assert.equal(reparsed.id, consentCriterion.id);
+  // Rule identifiers are stable within the JSON definition; database criterion IDs are separate.
+  assert.equal(reparsed.id, CONSENT_RULE_ID);
 
   const protocols = w.db
     .prepare("SELECT COUNT(*) AS total FROM study_protocol_version WHERE study_id = ?")
@@ -711,10 +712,8 @@ test("identity data requires a lawful basis and never leaks into analytic tables
     "an empty lawful basis must not be storable",
   );
 
-  // KNOWN GAP (reported to the lead, not fixed here): upsertPrivateIdentity
-  // (lib/repo/participants.ts:318) performs no lawful-basis validation of its own, so a
-  // whitespace-only basis passes the SQLite CHECK and is stored. The assertion below pins
-  // the current behaviour; when the repo adds a guard this expectation must be inverted.
+  // A whitespace-only lawful basis is not a documented lawful basis.
+  // Both the repository guard and database constraints must keep identity out.
   const gap = createParticipant(w.db, {
     organizationId: w.orgId,
     pseudonym: "FIX-902",
@@ -723,15 +722,19 @@ test("identity data requires a lawful basis and never leaks into analytic tables
     evidenceLocator: "sheet1!A11",
     consent: { studyId: null, version: "fixture-consent-v1", basis: "written_signed", status: "granted" },
   });
-  upsertPrivateIdentity(w.db, {
-    participantId: gap.participant.id,
-    fullName: null,
-    contactEmail: "whitespace.basis@example.test",
-    contactPhone: null,
-    contactHandle: null,
-    lawfulBasis: "   ",
-  });
-  assert.equal(getPrivateIdentity(w.db, gap.participant.id)?.lawful_basis, "   ");
+  assert.throws(
+    () => upsertPrivateIdentity(w.db, {
+      participantId: gap.participant.id,
+      fullName: null,
+      contactEmail: "whitespace.basis@example.test",
+      contactPhone: null,
+      contactHandle: null,
+      lawfulBasis: "   ",
+    }),
+    (error: unknown) => isDomainError(error, "participant.missing_lawful_basis"),
+    "a whitespace-only lawful basis must be refused before database persistence",
+  );
+  assert.equal(getPrivateIdentity(w.db, gap.participant.id), undefined);
 
   const identity = getPrivateIdentity(w.db, w.participantId);
   assert.ok(identity, "the fixture participant must have a restricted identity record");
@@ -931,7 +934,8 @@ test("form preflight fails the required field with a documented missing source a
   assert.equal(report.payload[w.optionalFieldId], "5");
   assert.equal(w.requiredFieldId in report.payload, false);
   assert.equal(report.counts.fail, 1);
-  assert.equal(report.counts.unmappedRequired, 1);
+  // This field is mapped, but its documented answer is missing; it is not "unmapped".
+  assert.equal(report.counts.unmappedRequired, 0);
   assert.equal(report.counts.missingSource, 1);
   w.db.close();
 });
@@ -1107,7 +1111,7 @@ test("authorization denies viewer writes and agent identity access", () => {
   assert.equal(agentDecision.policyCode, "rbac.agent_forbidden");
   assert.match(agentDecision.reason, /human approval is required/);
 
-  // A study-scoped write grant is required for a write into a study the actor cannot write.
+  // Registering an agent is an organization-scoped permission, not a study data write.
   const scopedDenied = authorize(w.agent, PERMISSIONS.agentWrite, { studyId: w.studyId });
   assert.equal(scopedDenied.allowed, true, "agentWrite carries no study-scope requirement");
   assert.equal(authorize(w.viewer, PERMISSIONS.studyWrite, { studyId: w.studyId }).allowed, false);
@@ -1145,8 +1149,15 @@ test("observed_answer and audit_event remain append-only on a live database", ()
     "audit_event must reject deletes",
   );
 
-  const derivedId = listDerivedScores(w.db, { sessionId: w.sessionT1.id })[0]?.id;
+  // Scores are materialized explicitly; world() only documents observed answers.
+  const scored = scoreAndPersistSession(w.db, w.sessionT1.id, { computedBy: w.admin.id });
+  const derivedId = scored.persistedScoreIds[0];
   assert.ok(derivedId);
+  assert.throws(
+    () => w.db.prepare("UPDATE derived_score SET raw_score = 999 WHERE id = ?").run(derivedId),
+    /immutable|append-only|cannot be (modified|updated)/i,
+    "derived scores must not be rewritten after computation",
+  );
   w.db.close();
 });
 

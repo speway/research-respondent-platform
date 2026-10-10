@@ -314,10 +314,11 @@ export function loadParticipantFacts(db: Db, organizationId: string, studyId?: s
   }>;
   const scores = db
     .prepare(
-      `SELECT ds.assessment_session_id, ds.participant_id, sd.scale_code, ds.instrument_version_id,
+      `SELECT ds.assessment_session_id, ds.participant_id, sd.scale_code, ses.instrument_version_id,
               ds.raw_score, ds.transformed_score, ds.standardized_score, ds.percentile, ds.computability,
               ds.algorithm_version, ds.computed_at
        FROM derived_score ds
+       JOIN assessment_session ses ON ses.id = ds.assessment_session_id
        JOIN scale_definition sd ON sd.id = ds.scale_definition_id
        WHERE ds.superseded_by_id IS NULL`,
     )
