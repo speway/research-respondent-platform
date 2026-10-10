@@ -366,3 +366,18 @@ Only a documentation commit follows this application source; its CI will be
 recorded in PR metadata after actual completion. Existing owner authorization
 for storage and further development persists; the remaining blocker is provider
 403/service sign-in, not missing blanket permission.
+
+### Official authentication continuation — after primary release
+
+Documentation head `b04ce05e80a32c0b093a32c59243a14ec47134ba` CI run
+38080517227 SUCCESS; every job step independently read back. Unauthenticated
+Preview curl returned 302 to protection, while canonical primary panel returned
+200; public production DB health returned the intended 503 generic refusal.
+The owner selected Google using secure browserAuth. Identifier/password entry
+was handled by the native protected credential surface; no values were read,
+stored or logged by the agent. Google reported an incorrect password, so Vercel
+service sign-in is not established. An official browser handoff is being
+prepared for this specific authentication blocker; do not retry credentials or
+switch methods automatically. Storage and hosted background queue remain
+unconfigured; the primary site continues to work without registration.
+The following documentation-only commit does not change deployed app source.
