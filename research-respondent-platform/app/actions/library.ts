@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { assertOwned } from "../../lib/services/ownership.ts";
 import { requireAuth } from "../../lib/services/session.ts";
 import { PERMISSIONS, assertAuthorized } from "../../lib/services/authz.ts";
 import { recordAudit } from "../../lib/services/audit.ts";
@@ -135,6 +136,7 @@ export async function createInstrumentVersionAction(formData: FormData): Promise
   try {
     assertAuthorized(actor, PERMISSIONS.instrumentWrite);
     const instrumentId = String(formData.get("instrumentId") ?? "");
+    assertOwned(db, actor, "instrument", instrumentId);
     const sourceTitle = String(formData.get("sourceTitle") ?? "").trim();
     const sourceReference = String(formData.get("sourceReference") ?? "").trim();
     const parsed = z
@@ -224,6 +226,7 @@ export async function addItemAction(formData: FormData): Promise<ActionResult> {
   try {
     assertAuthorized(actor, PERMISSIONS.instrumentWrite);
     const instrumentVersionId = String(formData.get("instrumentVersionId") ?? "");
+    assertOwned(db, actor, "instrumentVersion", instrumentVersionId);
     const parsed = z
       .object({
         itemCode: z.string().trim().min(1).max(20),
@@ -306,6 +309,7 @@ export async function createScaleAction(formData: FormData): Promise<ActionResul
   try {
     assertAuthorized(actor, PERMISSIONS.instrumentWrite);
     const instrumentVersionId = String(formData.get("instrumentVersionId") ?? "");
+    assertOwned(db, actor, "instrumentVersion", instrumentVersionId);
     const parsed = z
       .object({
         scaleCode: z.string().trim().min(1).max(24),
@@ -359,6 +363,7 @@ export async function createAlgorithmAction(formData: FormData): Promise<ActionR
   try {
     assertAuthorized(actor, PERMISSIONS.instrumentWrite);
     const instrumentVersionId = String(formData.get("instrumentVersionId") ?? "");
+    assertOwned(db, actor, "instrumentVersion", instrumentVersionId);
     const scaleDefinitionId = String(formData.get("scaleDefinitionId") ?? "");
     const algorithmJson = String(formData.get("algorithmJson") ?? "").trim();
     let rawAlgorithm: unknown;
@@ -399,12 +404,13 @@ export async function createAlgorithmAction(formData: FormData): Promise<ActionR
 export async function scoreSessionAction(formData: FormData): Promise<ActionResult> {
   const { db, actor } = await requireAuth();
   try {
-    assertAuthorized(actor, PERMISSIONS.scoreWrite);
     const sessionId = String(formData.get("sessionId") ?? "");
+    assertOwned(db, actor, "session", sessionId);
     const session = getAssessmentSession(db, sessionId);
     if (!session) {
       return { ok: false, message: "Assessment session not found." };
     }
+    assertAuthorized(actor, PERMISSIONS.scoreWrite, { studyId: session.study_id });
     const result = scoreAndPersistSession(db, sessionId, { computedBy: actor.id });
     recordAudit(db, {
       organizationId: actor.organizationId,

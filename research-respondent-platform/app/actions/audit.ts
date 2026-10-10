@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { assertOwned } from "../../lib/services/ownership.ts";
 import { requireAuth } from "../../lib/services/session.ts";
 import { PERMISSIONS, assertAuthorized } from "../../lib/services/authz.ts";
 import { recordAudit } from "../../lib/services/audit.ts";
@@ -28,7 +29,6 @@ function failure(error: unknown): ActionResult {
 export async function requestExportAction(formData: FormData): Promise<ActionResult> {
   const { db, actor } = await requireAuth();
   try {
-    assertAuthorized(actor, PERMISSIONS.exportCreate);
     const parsed = z
       .object({
         scope: z.enum([
@@ -49,9 +49,11 @@ export async function requestExportAction(formData: FormData): Promise<ActionRes
     if (!parsed.success) {
       return { ok: false, message: parsed.error.issues.map((issue) => issue.message).join("; ") };
     }
+    assertAuthorized(actor, PERMISSIONS.exportCreate, { studyId: parsed.data.studyId || null });
     if (parsed.data.scope === "identity_restricted") {
       assertAuthorized(actor, PERMISSIONS.identityRead);
     }
+    if (parsed.data.studyId) assertOwned(db, actor, "study", parsed.data.studyId);
     const job = requestExport(db, {
       organizationId: actor.organizationId,
       studyId: parsed.data.studyId || null,
@@ -86,8 +88,9 @@ export async function requestExportAction(formData: FormData): Promise<ActionRes
 export async function approveExportAction(formData: FormData): Promise<ActionResult> {
   const { db, actor } = await requireAuth();
   try {
-    assertAuthorized(actor, PERMISSIONS.exportApprove);
     const jobId = String(formData.get("jobId") ?? "");
+    assertOwned(db, actor, "export", jobId);
+    assertAuthorized(actor, PERMISSIONS.exportApprove, { studyId: getExportJob(db, jobId)?.study_id });
     const job = approveExport(db, jobId, actor.id);
     recordAudit(db, {
       organizationId: actor.organizationId,
@@ -111,6 +114,7 @@ export async function runExportAction(formData: FormData): Promise<ActionResult>
   const { db, actor } = await requireAuth();
   try {
     const jobId = String(formData.get("jobId") ?? "");
+    assertOwned(db, actor, "export", jobId);
     const result = runExportJob(db, actor, jobId);
     revalidatePath("/audit");
     return {
@@ -126,9 +130,10 @@ export async function runExportAction(formData: FormData): Promise<ActionResult>
 export async function denyExportAction(formData: FormData): Promise<ActionResult> {
   const { db, actor } = await requireAuth();
   try {
-    assertAuthorized(actor, PERMISSIONS.exportApprove);
     const jobId = String(formData.get("jobId") ?? "");
+    assertOwned(db, actor, "export", jobId);
     const reason = String(formData.get("reason") ?? "").trim() || "denied by reviewer";
+    assertAuthorized(actor, PERMISSIONS.exportApprove, { studyId: getExportJob(db, jobId)?.study_id });
     const denied = denyExport(db, jobId, reason);
     recordAudit(db, {
       organizationId: actor.organizationId,
@@ -214,7 +219,9 @@ export async function downloadExportAction(formData: FormData): Promise<ActionRe
   const { db, actor } = await requireAuth();
   try {
     const jobId = String(formData.get("jobId") ?? "");
+    assertOwned(db, actor, "export", jobId);
     const job = getExportJob(db, jobId);
+    assertAuthorized(actor, job?.scope === "identity_restricted" ? PERMISSIONS.identityRead : PERMISSIONS.exportCreate, { studyId: job?.study_id });
     if (!job) {
       return { ok: false, message: "Export job not found." };
     }

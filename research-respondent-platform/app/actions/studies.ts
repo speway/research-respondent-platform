@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { assertOwned, assertStudyChild } from "../../lib/services/ownership.ts";
 import { requireAuth } from "../../lib/services/session.ts";
 import { PERMISSIONS, assertAuthorized } from "../../lib/services/authz.ts";
 import { recordAudit } from "../../lib/services/audit.ts";
@@ -84,6 +85,7 @@ export async function updateStudyAction(formData: FormData): Promise<ActionResul
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     assertAuthorized(actor, PERMISSIONS.studyWrite, { studyId });
     const status = String(formData.get("status") ?? "");
     const parsed = z
@@ -128,6 +130,7 @@ export async function createProtocolAction(formData: FormData): Promise<ActionRe
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     assertAuthorized(actor, PERMISSIONS.studyWrite, { studyId });
     const parsed = z
       .object({
@@ -184,6 +187,7 @@ export async function createCriterionAction(formData: FormData): Promise<ActionR
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     assertAuthorized(actor, PERMISSIONS.studyWrite, { studyId });
     const label = String(formData.get("label") ?? "").trim();
     const kind = String(formData.get("kind") ?? "inclusion");
@@ -229,8 +233,10 @@ export async function deleteCriterionAction(formData: FormData): Promise<ActionR
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const criterionId = String(formData.get("criterionId") ?? "");
     assertAuthorized(actor, PERMISSIONS.studyWrite, { studyId });
+    assertStudyChild(db, studyId, "criterion", criterionId);
     const removed = deleteCriterion(db, criterionId);
     recordAudit(db, {
       organizationId: actor.organizationId,
@@ -254,7 +260,9 @@ export async function enrolParticipantAction(formData: FormData): Promise<Action
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const participantId = String(formData.get("participantId") ?? "");
+    assertOwned(db, actor, "participant", participantId);
     assertAuthorized(actor, PERMISSIONS.participantWrite, { studyId });
     const participant = db.prepare("SELECT pseudonym FROM participant WHERE id = ?").get(participantId) as
       | { pseudonym: string }
@@ -314,7 +322,9 @@ export async function setEnrolmentStatusAction(formData: FormData): Promise<Acti
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const participantId = String(formData.get("participantId") ?? "");
+    assertOwned(db, actor, "participant", participantId);
     const status = String(formData.get("status") ?? "");
     assertAuthorized(actor, PERMISSIONS.participantWrite, { studyId });
     const parsedStatus = z

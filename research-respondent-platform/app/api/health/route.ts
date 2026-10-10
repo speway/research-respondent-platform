@@ -29,11 +29,11 @@ export async function GET() {
       },
       { status: healthy ? 200 : 503 },
     );
-  } catch (error) {
+  } catch {
     return NextResponse.json(
       {
         status: "error",
-        message: error instanceof Error ? error.message : String(error),
+        message: "Database health check unavailable.",
         timestamp: new Date().toISOString(),
       },
       { status: 503 },

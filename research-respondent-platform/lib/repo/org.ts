@@ -229,7 +229,7 @@ export function resolveSession(db: Db, token: string): { session: SessionRow; us
   if (!session || session.revoked_at !== null) {
     return null;
   }
-  if (Date.parse(session.expires_at) < Date.now()) {
+  if (!Number.isFinite(Date.parse(session.expires_at)) || Date.parse(session.expires_at) <= Date.now()) {
     return null;
   }
   const user = getUserById(db, session.user_id);
@@ -318,7 +318,28 @@ export function revokeAccessGrant(db: Db, grantId: string): boolean {
  */
 export function buildActor(db: Db, user: UserRow): Actor {
   const decorated = decorateUser(db, user);
-  const permissions = new Set(permissionsForRoles(decorated.roles));
+  const assignments = db.prepare("SELECT role, study_id FROM role_assignment WHERE user_id = ? AND revoked_at IS NULL")
+    .all(user.id) as Array<{ role: string; study_id: string | null }>;
+  const permissions = new Set<Permission>();
+  const permissionStudyScopes: Record<string, string[]> = {};
+  const globalPermissions = new Set<string>();
+  for (const assignment of assignments) {
+    for (const permission of permissionsForRoles([assignment.role])) {
+      const consequential = permission.endsWith(":write") || permission.endsWith(":approve") ||
+        permission === "task:execute" || permission === "export:create" || permission === "import:commit";
+      if (consequential && assignment.study_id) {
+        (permissionStudyScopes[permission] ??= []).push(assignment.study_id);
+        if (permission.endsWith(":write") && permission !== "agent:write") permissions.add(`study:${assignment.study_id}:write` as Permission);
+      } else if (!assignment.study_id) globalPermissions.add(permission);
+      // A study-owned PI is not an organization-wide study administrator.
+      if (permission === "study:write" && assignment.study_id) {
+        permissions.add(`study:${assignment.study_id}:write` as Permission);
+      } else {
+        permissions.add(permission);
+      }
+    }
+  }
+  for (const permission of globalPermissions) delete permissionStudyScopes[permission];
   const grants = db
     .prepare(
       `SELECT scope_type, scope_id, permission FROM access_grant
@@ -328,15 +349,23 @@ export function buildActor(db: Db, user: UserRow): Actor {
   for (const grant of grants) {
     if (grant.scope_type === "study" && grant.scope_id) {
       permissions.add(`study:${grant.scope_id}:${grant.permission === "approve" ? "write" : grant.permission}` as Permission);
+      if (grant.permission === "write" || grant.permission === "approve") {
+        for (const scopes of Object.values(permissionStudyScopes)) if (!scopes.includes(grant.scope_id)) scopes.push(grant.scope_id);
+      }
     }
     if (grant.scope_type === "private_identity") {
-      permissions.add(grant.permission === "write" ? "identity:write" : "identity:read");
+      const permission = grant.permission === "write" ? "identity:write" : "identity:read";
+      permissions.add(permission);
+      delete permissionStudyScopes[permission];
     }
     if (grant.scope_type === "export") {
-      permissions.add(grant.permission === "approve" ? "export:approve" : "export:create");
+      const permission = grant.permission === "approve" ? "export:approve" : "export:create";
+      permissions.add(permission);
+      delete permissionStudyScopes[permission];
     }
     if (grant.scope_type === "integration") {
       permissions.add("agent:write");
+      delete permissionStudyScopes["agent:write"];
     }
   }
   return {
@@ -346,6 +375,7 @@ export function buildActor(db: Db, user: UserRow): Actor {
     roles: decorated.roles,
     organizationId: user.organization_id,
     permissions: [...permissions].sort(),
+    permissionStudyScopes,
   };
 }
 

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { assertOwned, assertParticipantPermission } from "../../lib/services/ownership.ts";
 import { requireAuth } from "../../lib/services/session.ts";
 import { PERMISSIONS, assertAuthorized } from "../../lib/services/authz.ts";
 import { recordAudit } from "../../lib/services/audit.ts";
@@ -62,7 +63,6 @@ function collectAttributes(formData: FormData): Partial<Record<AttributeField, s
 export async function createParticipantAction(formData: FormData): Promise<ActionResult> {
   const { db, actor } = await requireAuth();
   try {
-    assertAuthorized(actor, PERMISSIONS.participantWrite);
     const pseudonymPrefix = String(formData.get("pseudonymPrefix") ?? "P");
     const sourceTitle = String(formData.get("sourceTitle") ?? "").trim();
     const sourceReference = String(formData.get("sourceReference") ?? "").trim();
@@ -74,6 +74,9 @@ export async function createParticipantAction(formData: FormData): Promise<Actio
     const consentEvidenceNote = String(formData.get("consentEvidenceNote") ?? "").trim();
     const studyIdRaw = String(formData.get("studyId") ?? "");
     const studyId = studyIdRaw.length > 0 ? studyIdRaw : null;
+    if (studyId) assertOwned(db, actor, "study", studyId);
+    assertAuthorized(actor, PERMISSIONS.consentWrite, { studyId });
+    assertAuthorized(actor, PERMISSIONS.participantWrite, { studyId });
     const identityName = String(formData.get("identityName") ?? "").trim();
     const identityEmail = String(formData.get("identityEmail") ?? "").trim();
     const lawfulBasis = String(formData.get("lawfulBasis") ?? "").trim();
@@ -198,7 +201,8 @@ export async function updateAttributesAction(formData: FormData): Promise<Action
   const { db, actor } = await requireAuth();
   try {
     const participantId = String(formData.get("participantId") ?? "");
-    assertAuthorized(actor, PERMISSIONS.participantWrite);
+    assertOwned(db, actor, "participant", participantId);
+    assertParticipantPermission(db, actor, participantId, PERMISSIONS.participantWrite);
     const before = getParticipant(db, participantId);
     if (!before) {
       return { ok: false, message: "Participant not found." };
@@ -235,9 +239,11 @@ export async function recordConsentAction(formData: FormData): Promise<ActionRes
   const { db, actor } = await requireAuth();
   try {
     const participantId = String(formData.get("participantId") ?? "");
-    assertAuthorized(actor, PERMISSIONS.consentWrite);
+    assertOwned(db, actor, "participant", participantId);
     const studyIdRaw = String(formData.get("studyId") ?? "");
     const studyId = studyIdRaw.length > 0 ? studyIdRaw : null;
+    if (studyId) assertOwned(db, actor, "study", studyId);
+    assertAuthorized(actor, PERMISSIONS.consentWrite, { studyId });
     const version = String(formData.get("version") ?? "").trim();
     const status = String(formData.get("status") ?? "granted");
     const basis = String(formData.get("basis") ?? "written_signed");
@@ -300,7 +306,8 @@ export async function upsertIdentityAction(formData: FormData): Promise<ActionRe
   const { db, actor } = await requireAuth();
   try {
     const participantId = String(formData.get("participantId") ?? "");
-    assertAuthorized(actor, PERMISSIONS.identityWrite);
+    assertOwned(db, actor, "participant", participantId);
+    assertParticipantPermission(db, actor, participantId, PERMISSIONS.identityWrite);
     const lawfulBasis = String(formData.get("lawfulBasis") ?? "").trim();
     if (lawfulBasis.length < 4) {
       return { ok: false, message: "A documented lawful basis is required to store identity data." };
@@ -344,7 +351,8 @@ export async function addAnnotationAction(formData: FormData): Promise<ActionRes
   const { db, actor } = await requireAuth();
   try {
     const participantId = String(formData.get("participantId") ?? "");
-    assertAuthorized(actor, PERMISSIONS.assessmentWrite);
+    assertOwned(db, actor, "participant", participantId);
+    assertParticipantPermission(db, actor, participantId, PERMISSIONS.assessmentWrite);
     const body = String(formData.get("body") ?? "").trim();
     if (body.length < 5) {
       return { ok: false, message: "Write the annotation text." };

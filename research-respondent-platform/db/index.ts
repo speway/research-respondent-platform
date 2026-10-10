@@ -173,9 +173,11 @@ export function runMigrations(db: Db, dir: string = MIGRATIONS_DIR): MigrationRe
 
 export function migrationStatus(db: Db, dir: string = MIGRATIONS_DIR) {
   const files = loadMigrationFiles(dir);
-  const rows = db
+  // A status probe must not create migration metadata or fail on a fresh DB.
+  const hasMetadata = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'schema_migration'").get();
+  const rows = (hasMetadata ? db
     .prepare("SELECT id, applied_at, checksum FROM schema_migration ORDER BY id")
-    .all() as Array<{ id: string; applied_at: string; checksum: string }>;
+    .all() : []) as Array<{ id: string; applied_at: string; checksum: string }>;
   const byId = new Map(rows.map((row) => [row.id, row]));
   return files.map((file) => {
     const record = byId.get(file.id);

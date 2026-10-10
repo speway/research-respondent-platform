@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { assertOwned } from "../../lib/services/ownership.ts";
+import { participantConsentDecision } from "../../lib/services/exports-runner.ts";
 import { requireAuth } from "../../lib/services/session.ts";
 import { PERMISSIONS, assertAuthorized } from "../../lib/services/authz.ts";
 import { recordAudit } from "../../lib/services/audit.ts";
@@ -100,6 +102,7 @@ export async function grantCapabilityAction(formData: FormData): Promise<ActionR
   try {
     assertAuthorized(actor, PERMISSIONS.agentWrite);
     const agentId = String(formData.get("agentId") ?? "");
+    assertOwned(db, actor, "agent", agentId);
     const capability = String(formData.get("capability") ?? "");
     const parsed = z
       .enum([
@@ -153,7 +156,9 @@ export async function revokeCapabilityAction(formData: FormData): Promise<Action
   try {
     assertAuthorized(actor, PERMISSIONS.agentWrite);
     const capabilityId = String(formData.get("capabilityId") ?? "");
+    assertOwned(db, actor, "capability", capabilityId);
     const agentId = String(formData.get("agentId") ?? "");
+    assertOwned(db, actor, "agent", agentId);
     const revoked = revokeCapability(db, capabilityId);
     recordAudit(db, {
       organizationId: actor.organizationId,
@@ -177,6 +182,7 @@ export async function toggleAgentAction(formData: FormData): Promise<ActionResul
   try {
     assertAuthorized(actor, PERMISSIONS.agentWrite);
     const agentId = String(formData.get("agentId") ?? "");
+    assertOwned(db, actor, "agent", agentId);
     const active = String(formData.get("active") ?? "false") === "true";
     setAgentActive(db, agentId, active);
     recordAudit(db, {
@@ -200,9 +206,13 @@ export async function createTaskAction(formData: FormData): Promise<ActionResult
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const participantId = String(formData.get("participantId") ?? "");
+    assertOwned(db, actor, "participant", participantId);
     const externalFormVersionId = String(formData.get("externalFormVersionId") ?? "");
+    assertOwned(db, actor, "formVersion", externalFormVersionId);
     const assignedAgentId = String(formData.get("assignedAgentId") ?? "") || null;
+    if (assignedAgentId) assertOwned(db, actor, "agent", assignedAgentId);
     const taskKind = String(formData.get("taskKind") ?? "preflight_mapping");
     assertAuthorized(actor, PERMISSIONS.agentWrite, { studyId });
     const parsedKind = z
@@ -233,7 +243,7 @@ export async function createTaskAction(formData: FormData): Promise<ActionResult
       mappings: mappings.map(toMappingCandidate),
       context,
       consent: {
-        status: consent?.status ?? "none",
+        status: participantConsentDecision(db, participantId, studyId).allowed ? "granted" : "inactive",
         version: consent?.consent_version ?? null,
         withdrawnAt: consent?.withdrawn_at ?? null,
       },

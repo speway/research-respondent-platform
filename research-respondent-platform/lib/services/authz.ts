@@ -142,7 +142,12 @@ export function actorHasPermission(actor: Actor, permission: Permission): boolea
 }
 
 export function authorize(actor: Actor, permission: Permission, subject?: { studyId?: string | null }): AuthorizationDecision {
-  if (!actorHasPermission(actor, permission)) {
+  const studies = actor.permissionStudyScopes?.[permission];
+  if (studies && (!subject?.studyId || !studies.includes(subject.studyId))) {
+    return { allowed: false, reason: `Permission ${permission} requires its assigned study.`,
+      missingPermission: permission, policyCode: "rbac.study_scope" };
+  }
+  if (!actorHasPermission(actor, permission) && !(permission === PERMISSIONS.studyWrite && subject?.studyId && actor.permissions.includes(`study:${subject.studyId}:write`))) {
     return {
       allowed: false,
       reason: `Role set [${actor.roles.join(", ") || "none"}] does not include ${permission}.`,
@@ -202,36 +207,22 @@ export function requireActiveConsent(
   studyId: string | null,
   at: string,
 ): AuthorizationDecision {
-  const relevant = consents.filter((consent) => consent.studyId === studyId || consent.studyId === null);
-  if (relevant.length === 0) {
-    return {
-      allowed: false,
-      reason: studyId
-        ? `No consent record on file for study ${studyId}.`
-        : "No study-level or global consent record on file.",
-      policyCode: "consent.absent",
-    };
+  // Callers provide records newest first. A study-specific decision takes
+  // precedence over blanket consent; an older grant cannot undo a withdrawal.
+  const specific = studyId === null ? [] : consents.filter((consent) => consent.studyId === studyId);
+  const relevant = specific.length > 0 ? specific : consents.filter((consent) => consent.studyId === null);
+  const active = relevant[0];
+  if (!active) {
+    return { allowed: false, reason: "No applicable consent record on file.", policyCode: "consent.absent" };
   }
   const atTime = Date.parse(at);
-  const active = relevant.find((consent) => {
-    if (consent.status !== "granted") {
-      return false;
-    }
-    if (consent.withdrawnAt !== null) {
-      return false;
-    }
-    if (consent.expiresAt !== null && Number.isFinite(Date.parse(consent.expiresAt)) && Date.parse(consent.expiresAt) < atTime) {
-      return false;
-    }
-    return true;
-  });
-  if (!active) {
-    const withdrawn = relevant.find((consent) => consent.status === "withdrawn");
+  const expiry = active.expiresAt === null ? null : Date.parse(active.expiresAt);
+  if (!Number.isFinite(atTime) || (expiry !== null && (!Number.isFinite(expiry) || expiry <= atTime)) ||
+      active.status !== "granted" || active.withdrawnAt !== null) {
+    const withdrawn = active.status === "withdrawn" || active.withdrawnAt !== null;
     return {
       allowed: false,
-      reason: withdrawn
-        ? `Consent version ${withdrawn.version} was withdrawn${withdrawn.withdrawnAt ? ` on ${withdrawn.withdrawnAt}` : ""}.`
-        : `Latest consent status is "${relevant[0]?.status ?? "unknown"}"; only "granted" permits export or submission.`,
+      reason: withdrawn ? `Consent version ${active.version} was withdrawn.` : `Consent version ${active.version} is inactive or expired.`,
       policyCode: withdrawn ? "consent.withdrawn" : "consent.inactive",
     };
   }

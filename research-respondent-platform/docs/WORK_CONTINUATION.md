@@ -1,137 +1,73 @@
-# ChatGPT Work continuation plan
+# ChatGPT Work continuation
 
-## Merged baseline (verified 2026-10-10 UTC)
+## Source of truth and current task
 
-- Main commit: `b9f1da32947c57958dbea52dc03509a1093b015a` (squash merge of PR #1).
-- GitHub Actions on main: https://github.com/speway/research-respondent-platform/actions/runs/38050216368 **SUCCESS**.
-- Last verified main gates: dependencies PASS; native SQLite binding PASS; lint PASS; typecheck PASS; tests **165/165 PASS**; production build PASS; HTTP smoke suite **9/9 PASS**.
-- Issue #2 completed. Continue with https://github.com/speway/research-respondent-platform/issues/3 and then https://github.com/speway/research-respondent-platform/issues/4.
-- No production deployment was performed, and hosted persistent storage remains unresolved. Do not use the current file-backed SQLite architecture for production participant data on Vercel.
+Repository: `speway/research-respondent-platform` (private). App root: `research-respondent-platform/`.
+PR #1 is merged; Issue #2 is closed. Do not repeat the seven historical pipeline fixes.
+Current task branch: `fix/issue-3-security-review`, based on main `dabed376d36080bc31e466f6907c7172faab2e06`.
+Main CI evidence: https://github.com/speway/research-respondent-platform/actions/runs/38050403851 (SUCCESS).
 
+`CHATGPT_HANDOFF.md`, app README status tables and `RESEARCH_INTEGRITY.md` contain dated pre-GitHub observations. They are historical evidence, not the current repository/deployment state. Append corrections to the historical activity log; do not remove old entries.
 
-> **Current operational handoff (2026-10-10).** This file supersedes stale repository/deployment status inside `docs/CHATGPT_HANDOFF.md`. No unexecuted test or release is described as successful.
+## Verified batch: fresh database status (2026-10-10 UTC)
 
-## Current verified acceptance result (2026-10-10 UTC)
+Checked source commit: `c693186e39145cdc2b9b42ff374225db7885a241` (official GitHub commit on the task branch).
+Files: `db/index.ts`, `tests/integration/migrations.test.ts`.
+`migrationStatus()` reports all migrations pending on an unmigrated DB without creating schema metadata.
+Existing migration SQL and checksums are unchanged. Repository files were fetched using the official GitHub connection and verified byte-for-byte against their Git blob SHA before edits.
 
-- **Validated source commit:** `146991f741f92d552f1d53b8d988af9cf42e2eea`
-- **GitHub Actions evidence:** https://github.com/speway/research-respondent-platform/actions/runs/38050032327
-- `pnpm install --frozen-lockfile`: PASS
-- Native `better-sqlite3` check: PASS
-- `pnpm run lint`: PASS
-- `pnpm run typecheck`: PASS
-- `pnpm test`: **165/165 PASS**
-- `pnpm run build`: PASS
-- `pnpm run test:http`: **9/9 PASS** (authenticated production app on temporary DB)
-- Status: all automated CI gates satisfied **for the tested commit**. This is not equivalent to a production security review.
-- Issue #2 (pipeline integration failures): **closed, merged and verified on main**. Next focus: Issue #3 (migration status, authorization review), then Issue #4 (persistent production database and Vercel preview).
-- No deployment, user-data import or external Google Forms submissions were performed.
-- Recent fixes: persisted agent task ID now matches the validated task-contract ID; derived-score cohort SQL joins the assessment session; identity lawful-basis validation rejects whitespace; tests distinguish missing mapped values from unmapped fields; remaining test expectations now match actual persisted IDs and absence of external receipts; `/audit` and `/settings` are authenticated read-only operational pages.
-- Keep `main` and private research data protected. Before real participant data is used, perform a security review and implement durable storage / backup.
+Local runtime: Node 24.19.0; pnpm 11.25.0 (CI remains Node 24 / pnpm 11.7.0).
+The first native SQLite install failed because the restricted environment could not retrieve Node headers; installation succeeded with matching 24.19.0 headers from the Node binary npm package, without repository or lockfile changes.
 
-## Tracked GitHub issues
+| Command | Actual result |
+| --- | --- |
+| `pnpm install --frozen-lockfile` with local matching Node headers | exit 0 |
+| `pnpm run lint` | exit 0 |
+| `pnpm run typecheck` | exit 0 |
+| `pnpm test` | exit 0; 166/166 pass, 0 skipped (165 original + 1 regression) |
+| `pnpm run build` | exit 0; 19 app routes including audit/settings |
+| `pnpm run test:http` | exit 0; 9/9 pass, 0 skipped; production server on a disposable DB |
+| `DATABASE_FILE=<fresh temporary path> pnpm run db:status` | exit 0; 4 pending, 0 drift |
 
-- **P0:** https://github.com/speway/research-respondent-platform/issues/2 — restore seven failing pipeline integration tests.
-- **P1:** https://github.com/speway/research-respondent-platform/issues/3 — migration status regression, missing UI routes, authorization checks.
-- **P2:** https://github.com/speway/research-respondent-platform/issues/4 — durable database and safe Vercel preview.
+No actual participant records, credentials, local databases or exports were committed. No external forms were submitted. No deployment was performed in this batch.
 
-Issue #2 is closed as completed. The cleanup PR https://github.com/speway/research-respondent-platform/pull/1 was merged into main as commit `b9f1da32947c57958dbea52dc03509a1093b015a`. Next start with Issue #3.
+## Verified security batch: Issue #3 (2026-10-10 UTC)
 
-## Latest verified GitHub Actions result (2026-10-10 UTC)
+Checked source commit: `06c608321c4a9f6c4cc557a213fdca3fb2f627f5` on `fix/issue-3-security-review`.
+Modified: `app/actions/{agents,audit,cohorts,forms,import,library,participants,studies}.ts`, `app/api/health/route.ts`, `lib/domain/types.ts`, `lib/repo/{org,participants}.ts`, `lib/services/{authz,cohorts,exports-runner,orchestration,ownership,preflight-context}.ts`, `tests/integration/security.test.ts`, `tests/http/smoke.test.ts`.
 
-- CI run: https://github.com/speway/research-respondent-platform/actions/runs/38049379130
-- Source commit tested: `87792568eb49f117b6501d87cf7fb95add3d1224`
-- `pnpm install --frozen-lockfile` **PASS**; native `better-sqlite3` load **PASS**.
-- `pnpm run lint` **PASS** (after correcting 8 ESLint errors on this branch).
-- `pnpm run typecheck` **PASS** (after correcting 2 integration-test typing errors).
-- `pnpm test` **FAIL**: 165 tests, **158 pass and 7 fail**, all seven in `tests/integration/pipeline.test.ts`.
-- Production build and HTTP smoke test: **NOT RUN** (skipped because integration tests failed).
-- Failing cases and reported symptoms:
-  1. Study/protocol/criterion creation: unexpected strict equality assertion.
-  2. Private identity lawful basis: SQLite trigger rejects the write (must preserve the consent/legal-basis invariant).
-  3. Cohort with consent: SQL error `no such column: ds.instrument_version_id`.
-  4. Form preflight with missing source: strict equality assertion mismatch.
-  5. Orchestration blocked external submission: expected block outcome differs (`failed` observed).
-  6. Agent authorization: test asserts agentWrite is not study-scoped; authorization rejects it.
-  7. Append-only answer/audit event: assertion failed.
-- **Next concrete action:** reproduce failures one at a time. Compare test expectations with the protocol, schema and authorization invariants. Repair incorrect SQL and test fixtures as needed; do **not** weaken identity, consent, provenance or submission restrictions to make a test pass. Then rerun all acceptance gates.
+- Consent gates now filter actual export rows per participant/study; withdrawal cannot fall back to an older grant or blanket consent. Invalid/equal expiry dates fail closed. Withdrawal returns its persisted record ID for audit.
+- Shared provenance sources without participant-linked sessions are omitted conservatively; sources shared across studies are omitted from study-specific exports. Raw source metadata/free-text are not guaranteed anonymous; review content before sharing.
+- Latest-session mapping keeps every item, scopes answers/scores to the requested study and avoids mixing scores from an older selected session.
+- Fixed-query ownership guards protect supplied study/participant/form/library/cohort/agent/export IDs. Task mutations check organization ownership. Study roles no longer grant global study administration; consequential permissions retain their assigned study scope. Participant-wide edits require a grant in an enrolled study.
+- Snapshot creation requires write permission. Export approval/read actions check ownership and permissions. JSONL is serialized as one object per line.
+- Session expiry is validated; health errors no longer echo DB paths/errors. Cookie flags and tampered-session denial are checked over HTTP.
+- Audit/settings routes already existed and rendered successfully; they were not recreated. Audit exports UI remains a read-only monitor; export actions not wired to that page are tested through services, not misreported as a live UI flow.
 
-## Verified source-control baseline
+| Command on this source | Actual result |
+| --- | --- |
+| `pnpm run lint` | exit 0 |
+| `pnpm run typecheck` | exit 0 |
+| `pnpm test` | exit 0; 173/173, 0 skipped |
+| `pnpm run build` | exit 0; 19 routes |
+| `pnpm run test:http` | exit 0; 11/11, 0 skipped |
 
-- GitHub repository: `speway/research-respondent-platform` (private as inspected on 2026-10-10).
-- Default branch: `main`; initial code snapshot inspected at commit `127fa2540752d80d25b062dfb6ed32929c3debe1`.
-- Project is inside `research-respondent-platform/`, **not** the GitHub repository root. Deliberately keep that app layout for now. Vercel root directory must point to the nested app if preview deployment is attempted.
-- Baseline has 105 tracked files, Next.js 16 / React 19 / TypeScript, pnpm 11, native `better-sqlite3`, migrations, UI routes, domain engines, agent orchestration and tests. These are code-presence observations, not proof that every feature works.
-- Original CI path was nested under `research-respondent-platform/.github/workflows/ci.yml` and therefore was not a working GitHub workflow at repository root. The repository-cleanup PR moves the workflow to `.github/workflows/ci.yml` and gives its commands the correct working directory.
-- The `pnpm-workspace.yaml` baseline contained the placeholder value `allowBuilds.better-sqlite3 = "set this to true or false"`; this PR replaces it with explicit boolean policy and removes the unsupported pnpm 11 `onlyBuiltDependencies` key.
-- The earlier handoff was created in a local workspace **before GitHub initialization**. Its claims about missing git, workflow, pages and 3 migrations are historical, not necessarily true of this current commit. The repository currently contains 4 migration files and an `/agents` page.
+The HTTP suite now sends real multipart server-action requests. A foreign administrator's study update is denied without changing the record; identical arguments succeed for the owning administrator. An initial attempt to test export actions over HTTP failed because those actions are not registered in the current read-only audit page; the corrected test exercises the live study action. The first new security-fixture run failed from incomplete fixture attributes, then passed after fixing the fixture. No failed runs are claimed as successful.
 
-## What changed in repository-cleanup PR
+Organization-scoped list/read pages remain the existing organization-sharing model; this batch does not claim per-study isolation for every aggregate read. Real-data deployment still requires the persistence and security review in Issue #4.
 
-- New root `README.md`: navigable index, correct setup commands and deployment boundary.
-- New root `AGENTS.md`: durable cross-agent operating instructions.
-- New root `.gitignore`: excludes node modules, build output, local SQLite/exports, secrets and credentials.
-- Relocated GitHub Actions workflow to repository root, adjusted pnpm lockfile cache key and command working directories.
-- Updated `pnpm-workspace.yaml` for pnpm 11 build-script allowlist.
-- Removed abandoned `scratch-sqlite-test/` dependency probe and empty `.Rhistory`.
-- Added this document for Work and future AI agents.
-- Did **not** relocate `app/`, `db/`, `lib/`, or rewrite the existing historical handoff; no silent mass refactors.
+## Issue #4 boundary
 
-## Priority queue (one completed task per iteration)
+Persistent storage on Vercel is unresolved. Current `better-sqlite3` file data is appropriate only on persistent infrastructure, not ordinary Vercel functions. Do not label an ephemeral preview DB durable.
+Vercel project `research-respondent-platform` / `prj_QImIDlAL2gWdBGOVUayiUjVkeO2r` was created in team `team_ztfiT5yPQ2DPmzYfb4ZWyp6W`, with Next.js, Node 24, app root and SSO protection for all deployments. No deployment yet. Listing storage integrations returned HTTP 403 (forbidden); no authenticated Vercel CLI is installed. Do not assume a persistent resource exists.
+Only prepare a preview without real research data; require human review of Issue #3 and a documented persistent store/recovery plan before production. Use official connected service authorization; never ask for tokens in chat. Do not change billing, deploy production or submit forms without explicit authorization.
 
-### P0: Verify CI end-to-end
+## Next three tasks
 
-1. Check out this PR branch locally or in ChatGPT Work.
-2. Execute `pnpm install --frozen-lockfile` from the nested application directory.
-3. Run `pnpm run lint`, `pnpm run typecheck`, `pnpm test`, `pnpm run build`, `pnpm run test:http`.
-4. Record failure output and fix root causes, **not** blanket-disable tests or lint rules.
-5. Check GitHub Actions for this PR; only merge after reviewing CI. The PR's existence and correct workflow path do not guarantee green checks.
+1. Review/merge the Issue #3 PR after its GitHub CI passes.
+2. Stage a fail-closed, read-only Vercel Preview with no participant records; verify its real URL.
+3. Continue Issue #4: persistence/recovery plan and safe Vercel Preview; record verified URLs and precise remaining blockers. Keep production disabled.
 
-### P1: Repair verified and likely functional blockers
+## Working rules
 
-1. Reproduce `db:status` on an absent/new SQLite database: previous DeepSeek logs reported a `no such table: schema_migration` failure. Add a regression test and make missing migration metadata report migrations as pending.
-2. Re-run the integration pipeline and HTTP smoke tests: historical snapshot showed failures during concurrent agent editing. Revalidate them on the current **stable** code before trusting old error counts.
-3. Compare `components/site-nav.tsx` destinations to actual `app/**/page.tsx` routes. Current tree has `app/agents/page.tsx` but no `app/audit/page.tsx` or `app/settings/page.tsx`. Either implement the pages fully or remove disabled links until ready.
-4. Check all server-action authorization boundaries, session-cookie handling, input validation, per-study scope, personal-data exposure, and export permissions. Add focused tests.
-
-### P2: Product data integrity and observability
-
-- Verify consent, participant identity separation, immutable observed answers and audit event logging at database AND action boundaries.
-- Confirm that psychometric item wording, scoring keys and interpretation thresholds are versioned and legally/licensably sourced; do not infer psychometric validity from code unit tests alone.
-- Confirm imports reject missing provenance and unsupported free-text outcomes rather than silently filling them.
-- Add reliable run-level summaries and exportable structured audit results, including failure causes, idempotency and explicit human approvals.
-- Integrate external form structure/response reads only through authorized provider APIs; keep submission blocked unless an independently verified official provider capability and participant authorization exist.
-
-### P3: Production architecture and deployment
-
-1. Before hosting real data, select a persistent managed database (e.g., hosted PostgreSQL) or suitable persistent infrastructure; current `better-sqlite3` file database is for local development, not durable Vercel serverless storage.
-2. Plan SQL migrations, backup/restore, retention/deletion, data minimization, security review, role enforcement and encryption/secret management.
-3. Connect GitHub and Vercel using the **user's official permission/authorization flow**, never collect personal access tokens in chat.
-4. Create a preview environment with Vercel Root Directory = `research-respondent-platform`. Verify actual deployment URL, health endpoint, sign-in and smoke tests; don't label preview production.
-5. Ask for explicit owner approval before deploying with real participants, enabling any external submission, changing billing or exposing a public site.
-
-## The Work workflow
-
-Start ChatGPT **Work mode** with the instruction below; connect the GitHub app already linked where authorized and connect Vercel through its official connection if needed.
-
-```text
-Continue development of GitHub repository speway/research-respondent-platform.
-First read AGENTS.md, README.md, research-respondent-platform/docs/WORK_CONTINUATION.md, and docs/CHATGPT_HANDOFF.md inside the app. Inspect current main, open PRs, and recent commits. The historical DeepSeek handoff predates GitHub and is NOT the source of truth for repo status.
-Do not rebuild from zero or repeat completed work. Take the highest-priority unresolved item in WORK_CONTINUATION.md, implement a narrowly scoped code fix on a new branch, execute real lint/typecheck/unit/integration/build/HTTP checks, document observed results and remaining failures, and open a PR. Update WORK_CONTINUATION.md with the commit and next three tasks. Work iteratively until the acceptance checks are green.
-Use one primary coding agent by default; spawn more only for independent modules with defined budgets. Never share or log secrets. Keep participant responses empirical, documented and consented; never substitute generated data for actual participants.
-Do not deploy to Vercel production or incur costs without explicit user approval. Once local and CI gates pass, ask for official Vercel connection and propose a preview deployment with a persistent database plan.
-```
-
-## Hand-off checklist after each Work batch
-
-- Current branch / exact commit and PR URL.
-- Modified and removed file paths; rationale.
-- Commands executed and real pass/fail counts with error excerpts.
-- Database migration state including source of truth.
-- Security or privacy issues found, with severity and mitigation.
-- Preview URL and logs **only if deployed and verified**.
-- Top three next tasks, blockers, and required human decisions.
-- Updated `docs/WORK_CONTINUATION.md` committed with changes.
-
-## Budget control
-
-Avoid speculative parallel teams. Separate each task into a bounded patch and acceptance criteria. Reuse existing functions and tests. Avoid repeatedly pasting the entire codebase into agent context. Stop and report a clear blocker when authorization or an external resource is actually required.
+Use one main agent. Work in bounded patches: inspect → patch → tests → documentation → commit → PR. Keep applied migrations immutable. Do not force push or write directly to main. No real responses may be replaced or filled with generated values. Every pass claim must name its tested source commit and actual command result.

@@ -22,6 +22,7 @@ import {
 } from "../repo/cohorts.ts";
 import { listCriteria } from "../repo/studies.ts";
 import { recordAudit } from "./audit.ts";
+import { assertOwned } from "./ownership.ts";
 import { assertAuthorized, PERMISSIONS } from "./authz.ts";
 
 export interface CohortRuleBundle {
@@ -58,9 +59,10 @@ export function segmentRuleBundle(db: Db, segmentId: string): CohortRuleBundle {
 export function getStudyCohortPreview(
   db: Db,
   studyId: string,
-  _actor?: Actor,
+  actor?: Actor,
   options: { includeRules?: CohortRule[] } = {},
 ): CohortPreview {
+  if (actor) { assertOwned(db, actor, "study", studyId); assertAuthorized(actor, PERMISSIONS.cohortRead, { studyId }); }
   const bundle = studyRuleBundle(db, studyId);
   const rules = options.includeRules ? [...options.includeRules, ...bundle.rules] : bundle.rules;
   const facts = loadParticipantFacts(db, studyOrganizationId(db, studyId), studyId);
@@ -95,6 +97,7 @@ export function createStudySegment(
     rules: Array<{ kind: "include" | "exclude"; rule: CohortRule; label: string }>;
   },
 ): SegmentRow {
+  assertOwned(db, actor, "study", input.studyId);
   assertAuthorized(actor, PERMISSIONS.cohortWrite, { studyId: input.studyId });
   const organizationId = studyOrganizationId(db, input.studyId);
   const segment = createSegment(db, {
@@ -128,6 +131,7 @@ export function updateSegmentRules(
   if (!segment) {
     throw new Error(`Segment ${segmentId} not found.`);
   }
+  assertOwned(db, actor, "segment", segmentId);
   assertAuthorized(actor, PERMISSIONS.cohortWrite, { studyId: segment.study_id });
   replaceSegmentRules(db, segmentId, rules);
   recordAudit(db, {
@@ -147,7 +151,8 @@ export function snapshotSegment(db: Db, actor: Actor, segmentId: string) {
   if (!segment) {
     throw new Error(`Segment ${segmentId} not found.`);
   }
-  assertAuthorized(actor, PERMISSIONS.cohortRead, { studyId: segment.study_id });
+  assertOwned(db, actor, "segment", segmentId);
+  assertAuthorized(actor, PERMISSIONS.cohortWrite, { studyId: segment.study_id });
   const bundle = segmentRuleBundle(db, segmentId);
   const facts = loadParticipantFacts(db, segment.organization_id, segment.study_id);
   const preview = evaluateCohort(bundle.rules, facts);
