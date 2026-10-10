@@ -1,8 +1,8 @@
 # Agent automation — browser protocol v1
 
-An operator hands an authorized browser agent the workbench URL, actual source file, destination form URL and purpose. The agent can perform preparation without navigating the workbench controls: load → visible form read → automatic mapping → validation → action plan. The supplied adapter can additionally fill and verify text and single-choice sections and, within an explicit grant, submit one response and record the visible confirmation.
+An operator hands an authorized browser agent the workbench URL, actual source file, destination form URL and purpose. The agent can perform preparation without navigating the workbench controls: load → visible form read → automatic mapping → validation → action plan. The supplied adapter can additionally fill and verify text, numbers, finite choices, checkbox sets, dropdowns and labeled matrix rows and, within an explicit grant, submit one response and record the visible confirmation.
 
-This is a working external-browser adapter, not a continuously running AI service in Vercel Preview. No model provider, worker deployment, durable multi-user database or official Google browser session is provisioned by this change. A live Google Form has not been independently tested. The automated browser evidence uses an explicitly isolated two-section UI fixture.
+This is a working external-browser adapter, not a continuously running AI service in Vercel Preview. No model provider, worker deployment, durable multi-user database or official Google browser session is provisioned by this change. A live UI audit reached the introduction and first six questions of the supplied Google Form without entering answers; complete live filling/submission remains unverified. See CLOUD_AGENT.md for the bounded, not-yet-provisioned cloud reader. The automated browser evidence uses an explicitly isolated two-section UI fixture.
 
 ## Discovery and commands
 
@@ -54,11 +54,11 @@ const result = await runFormTask({
 });
 ```
 
-With no grant this reads the first visible section and prepares its plan without writing form answers. `plan.respondents` lets the agent inspect the explicitly selected IDs. An explicit participant must belong to the source selection; the adapter never silently chooses the first person. Agents using other browser tools may use the same protocol and plan with the `fill-google-forms` skill instead of Playwright, while preserving its checks.
+With no grant this traverses information-only introductory pages and reads the first question section and prepares its plan without writing form answers. `plan.respondents` lets the agent inspect the explicitly selected IDs. An explicit participant must belong to the source selection; the adapter never silently chooses the first person. Agents using other browser tools may use the same protocol and plan with the `fill-google-forms` skill instead of Playwright, while preserving its checks.
 
 For authorized filling, pass a grant with exact `formUrl`, `participantRef`, `sourceSha256`, non-empty `evidenceReference`, future ISO `expiresAt`, `mayFill:true`, boolean `maySubmit` and `maxSubmissions:1`. Permission for a source file alone does not grant permission to transfer sensitive answers to any recipient. The grant is a declared scoped authorization and must be derived from the operator's actual instruction/consent evidence. Its hash identifies a file, not proof of participants or consent. No repeated operator approval is needed within an already granted scope.
 
-The adapter reads each section, prepares/checks a plan, fills through semantic controls, verifies every value and clicks Next once. It stops on an unchanged section or validation failure instead of repeating blind clicks. Default supported controls: one text/paragraph input per question and single-choice radios. Matrices, checkbox sets, dropdowns, Other-text, dates, uploads, custom validation and unfamiliar layouts require the full skill reader/executor; this adapter stops on them. The domain plan can describe numbers/dropdowns supplied by a more capable reader, but this does not mean the bundled reader supports them. Maximum 100 sections per run.
+The adapter reads each section, prepares/checks a plan, fills through semantic controls, verifies every value and clicks Next once. It stops on an unchanged section or validation failure instead of repeating blind clicks. Supported controls: one text/paragraph or native number input per question, exact radio choices, checkbox sets, native select and accessible listbox/combobox options, matrices partitioned by explicit radiogroup or table-row boundaries and unique row labels. Each matrix row is its own source-backed question labeled `section / matrix title / row`. Multi-select cells are nonempty JSON-array strings of unique exact labels (for example `["A, B","C"]`), never comma-split. Known finite radios alongside an unlabelled Other input are supported; actual Other text is not inferred or filled. Dates, file uploads, unlabelled/mixed matrix layouts, one-per-column restrictions, custom validation and unfamiliar controls are not promised. Native visible min/max are checked; hidden validation rules are not inferred. Maximum 100 sections per run including intro pages.
 
 With `maySubmit:false`, the final result is `filled_not_submitted`. A future batch agent may queue individually granted participant tasks; this change does not provide a hosted batch queue, cross-worker lease service or guaranteed percentage of arbitrary forms.
 
@@ -73,3 +73,30 @@ The key hashes recipient URL, participant reference and source hash. The receipt
 The actual Chromium scripts cover the original workbench and the complete agent path against an intercepted, isolated UI fixture: source load/hash → read → map → check → two-section fill/verify → confirmation/receipt. Also covered: no-write default, expired/foreign grant denial, stale/concurrent commands, malformed input preserving state, missing answers, uncertain result and repeat-submit denial, mobile layout, no workbench POSTs and unchanged research tables. Fixture confirmation is not proof of a live Google Forms submission.
 
 GitHub CI runs both scripts after locked install, lint, typecheck, unit/integration, build and HTTP checks. Playwright 1.62.1 and Chromium are installed only as isolated CI tooling; application dependencies/lockfile are unchanged. `PLAYWRIGHT_MODULE` and optional `BROWSER_EXECUTABLE_PATH` permit an existing local runtime. See `BROWSER_WORKBENCH.md` for execution prerequisites and `WORK_CONTINUATION.md` for actual checked SHAs, counts, CI and deployment evidence.
+
+## New form using the configured source — 2026-10-10 UTC
+
+After a valid source/ID/purpose/criteria context is loaded, send only
+`{command:"target", expectedRevision, formUrl}`. It retains source values, hash
+and criteria but clears old mappings and observations, including for the same
+URL. It cannot load a missing source, authorize a new recipient or preserve an
+old map. The Automation tab exposes the same action through a URL input.
+
+The external executor accepts `runFormTask({workbenchPage, formPage, formUrl,
+participantRef, grant})` without `task` to reuse that context. Supply either a task
+or a new URL, never both. Selection of one explicitly authorized participant and
+any needed recipient grant remain the caller's responsibility. A restored project
+is usable context only after configuring its ID/source/purpose and reading the
+current form. No server database is searched from a browser-only panel.
+
+`auditFirstSection({formPage,formUrl})` reads without any participant source:
+information pages are navigated once, questions are observed, no answers are
+written. Unknown controls cannot be skipped as an intro. Empty final forms,
+repeated pages and navigation validation stop. Matrices and dropdown support is
+verified by isolated Chromium fixtures; their use on the owner's live form was
+not tested because required factual answers were unavailable for later sections.
+
+The same-tab JavaScript transport still requires an executor able to invoke the
+bridge. Agents limited to read-only DOM evaluation cannot use it to mutate the
+panel; use accessible controls/file upload or an authorized Playwright-compatible
+executor. No unsupported WebMCP availability is asserted.

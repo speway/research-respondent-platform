@@ -43,3 +43,7 @@ If Playwright is already available by ordinary module resolution, omit `PLAYWRIG
 Verified runtime: Node 24.19.0, pnpm 11.25.0, Playwright 1.62.1, Chromium 153.0.8010.0. The restricted container required browser archives extracted without ownership changes; no browser binary or installation artifact is committed. Browser test covers file import, exact source hash, filtering, missing-answer denial, mapping, packet download, project restore, origin rejection, dictionary labels, 390px mobile overflow, absence of page errors/POST requests and unchanged research tables.
 
 Follow `WORK_CONTINUATION.md` for source SHA, CI and deployment evidence. Durable multi-user hosting and live submission are still separate incomplete work; do not close Issue #4 on this first-trial panel alone.
+
+## 2026-10-10: link reuse and expanded controls
+
+Automation now accepts a new Google Forms link while retaining the loaded source and criteria. The agent discards the old observation and reads every new section. Labeled radio/checkbox matrices, finite multiple selection, native/custom accessible dropdowns and numbers are supported in the portable browser adapter and verified on isolated actual-Chromium fixtures. Multi-select cells require explicit JSON-array strings of exact labels. A read-only live audit inspected the first question section; complete live submission and the hosted background worker remain unverified. The bounded cloud audit adapter is prepared in `CLOUD_AGENT.md`, with no anonymous billable endpoint or automatically provisioned resources.

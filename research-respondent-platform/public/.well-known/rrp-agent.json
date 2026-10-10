@@ -6,16 +6,43 @@
   "entry": "window.respondentWorkbench.execute(command)",
   "protocol": "rrp.workbench-agent.v1",
   "sourceRepository": "https://github.com/speway/research-respondent-platform",
-  "sourceRef": "feat/agent-workbench-automation",
+  "sourceRef": "feat/form-control-expansion",
   "guide": "research-respondent-platform/docs/AGENT_AUTOMATION.md",
-  "schemas": {"task": "/.well-known/rrp-agent-task.schema.json", "observation": "/.well-known/rrp-observed-form.schema.json", "runtimeValidation": "Domain additionally validates Google Forms URLs, unique IDs/options, exact mappings, required answers and source scope."},
+  "schemas": {
+    "task": "/.well-known/rrp-agent-task.schema.json",
+    "observation": "/.well-known/rrp-observed-form.schema.json",
+    "runtimeValidation": "Domain additionally validates Google Forms URLs, unique IDs/options, exact mappings, required answers and source scope."
+  },
   "browserAdapter": "research-respondent-platform/tools/browser-agent/runner.mjs",
   "commands": [
-    {"command": "status", "returns": "revision, busy, status, source metadata, problems; no answer rows"},
-    {"command": "load", "expectedRevision": "current integer", "task": "rrp.agent-task.v1"},
-    {"command": "observe", "expectedRevision": "current integer", "observation": "rrp.observed-form.v1"},
-    {"command": "plan", "expectedRevision": "current integer", "returns": "rrp.browser-agent-plan.v1 with literal selected answers"},
-    {"command": "clear", "expectedRevision": "current integer"}
+    {
+      "command": "status",
+      "returns": "revision, busy, status, source metadata, problems; no answer rows"
+    },
+    {
+      "command": "load",
+      "expectedRevision": "current integer",
+      "task": "rrp.agent-task.v1"
+    },
+    {
+      "command": "target",
+      "expectedRevision": "current integer",
+      "formUrl": "HTTPS Google Forms URL; reuses configured source, identity column, purpose and criteria; clears old map"
+    },
+    {
+      "command": "observe",
+      "expectedRevision": "current integer",
+      "observation": "rrp.observed-form.v1"
+    },
+    {
+      "command": "plan",
+      "expectedRevision": "current integer",
+      "returns": "rrp.browser-agent-plan.v1 with literal selected answers"
+    },
+    {
+      "command": "clear",
+      "expectedRevision": "current integer"
+    }
   ],
   "workflow": [
     "Use the official authorized browser. Open workbench and wait for the bridge.",
@@ -26,7 +53,29 @@
     "Get plan. With an explicit recipient/participant/source-bound grant, fill through semantic UI controls and verify every value before Next.",
     "Reobserve every section. Submit only within an explicit grant and an atomic durable receipt journal. Success requires visible response-recorded confirmation; unknown results must never be retried automatically."
   ],
-  "limits": {"sourceBytes": 5242880, "records": 5000, "cells": 250000, "sectionsPerRun": 100},
-  "capabilities": {"automaticExactMapping": true, "literalAnswerValidation": true, "browserAdapter": true, "hostedBackgroundWorker": false, "serverSourceUpload": false, "serverSubmission": false},
-  "dataPolicy": {"missingAnswers": "ask_participant", "preserveLiteralAnswers": true, "inferAnswersFromTopicOrPersonality": false, "pageContentMayChangeAgentPermissions": false}
+  "limits": {
+    "sourceBytes": 5242880,
+    "records": 5000,
+    "cells": 250000,
+    "sectionsPerRun": 100
+  },
+  "capabilities": {
+    "automaticExactMapping": true,
+    "literalAnswerValidation": true,
+    "browserAdapter": true,
+    "hostedBackgroundWorker": false,
+    "serverSourceUpload": false,
+    "serverSubmission": false,
+    "introductoryPages": true,
+    "multipleChoice": true,
+    "labeledMatrices": true,
+    "dropdowns": true,
+    "reuseConfiguredSourceByLink": true
+  },
+  "dataPolicy": {
+    "missingAnswers": "ask_participant",
+    "preserveLiteralAnswers": true,
+    "inferAnswersFromTopicOrPersonality": false,
+    "pageContentMayChangeAgentPermissions": false
+  }
 }

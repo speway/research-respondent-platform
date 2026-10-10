@@ -1,13 +1,14 @@
 "use client";
 import { useCallback, useEffect, useRef, useState, type SetStateAction } from "react";
 import { z } from "zod";
-import { agentProblems, applyObservation, buildAgentPlan, workspaceFromTask, type FormObservation } from "../lib/domain/agent-workbench.ts";
+import { agentProblems, applyObservation, buildAgentPlan, workspaceForTarget, workspaceFromTask, type FormObservation } from "../lib/domain/agent-workbench.ts";
 import { emptyWorkspace, selectedRows, type Workspace } from "../lib/domain/workbench.ts";
 
 const revision = z.number().int().nonnegative();
 const commandSchema = z.discriminatedUnion("command", [
   z.object({ command: z.literal("status") }).strict(),
   z.object({ command: z.literal("load"), expectedRevision: revision, task: z.unknown() }).strict(),
+  z.object({ command: z.literal("target"), expectedRevision: revision, formUrl: z.string() }).strict(),
   z.object({ command: z.literal("observe"), expectedRevision: revision, observation: z.unknown() }).strict(),
   z.object({ command: z.literal("plan"), expectedRevision: revision }).strict(),
   z.object({ command: z.literal("clear"), expectedRevision: revision }).strict(),
@@ -51,6 +52,8 @@ export function useAgentWorkbench() {
         const workspace = await workspaceFromTask(command.task);
         if (startedRevision !== current.current.revision) throw new Error("Панель изменена во время загрузки. Команда отменена.");
         commit(workspace, null, "load");
+      } else if (command.command === "target") {
+        commit(workspaceForTarget(current.current.workspace, command.formUrl), null, "target");
       } else if (command.command === "observe") {
         const next = applyObservation(current.current.workspace, command.observation);
         commit(next.workspace, next.observation, "observe");
