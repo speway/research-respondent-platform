@@ -22,7 +22,7 @@ export const observationSchema = z.object({
 });
 export type FormObservation = z.infer<typeof observationSchema>;
 export type ObservedQuestion = FormObservation["questions"][number];
-const taskSchema = z.object({
+export const taskSchema = z.object({
   schema: z.literal("rrp.agent-task.v1"), source: z.object({ name: label, text: z.string() }).strict(),
   reference: label, purpose: label, formUrl, idHeader: label.optional(),
   match: z.enum(["all", "any"]).default("all"),

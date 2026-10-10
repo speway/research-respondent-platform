@@ -1,6 +1,8 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
-import { agentProblems, applyObservation, automaticMappings, buildAgentPlan, observationSchema, workspaceFromTask, type AgentTask, type FormObservation } from "../../lib/domain/agent-workbench.ts";
+import { readFile } from "node:fs/promises";
+import { z } from "zod";
+import { agentProblems, applyObservation, automaticMappings, buildAgentPlan, observationSchema, taskSchema, workspaceFromTask, type AgentTask, type FormObservation } from "../../lib/domain/agent-workbench.ts";
 
 const url = "https://docs.google.com/forms/d/e/fixture/viewform";
 function task(text = 'participant_id,Блок / Возраст,Блок / Выбор\nfixture-1,22,Да\n'): AgentTask {
@@ -77,4 +79,11 @@ test("observation schemas refuse duplicate IDs/options and unrecognized instruct
   assert.throws(() => observationSchema.parse({ ...o, questions: [o.questions[0], o.questions[0]] }));
   assert.throws(() => observationSchema.parse({ ...o, questions: [{ ...o.questions[1], options: ["Да", "Да"] }] }));
   assert.throws(() => observationSchema.parse({ ...o, method: "hidden_payload" }));
+});
+test("published agent input schemas match the runtime contract", async () => {
+  for (const [name, schema] of [["rrp-agent-task", taskSchema], ["rrp-observed-form", observationSchema]] as const) {
+    const published = JSON.parse(await readFile(new URL(`../../public/.well-known/${name}.schema.json`, import.meta.url), "utf8"));
+    assert.deepEqual(published, z.toJSONSchema(schema, { io: "input" }));
+    assert.equal(published.additionalProperties, false);
+  }
 });

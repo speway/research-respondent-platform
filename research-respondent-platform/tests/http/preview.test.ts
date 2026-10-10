@@ -57,6 +57,11 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     assert.equal(manifest.capabilities.serverSourceUpload, false);
     assert.equal(response.body.includes("preview@example.test"), false);
     assert.equal("source" in manifest, false);
+    for (const name of ["task", "observation"]) {
+      const schema = await httpGet(server.baseUrl, manifest.schemas[name]);
+      assert.equal(schema.status, 200);
+      assert.equal(JSON.parse(schema.body).additionalProperties, false);
+    }
   });
 
   it("a real create-study POST remains refused even with a valid file-database cookie", async () => {

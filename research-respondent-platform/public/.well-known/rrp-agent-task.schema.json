@@ -1,0 +1,102 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "rrp.agent-task.v1"
+    },
+    "source": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 20000
+        },
+        "text": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "text"
+      ],
+      "additionalProperties": false
+    },
+    "reference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "formUrl": {
+      "type": "string"
+    },
+    "idHeader": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 20000
+    },
+    "match": {
+      "default": "all",
+      "type": "string",
+      "enum": [
+        "all",
+        "any"
+      ]
+    },
+    "criteria": {
+      "default": [],
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "header": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 20000
+          },
+          "op": {
+            "type": "string",
+            "enum": [
+              "eq",
+              "ne",
+              "contains",
+              "gte",
+              "lte",
+              "present",
+              "missing"
+            ]
+          },
+          "value": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "header",
+          "op",
+          "value",
+          "label"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "source",
+    "reference",
+    "purpose",
+    "formUrl"
+  ],
+  "additionalProperties": false
+}

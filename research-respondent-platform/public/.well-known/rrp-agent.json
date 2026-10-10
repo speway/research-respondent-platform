@@ -6,7 +6,9 @@
   "entry": "window.respondentWorkbench.execute(command)",
   "protocol": "rrp.workbench-agent.v1",
   "sourceRepository": "https://github.com/speway/research-respondent-platform",
+  "sourceRef": "feat/agent-workbench-automation",
   "guide": "research-respondent-platform/docs/AGENT_AUTOMATION.md",
+  "schemas": {"task": "/.well-known/rrp-agent-task.schema.json", "observation": "/.well-known/rrp-observed-form.schema.json", "runtimeValidation": "Domain additionally validates Google Forms URLs, unique IDs/options, exact mappings, required answers and source scope."},
   "browserAdapter": "research-respondent-platform/tools/browser-agent/runner.mjs",
   "commands": [
     {"command": "status", "returns": "revision, busy, status, source metadata, problems; no answer rows"},
