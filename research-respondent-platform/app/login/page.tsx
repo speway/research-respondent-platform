@@ -1,4 +1,5 @@
-﻿import { redirect } from "next/navigation";
+﻿import { hostingMode } from "../../lib/services/hosting-policy.ts";
+import { redirect } from "next/navigation";
 import { LoginForm } from "../../components/login-form.tsx";
 import { Panel } from "../../components/ui.tsx";
 import { getCurrentAuth } from "../../lib/services/session.ts";
@@ -6,6 +7,7 @@ import { getCurrentAuth } from "../../lib/services/session.ts";
 export const dynamic = "force-dynamic";
 
 export default async function LoginPage() {
+  const preview = hostingMode(process.env) !== "persistent-local";
   const auth = await getCurrentAuth();
   if (auth) {
     redirect("/");
@@ -22,10 +24,10 @@ export default async function LoginPage() {
       </div>
       <Panel title="Sign in" subtitle="Access is role-based; identity data is a separate, explicitly granted scope.">
         <div className="p-4">
-          <LoginForm />
+          {preview ? <p role="status" className="note">Protected infrastructure preview. Sign-in and research data entry are disabled until durable storage is configured.</p> : <LoginForm />}
         </div>
       </Panel>
-      <Panel title="First run" subtitle="The platform ships with an empty research database by design.">
+      {preview ? null : <Panel title="First run" subtitle="The platform ships with an empty research database by design.">
         <div className="grid gap-2 p-4 text-[0.8125rem]">
           <p>
             Create the first administrator, organization and audit trail with:
@@ -39,7 +41,7 @@ npm run bootstrap -- --org "Your lab" --email you@example.org --password "<min 1
             Participants → Import documented source.
           </p>
         </div>
-      </Panel>
+      </Panel>}
     </div>
   );
 }
