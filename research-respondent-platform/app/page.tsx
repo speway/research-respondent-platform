@@ -14,7 +14,7 @@ import { assessRetention } from "../lib/repo/exports.ts";
 export const dynamic = "force-dynamic";
 
 export default async function OverviewPage() {
-  if (hostingMode(process.env) === "isolated-preview") redirect("/workbench");
+  if (hostingMode(process.env) !== "persistent-local") redirect("/workbench");
   const { db, actor } = await requireAuth();
   const organizationId = actor.organizationId;
 

@@ -85,3 +85,33 @@ Sandbox worker. Keep sources encrypted with a declared retention period. A
 permanently idle VM is unnecessary: the service can accept a link continuously
 and allocate the browser only for a authorized job. A link cannot supply actual
 missing participant answers or automatically authorize another recipient.
+
+## Approved runtime evidence and current adapter — 2026-10-10
+
+The historical unprovisioned state above is superseded by the one owner-approved
+cloud run recorded in `CLOUD_RUNTIME_VERIFICATION.md`: official API creation,
+sandboxed Chromium reading the supplied live form's first question section,
+audit exit 0, no answers/submission, stopped VM verified independently.
+The command path needed directory creation, HTTPS-only Ubuntu sources, the
+observed browser download redirect domain, and separate root dependency/user
+binary installs. The final adapter incorporates these repairs, refuses decoded
+prefill/answer parameters, reads traced assets before allocation and rechecks
+approval expiry after the durable reservation. Its final stricter network guard
+has fixture coverage, not a second live cloud run. Run the CLI from the app root.
+
+`createPrivateCloudBudgetJournal` uses private Blob create-only writes with
+explicit deterministic paths and `allowOverwrite:false`. Any unsuccessful or
+uncertain acknowledgment throws before VM allocation. Markers contain only a
+schema constant, with the budget hash in the path, and must never be deleted or
+expired to renew an approval. SDK auth is official OIDC/linked store credentials;
+no token is returned or included in client assets. The injected-provider tests
+do not establish real distributed storage concurrency. A Blob journal is not
+the participant database, submission ledger or general durable queue.
+
+The owner reauthorized storage/public-panel work after the auto-review rejection.
+The newly allowed official Blob create request returned provider 403; no store
+exists. The primary browser panel may be published without app registration and
+without server data, while Preview/deployment protection and research access
+controls remain. No hosted participant worker or public paid start route is
+enabled. No additional permission question is required for the already authorized
+step; official service access and empirical source/consent records are required.

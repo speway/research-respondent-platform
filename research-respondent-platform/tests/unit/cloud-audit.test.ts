@@ -10,8 +10,15 @@ function fixture(failure = "") {
   const createSandbox: AuditFactory = async (options) => {
     created++; assert.equal(options.timeout, 300000); assert.equal(options.resources.vcpus, 1); assert.equal(options.persistent, false); assert.deepEqual(options.ports, []);
     return {
-      writeFiles: async (files) => { assert.equal(files.length, 2); assert.ok(files.every((f) => f.path.startsWith("/vercel/sandbox/"))); calls.push("files"); },
-      runCommand: async ({ cmd, args }) => { calls.push(cmd); assert.equal(args.includes("--token"), false); return { exitCode: failure === "command" ? 1 : 0, stdout: async () => "" }; },
+      writeFiles: async (files) => { assert.equal(files.length, 4); assert.ok(files.every((f) => f.path.startsWith("/vercel/sandbox/"))); calls.push("files"); },
+      runCommand: async ({ cmd, args, cwd, sudo }) => {
+        calls.push(cmd); assert.equal(args.includes("--token"), false);
+        if (cmd === "mkdir") { assert.equal(cwd, "/"); assert.equal(sudo, undefined); }
+        else { assert.equal(cwd, "/vercel/sandbox"); }
+        if (args.includes("install-deps") || args.includes("/vercel/sandbox/prepare-ubuntu.mjs")) assert.equal(sudo, true);
+        if (cmd === "node" && args.includes("install")) assert.equal(sudo, undefined);
+        return { exitCode: failure === "command" ? 1 : 0, stdout: async () => "" };
+      },
       update: async ({ networkPolicy }) => { calls.push("network"); assert.equal(networkPolicy.allow.includes("registry.npmjs.org"), false); assert.equal(networkPolicy.allow.includes("docs.google.com"), true); },
       readFileToBuffer: async () => Buffer.from(failure === "foreign" ? JSON.stringify({ ...result, observation: { ...result.observation, url: "https://forms.gle/other", requestedUrl: "https://forms.gle/other" } }) : failure === "oversize" ? "x".repeat(CLOUD_AUDIT_LIMITS.maxOutputBytes + 1) : JSON.stringify(result)),
       stop: async () => { stopped++; },
@@ -22,7 +29,7 @@ function fixture(failure = "") {
 test("cloud audit has a fixed budget, narrows egress before reading and always stops its VM", async () => {
   const f = fixture();
   assert.deepEqual(await runCloudFormAudit({ formUrl: url, approval, ...f }), result);
-  assert.deepEqual(f.calls, ["files", "npm", "node", "network", "node"]); assert.equal(f.stopped, 1);
+  assert.deepEqual(f.calls, ["mkdir", "files", "npm", "node", "node", "node", "network", "node"]); assert.equal(f.stopped, 1);
   await assert.rejects(runCloudFormAudit({ formUrl: url, approval, ...f }), /already reserved/);
   assert.equal(f.created, 1);
 });
@@ -37,4 +44,10 @@ test("expired or foreign input cannot provision, and failed/invalid output stops
 test("simultaneous cloud requests consume one atomic budget reservation", async () => {
   const f = fixture(); const runs = await Promise.allSettled(Array.from({ length: 8 }, () => runCloudFormAudit({ formUrl: url, approval, ...f })));
   assert.equal(runs.filter((r) => r.status === "fulfilled").length, 1); assert.equal(f.created, 1);
+});
+test("approval that expires during a slow reservation cannot allocate a VM", async () => {
+  const f = fixture(); let at = Date.parse("2098-12-31T23:59:59Z");
+  const budgetJournal = { claim: async () => { at = Date.parse(approval.expiresAt); return true; } };
+  await assert.rejects(runCloudFormAudit({ formUrl: url, approval, createSandbox: f.createSandbox, budgetJournal, now: () => at }), /expired during reservation/);
+  assert.equal(f.created, 0);
 });

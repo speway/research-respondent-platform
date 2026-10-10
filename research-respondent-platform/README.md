@@ -343,3 +343,20 @@ Current protected Preview: https://research-respondent-platform-p5gqj3uzd-spw1.v
 ### 2026-10-10: form controls and link reuse
 
 The existing browser workbench can reuse its configured source and criteria for a new form URL. Its browser adapter now handles information-only pages, labeled matrix rows, checkbox sets, native/accessibility dropdowns and native numbers, with exact source-value verification. Live UI inspection reached the supplied form’s first six questions without entering answers. `docs/CLOUD_AGENT.md` documents an executable, bounded Vercel Sandbox read-only adapter, which is not yet provisioned or a permanent cloud service. No production participant data or real external submission is included.
+
+### 2026-10-10: cloud runtime verified and primary panel release
+
+The approved real Sandbox audit launched sandboxed Chromium and read the
+previously supplied live Google Form's first question section without answers
+or submission; the VM was stopped and checked independently. The adapter now
+includes the cloud setup repairs and stricter read-only guards. Full cloud SDK
+Function hosting, source/consent storage and the background queue remain pending
+official storage access (Blob create HTTP 403). A prepared private budget journal
+is not a configured participant database. See `docs/CLOUD_RUNTIME_VERIFICATION.md`.
+
+At the owner's explicit request, the data-free browser workbench can now open
+as the public primary site without application registration. Production database
+access/sign-in remain disabled; participant files stay in the user's tab unless
+explicitly exported. Current checked application: 204 tests, 17 HTTP checks,
+lint/TypeScript/build and all three actual Chromium scripts pass. Final GitHub
+commit and verified primary/Preview URLs are recorded in WORK_CONTINUATION.

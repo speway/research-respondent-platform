@@ -303,3 +303,21 @@ Application-source CI https://github.com/speway/research-respondent-platform/act
 Branch `feat/form-control-expansion` continues PR #10. Existing components/migrations were preserved. Introductory pages, row-scoped radio/checkbox matrices, exact multiple-choice sets, dropdowns and native number limits are handled by the portable adapter. A new `target` command/Automation URL input reuses the loaded base and criteria while invalidating the previous observation/map. Actual Chromium checks include draft leakage refusal, row isolation, numbers, lists and link reuse; see WORK_CONTINUATION.md for the checked source and CI/Preview readbacks.
 
 Read-only live inspection reached page 2 of the supplied Google Form and inspected six question containers without filling or submitting. The bounded official-SDK cloud audit adapter is written/tested with injected Sandbox lifecycle fixtures, but real provisioning/install remains unverified and no hosted background service was activated. Its five-minute one-vCPU nonpersistent run requires a durable atomic budget journal and an evidenced one-run approval. Project metadata lists no sandboxes or envs; billing allowance is not exposed. Production and real-data submission remain unapproved.
+
+### 19. Verified cloud runtime and public main panel continuation (2026-10-10)
+
+One explicitly approved Vercel Sandbox run actually launched sandboxed Chromium
+and read the supplied Google Form's second page after its empty introduction.
+Audit exit 0; no source records, answers or submission; stop verified after
+239781 ms. Runtime repairs and provider counters are in
+`CLOUD_RUNTIME_VERIFICATION.md`; final stricter guards are fixture-tested and
+not yet re-run in a cloud Function. Adapter OIDC hosting/queue remain incomplete.
+The latest owner message explicitly authorizes all project work and requests a
+normal main site URL. Workbench/home routing now permits the data-free public
+panel in production; research/SQLite access remains blocked. Local checks:
+204 tests, 17 HTTP, lint/types/build and all three Chromium scripts pass.
+A new private Blob budget adapter is prepared; after reauthorization, provider
+create returned 403. No store/anonymous paid endpoint exists. Use the latest
+WORK_CONTINUATION/PR records for final commit, CI and deployment URLs. Do not ask
+for blanket permission again; proceed through official service authorization and
+require actual participant sources/consent before empirical submissions.
