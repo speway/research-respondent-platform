@@ -36,6 +36,18 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     assert.equal(response.body.includes("data-table"), false);
   });
 
+  it("preview home opens the browser workbench without application sign-in", async () => {
+    const home = await httpGet(server.baseUrl, "/");
+    assert.ok([302, 303, 307, 308].includes(home.status));
+    assert.match(home.location ?? "", /\/workbench/);
+    const panel = await httpGet(server.baseUrl, "/workbench");
+    assert.equal(panel.status, 200);
+    assert.match(panel.body, /Respondent Lab/);
+    assert.match(panel.body, /Скачать пакет для агента|Пакет для агента/);
+    assert.equal(panel.body.includes('name="password"'), false);
+    assert.equal(panel.body.includes("preview@example.test"), false);
+  });
+
   it("a real create-study POST remains refused even with a valid file-database cookie", async () => {
     const ref = serverActionRefsFromBuild().find((entry) => entry.exportedName === "createStudyAction");
     assert.ok(ref);
@@ -53,5 +65,8 @@ it("Vercel production refuses SQLite database health until durable hosting is co
     assert.equal(health.status, 503);
     assert.match(health.body, /Database health check unavailable/);
     assert.equal(health.body.includes(production.dbFile), false);
+    const panel = await httpGet(production.baseUrl, "/workbench");
+    assert.ok([302, 303, 307, 308].includes(panel.status));
+    assert.match(panel.location ?? "", /\/login/);
   } finally { await production.stop(); removeTempDb(production.dbFile); }
 });

@@ -1,4 +1,5 @@
 ﻿import { hostingMode } from "../../lib/services/hosting-policy.ts";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { LoginForm } from "../../components/login-form.tsx";
 import { Panel } from "../../components/ui.tsx";
@@ -25,6 +26,7 @@ export default async function LoginPage() {
       <Panel title="Sign in" subtitle="Access is role-based; identity data is a separate, explicitly granted scope.">
         <div className="p-4">
           {preview ? <p role="status" className="note">Protected infrastructure preview. Sign-in and research data entry are disabled until durable storage is configured.</p> : <LoginForm />}
+          {hostingMode(process.env) === "isolated-preview" ? <Link href="/workbench" className="btn btn-primary mt-4 no-underline">Открыть панель подготовки</Link> : null}
         </div>
       </Panel>
       {preview ? null : <Panel title="First run" subtitle="The platform ships with an empty research database by design.">

@@ -1,0 +1,1164 @@
+{
+  "model_version": "1.0.0",
+  "coordinate_meaning": "Внутренние авторские координаты 0–100, не тестовые баллы/процентили.",
+  "loadings_status": "author_assumptions_uncalibrated",
+  "groups": {
+    "bfi2_facets": {
+      "source_ids": [
+        "bfi2"
+      ],
+      "dimensions": {
+        "sociability": {
+          "label_ru": "Общительность",
+          "loadings": {
+            "social": 0.7
+          }
+        },
+        "assertiveness": {
+          "label_ru": "Напористость",
+          "loadings": {
+            "agency": 0.65
+          }
+        },
+        "energy": {
+          "label_ru": "Энергичность",
+          "loadings": {
+            "activation": 0.65
+          }
+        },
+        "compassion": {
+          "label_ru": "Сочувствие",
+          "loadings": {
+            "affiliation": 0.7
+          }
+        },
+        "respectfulness": {
+          "label_ru": "Уважительность",
+          "loadings": {
+            "affiliation": 0.55
+          }
+        },
+        "trust": {
+          "label_ru": "Доверие",
+          "loadings": {
+            "trust": 0.7
+          }
+        },
+        "organization": {
+          "label_ru": "Организованность",
+          "loadings": {
+            "control": 0.7
+          }
+        },
+        "productiveness": {
+          "label_ru": "Продуктивность",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "responsibility": {
+          "label_ru": "Ответственность",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "anxiety": {
+          "label_ru": "Тревожность",
+          "loadings": {
+            "distress": 0.7
+          }
+        },
+        "low_mood": {
+          "label_ru": "Склонность к сниженному настроению",
+          "loadings": {
+            "distress": 0.6
+          }
+        },
+        "volatility": {
+          "label_ru": "Эмоциональная изменчивость",
+          "loadings": {
+            "reactivity": 0.7
+          }
+        },
+        "curiosity": {
+          "label_ru": "Интеллектуальная любознательность",
+          "loadings": {
+            "openness": 0.7
+          }
+        },
+        "aesthetics": {
+          "label_ru": "Эстетическая чувствительность",
+          "loadings": {
+            "sensitivity": 0.65
+          }
+        },
+        "imagination": {
+          "label_ru": "Творческое воображение",
+          "loadings": {
+            "openness": 0.65
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "ipip_neo_facets": {
+      "source_ids": [
+        "ipipneo"
+      ],
+      "dimensions": {
+        "anxiety": {
+          "label_ru": "Тревожность",
+          "loadings": {
+            "distress": 0.65
+          }
+        },
+        "anger": {
+          "label_ru": "Гневливость",
+          "loadings": {
+            "reactivity": 0.65
+          }
+        },
+        "low_mood": {
+          "label_ru": "Сниженное настроение",
+          "loadings": {
+            "distress": 0.6
+          }
+        },
+        "self_consciousness": {
+          "label_ru": "Социальная застенчивость",
+          "loadings": {
+            "social": -0.6
+          }
+        },
+        "immoderation": {
+          "label_ru": "Неумеренность",
+          "loadings": {
+            "control": -0.6
+          }
+        },
+        "vulnerability": {
+          "label_ru": "Уязвимость к давлению",
+          "loadings": {
+            "distress": 0.6
+          }
+        },
+        "friendliness": {
+          "label_ru": "Дружелюбие",
+          "loadings": {
+            "affiliation": 0.6
+          }
+        },
+        "gregariousness": {
+          "label_ru": "Поиск общения",
+          "loadings": {
+            "social": 0.65
+          }
+        },
+        "assertiveness": {
+          "label_ru": "Напористость",
+          "loadings": {
+            "agency": 0.65
+          }
+        },
+        "activity": {
+          "label_ru": "Темп активности",
+          "loadings": {
+            "activation": 0.6
+          }
+        },
+        "excitement_seeking": {
+          "label_ru": "Поиск возбуждения",
+          "loadings": {
+            "novelty": 0.65
+          }
+        },
+        "cheerfulness": {
+          "label_ru": "Жизнерадостность",
+          "loadings": {
+            "positive": 0.7
+          }
+        },
+        "imagination": {
+          "label_ru": "Воображение",
+          "loadings": {
+            "openness": 0.65
+          }
+        },
+        "artistic_interests": {
+          "label_ru": "Интерес к искусству",
+          "loadings": {
+            "sensitivity": 0.65
+          }
+        },
+        "emotionality": {
+          "label_ru": "Восприимчивость к переживаниям",
+          "loadings": {
+            "sensitivity": 0.6
+          }
+        },
+        "adventurousness": {
+          "label_ru": "Предпочтение нового",
+          "loadings": {
+            "novelty": 0.6
+          }
+        },
+        "intellectual_engagement": {
+          "label_ru": "Интерес к сложным идеям",
+          "loadings": {
+            "openness": 0.7
+          }
+        },
+        "value_openness": {
+          "label_ru": "Открытость пересмотру убеждений",
+          "loadings": {
+            "openness": 0.5
+          }
+        },
+        "trust": {
+          "label_ru": "Доверие",
+          "loadings": {
+            "trust": 0.65
+          }
+        },
+        "morality": {
+          "label_ru": "Прямота и отказ от манипуляции",
+          "loadings": {
+            "integrity": 0.65
+          }
+        },
+        "altruism": {
+          "label_ru": "Готовность помогать",
+          "loadings": {
+            "affiliation": 0.65
+          }
+        },
+        "cooperation": {
+          "label_ru": "Сотрудничество",
+          "loadings": {
+            "affiliation": 0.6
+          }
+        },
+        "modesty": {
+          "label_ru": "Скромность",
+          "loadings": {
+            "integrity": 0.5
+          }
+        },
+        "sympathy": {
+          "label_ru": "Сочувствие",
+          "loadings": {
+            "affiliation": 0.6
+          }
+        },
+        "self_efficacy": {
+          "label_ru": "Уверенность в действиях",
+          "loadings": {
+            "agency": 0.6
+          }
+        },
+        "orderliness": {
+          "label_ru": "Порядок",
+          "loadings": {
+            "control": 0.65
+          }
+        },
+        "dutifulness": {
+          "label_ru": "Обязательность",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "achievement": {
+          "label_ru": "Стремление к достижению",
+          "loadings": {
+            "agency": 0.55
+          }
+        },
+        "self_discipline": {
+          "label_ru": "Самодисциплина",
+          "loadings": {
+            "control": 0.7
+          }
+        },
+        "cautiousness": {
+          "label_ru": "Обдумывание последствий",
+          "loadings": {
+            "control": 0.6
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "hexaco_facets": {
+      "source_ids": [
+        "hexaco"
+      ],
+      "dimensions": {
+        "sincerity": {
+          "label_ru": "Искренность",
+          "loadings": {
+            "integrity": 0.65
+          }
+        },
+        "fairness": {
+          "label_ru": "Справедливость",
+          "loadings": {
+            "integrity": 0.65
+          }
+        },
+        "greed_avoidance": {
+          "label_ru": "Невовлечённость в статусную роскошь",
+          "loadings": {
+            "integrity": 0.5
+          }
+        },
+        "modesty": {
+          "label_ru": "Скромность",
+          "loadings": {
+            "integrity": 0.55
+          }
+        },
+        "fearfulness": {
+          "label_ru": "Опасение физической угрозы",
+          "loadings": {
+            "distress": 0.55
+          }
+        },
+        "anxiety": {
+          "label_ru": "Беспокойство",
+          "loadings": {
+            "distress": 0.65
+          }
+        },
+        "dependence": {
+          "label_ru": "Потребность в эмоциональной поддержке",
+          "loadings": {
+            "affiliation": 0.45
+          }
+        },
+        "sentimentality": {
+          "label_ru": "Эмоциональная привязанность",
+          "loadings": {
+            "affiliation": 0.6
+          }
+        },
+        "social_self_esteem": {
+          "label_ru": "Социальное самоуважение",
+          "loadings": {
+            "agency": 0.55
+          }
+        },
+        "social_boldness": {
+          "label_ru": "Социальная смелость",
+          "loadings": {
+            "agency": 0.6
+          }
+        },
+        "sociability": {
+          "label_ru": "Общительность",
+          "loadings": {
+            "social": 0.65
+          }
+        },
+        "liveliness": {
+          "label_ru": "Живость",
+          "loadings": {
+            "activation": 0.6
+          }
+        },
+        "forgivingness": {
+          "label_ru": "Готовность прощать",
+          "loadings": {
+            "trust": 0.5
+          }
+        },
+        "gentleness": {
+          "label_ru": "Мягкость",
+          "loadings": {
+            "affiliation": 0.6
+          }
+        },
+        "flexibility": {
+          "label_ru": "Готовность компромисса",
+          "loadings": {
+            "affiliation": 0.45
+          }
+        },
+        "patience": {
+          "label_ru": "Терпение в отношениях",
+          "loadings": {
+            "reactivity": -0.6
+          }
+        },
+        "organization": {
+          "label_ru": "Организованность",
+          "loadings": {
+            "control": 0.65
+          }
+        },
+        "diligence": {
+          "label_ru": "Прилежание",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "perfectionism": {
+          "label_ru": "Тщательность",
+          "loadings": {
+            "control": 0.55
+          }
+        },
+        "prudence": {
+          "label_ru": "Осмотрительность",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "aesthetics": {
+          "label_ru": "Эстетическая восприимчивость",
+          "loadings": {
+            "sensitivity": 0.6
+          }
+        },
+        "inquisitiveness": {
+          "label_ru": "Любознательность",
+          "loadings": {
+            "openness": 0.65
+          }
+        },
+        "creativity": {
+          "label_ru": "Творческий поиск",
+          "loadings": {
+            "openness": 0.6
+          }
+        },
+        "unconventionality": {
+          "label_ru": "Принятие необычного",
+          "loadings": {
+            "openness": 0.55
+          }
+        },
+        "altruism": {
+          "label_ru": "Альтруистическая ориентация",
+          "loadings": {
+            "affiliation": 0.65
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "cattell_concepts": {
+      "source_ids": [
+        "16pf",
+        "16pf-scales"
+      ],
+      "dimensions": {
+        "A": {
+          "label_ru": "Теплота",
+          "loadings": {
+            "affiliation": 0.65
+          }
+        },
+        "C": {
+          "label_ru": "Эмоциональная устойчивость",
+          "loadings": {
+            "distress": -0.6
+          }
+        },
+        "E": {
+          "label_ru": "Доминантность",
+          "loadings": {
+            "agency": 0.65
+          }
+        },
+        "F": {
+          "label_ru": "Живость",
+          "loadings": {
+            "activation": 0.6
+          }
+        },
+        "G": {
+          "label_ru": "Следование правилам",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "H": {
+          "label_ru": "Социальная смелость",
+          "loadings": {
+            "social": 0.6
+          }
+        },
+        "I": {
+          "label_ru": "Чувствительность",
+          "loadings": {
+            "sensitivity": 0.6
+          }
+        },
+        "L": {
+          "label_ru": "Настороженность",
+          "loadings": {
+            "trust": -0.6
+          }
+        },
+        "M": {
+          "label_ru": "Абстрактность",
+          "loadings": {
+            "openness": 0.6
+          }
+        },
+        "N": {
+          "label_ru": "Закрытость",
+          "loadings": {
+            "social": -0.45
+          }
+        },
+        "O": {
+          "label_ru": "Тревожные опасения",
+          "loadings": {
+            "distress": 0.65
+          }
+        },
+        "Q1": {
+          "label_ru": "Открытость изменениям",
+          "loadings": {
+            "openness": 0.6
+          }
+        },
+        "Q2": {
+          "label_ru": "Самостоятельность",
+          "loadings": {
+            "agency": 0.5
+          }
+        },
+        "Q3": {
+          "label_ru": "Организующий самоконтроль",
+          "loadings": {
+            "control": 0.65
+          }
+        },
+        "Q4": {
+          "label_ru": "Напряжённость",
+          "loadings": {
+            "distress": 0.6
+          }
+        }
+      },
+      "unknown_dimensions": {
+        "B": "Рассуждение: неизвестно без задач/результатов; не выводить из открытости."
+      }
+    },
+    "pts_concepts": {
+      "source_ids": [
+        "pts"
+      ],
+      "dimensions": {
+        "excitation_strength": {
+          "label_ru": "Переносимость интенсивной стимуляции",
+          "loadings": {
+            "endurance": 0.65
+          }
+        },
+        "inhibition_strength": {
+          "label_ru": "Сдерживание реакции",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "mobility": {
+          "label_ru": "Перестройка реакции",
+          "loadings": {
+            "flexibility": 0.65
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "rtt_concepts": {
+      "source_ids": [
+        "fcb",
+        "fcbr"
+      ],
+      "dimensions": {
+        "briskness": {
+          "label_ru": "Быстрота",
+          "loadings": {
+            "activation": 0.6
+          }
+        },
+        "perseveration": {
+          "label_ru": "Продолжение реакции после события",
+          "loadings": {
+            "reactivity": 0.55
+          }
+        },
+        "sensory_sensitivity": {
+          "label_ru": "Сенсорная чувствительность",
+          "loadings": {
+            "sensitivity": 0.7
+          }
+        },
+        "emotional_reactivity": {
+          "label_ru": "Эмоциональная реактивность",
+          "loadings": {
+            "reactivity": 0.7
+          }
+        },
+        "endurance": {
+          "label_ru": "Выносливость к нагрузке",
+          "loadings": {
+            "endurance": 0.7
+          }
+        },
+        "activity": {
+          "label_ru": "Поиск стимуляции",
+          "loadings": {
+            "activation": 0.65
+          }
+        },
+        "rhythmicity": {
+          "label_ru": "Регулярность жизненных ритмов",
+          "loadings": {
+            "control": 0.5
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "atq_concepts": {
+      "source_ids": [
+        "atq"
+      ],
+      "dimensions": {
+        "fear": {
+          "label_ru": "Страх ожидания угрозы",
+          "loadings": {
+            "distress": 0.6
+          }
+        },
+        "sadness": {
+          "label_ru": "Реакция печали",
+          "loadings": {
+            "distress": 0.55
+          }
+        },
+        "discomfort": {
+          "label_ru": "Сенсорный дискомфорт",
+          "loadings": {
+            "sensitivity": 0.6
+          }
+        },
+        "frustration": {
+          "label_ru": "Реакция на блокирование цели",
+          "loadings": {
+            "reactivity": 0.6
+          }
+        },
+        "sociability": {
+          "label_ru": "Удовольствие от общения",
+          "loadings": {
+            "social": 0.65
+          }
+        },
+        "positive_affect": {
+          "label_ru": "Позитивный аффект",
+          "loadings": {
+            "positive": 0.65
+          }
+        },
+        "high_intensity_pleasure": {
+          "label_ru": "Удовольствие от интенсивной стимуляции",
+          "loadings": {
+            "novelty": 0.6
+          }
+        },
+        "attention_control": {
+          "label_ru": "Контроль внимания",
+          "loadings": {
+            "control": 0.65
+          }
+        },
+        "inhibitory_control": {
+          "label_ru": "Тормозящий контроль",
+          "loadings": {
+            "control": 0.65
+          }
+        },
+        "activation_control": {
+          "label_ru": "Начало действия вопреки избеганию",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "neutral_sensitivity": {
+          "label_ru": "Чувствительность к слабым стимулам",
+          "loadings": {
+            "sensitivity": 0.6
+          }
+        },
+        "affective_sensitivity": {
+          "label_ru": "Чувствительность к эмоциональным сигналам",
+          "loadings": {
+            "sensitivity": 0.6
+          }
+        },
+        "associative_sensitivity": {
+          "label_ru": "Ассоциативная чувствительность",
+          "loadings": {
+            "openness": 0.55
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "tci_concepts": {
+      "source_ids": [
+        "tci"
+      ],
+      "dimensions": {
+        "novelty_seeking": {
+          "label_ru": "Поиск новизны",
+          "loadings": {
+            "novelty": 0.65
+          }
+        },
+        "harm_avoidance": {
+          "label_ru": "Избегание ущерба",
+          "loadings": {
+            "distress": 0.6
+          }
+        },
+        "reward_dependence": {
+          "label_ru": "Ориентация на социальное подкрепление",
+          "loadings": {
+            "affiliation": 0.55
+          }
+        },
+        "persistence": {
+          "label_ru": "Целевая настойчивость",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "self_directedness": {
+          "label_ru": "Самонаправленность",
+          "loadings": {
+            "agency": 0.6
+          }
+        },
+        "cooperativeness": {
+          "label_ru": "Кооперативность",
+          "loadings": {
+            "affiliation": 0.6
+          }
+        },
+        "self_transcendence": {
+          "label_ru": "Самотрансценденция",
+          "loadings": {
+            "openness": 0.4
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "self_regulation": {
+      "source_ids": [
+        "sspm"
+      ],
+      "dimensions": {
+        "planning": {
+          "label_ru": "Планирование",
+          "loadings": {
+            "control": 0.65
+          }
+        },
+        "modeling": {
+          "label_ru": "Учёт значимых условий",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "programming": {
+          "label_ru": "Программирование действий",
+          "loadings": {
+            "control": 0.65
+          }
+        },
+        "evaluation": {
+          "label_ru": "Оценивание результата",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "flexibility": {
+          "label_ru": "Гибкость регуляции",
+          "loadings": {
+            "flexibility": 0.7
+          }
+        },
+        "independence": {
+          "label_ru": "Самостоятельность регуляции",
+          "loadings": {
+            "agency": 0.55
+          }
+        },
+        "reliability": {
+          "label_ru": "Устойчивость регуляции под нагрузкой",
+          "loadings": {
+            "endurance": 0.6
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "emotion_regulation": {
+      "source_ids": [
+        "erq",
+        "ders"
+      ],
+      "dimensions": {
+        "reappraisal": {
+          "label_ru": "Когнитивная переоценка",
+          "loadings": {
+            "flexibility": 0.55
+          }
+        },
+        "suppression": {
+          "label_ru": "Подавление экспрессии",
+          "loadings": {
+            "restraint": 0.65
+          }
+        },
+        "nonacceptance": {
+          "label_ru": "Непринятие переживания",
+          "loadings": {
+            "distress": 0.5
+          }
+        },
+        "goal_difficulty": {
+          "label_ru": "Трудности действия при переживании",
+          "loadings": {
+            "control": -0.55
+          }
+        },
+        "impulse_difficulty": {
+          "label_ru": "Трудности контроля при переживании",
+          "loadings": {
+            "control": -0.55
+          }
+        },
+        "awareness_difficulty": {
+          "label_ru": "Трудности осознания эмоций",
+          "loadings": {
+            "sensitivity": -0.45
+          }
+        },
+        "strategy_difficulty": {
+          "label_ru": "Ощущение недоступности способов регуляции",
+          "loadings": {
+            "flexibility": -0.5
+          }
+        },
+        "clarity_difficulty": {
+          "label_ru": "Трудности ясности эмоций",
+          "loadings": {
+            "sensitivity": -0.45
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "impulsivity": {
+      "source_ids": [
+        "upps"
+      ],
+      "dimensions": {
+        "negative_urgency": {
+          "label_ru": "Поспешность при негативных эмоциях",
+          "loadings": {
+            "reactivity": 0.6
+          }
+        },
+        "positive_urgency": {
+          "label_ru": "Поспешность при позитивных эмоциях",
+          "loadings": {
+            "activation": 0.5
+          }
+        },
+        "lack_premeditation": {
+          "label_ru": "Недостаток обдумывания",
+          "loadings": {
+            "control": -0.6
+          }
+        },
+        "lack_perseverance": {
+          "label_ru": "Недостаток настойчивости",
+          "loadings": {
+            "control": -0.6
+          }
+        },
+        "sensation_seeking": {
+          "label_ru": "Поиск ощущений",
+          "loadings": {
+            "novelty": 0.65
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "resources": {
+      "source_ids": [
+        "brs",
+        "gse",
+        "ius"
+      ],
+      "dimensions": {
+        "recovery": {
+          "label_ru": "Восстановление после стресса",
+          "loadings": {
+            "endurance": 0.6
+          }
+        },
+        "self_efficacy": {
+          "label_ru": "Общая самоэффективность",
+          "loadings": {
+            "agency": 0.6
+          }
+        },
+        "uncertainty_intolerance": {
+          "label_ru": "Непереносимость неопределённости",
+          "loadings": {
+            "distress": 0.6
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "attachment": {
+      "source_ids": [
+        "ecr"
+      ],
+      "dimensions": {
+        "anxiety": {
+          "label_ru": "Опасения потери близости",
+          "loadings": {
+            "distress": 0.55
+          }
+        },
+        "avoidance": {
+          "label_ru": "Избегание близости",
+          "loadings": {
+            "trust": -0.55
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "coping_tendencies": {
+      "source_ids": [
+        "cope"
+      ],
+      "dimensions": {
+        "active": {
+          "label_ru": "Активные действия",
+          "loadings": {
+            "agency": 0.55
+          }
+        },
+        "planning": {
+          "label_ru": "Продумывание совладания",
+          "loadings": {
+            "control": 0.55
+          }
+        },
+        "support": {
+          "label_ru": "Поиск поддержки",
+          "loadings": {
+            "affiliation": 0.55
+          }
+        },
+        "acceptance": {
+          "label_ru": "Принятие факта ситуации",
+          "loadings": {
+            "flexibility": 0.55
+          }
+        },
+        "avoidance": {
+          "label_ru": "Избегающее отвлечение",
+          "loadings": {
+            "distress": 0.4
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "mpq_concepts": {
+      "source_ids": [
+        "mpq"
+      ],
+      "dimensions": {
+        "wellbeing": {
+          "label_ru": "Благополучие",
+          "loadings": {
+            "positive": 0.6
+          }
+        },
+        "social_potency": {
+          "label_ru": "Социальная влиятельность",
+          "loadings": {
+            "agency": 0.6
+          }
+        },
+        "achievement": {
+          "label_ru": "Достижения",
+          "loadings": {
+            "control": 0.55
+          }
+        },
+        "social_closeness": {
+          "label_ru": "Социальная близость",
+          "loadings": {
+            "affiliation": 0.6
+          }
+        },
+        "stress_reaction": {
+          "label_ru": "Реакция на стресс",
+          "loadings": {
+            "distress": 0.6
+          }
+        },
+        "alienation": {
+          "label_ru": "Ожидание недоброжелательности",
+          "loadings": {
+            "trust": -0.55
+          }
+        },
+        "aggression": {
+          "label_ru": "Агрессивное реагирование",
+          "loadings": {
+            "reactivity": 0.5
+          }
+        },
+        "control": {
+          "label_ru": "Сдержанный обдуманный стиль",
+          "loadings": {
+            "control": 0.6
+          }
+        },
+        "harm_avoidance": {
+          "label_ru": "Избегание физического риска",
+          "loadings": {
+            "distress": 0.5
+          }
+        },
+        "traditionalism": {
+          "label_ru": "Приверженность традиции",
+          "loadings": {
+            "openness": -0.45
+          }
+        },
+        "absorption": {
+          "label_ru": "Поглощённость переживанием",
+          "loadings": {
+            "sensitivity": 0.55
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "value_priorities": {
+      "source_ids": [
+        "values"
+      ],
+      "dimensions": {
+        "self_direction": {
+          "label_ru": "Самостоятельность",
+          "loadings": {
+            "agency": 0.4
+          }
+        },
+        "stimulation": {
+          "label_ru": "Стимуляция",
+          "loadings": {
+            "novelty": 0.45
+          }
+        },
+        "hedonism": {
+          "label_ru": "Удовольствие",
+          "loadings": {
+            "positive": 0.35
+          }
+        },
+        "achievement": {
+          "label_ru": "Достижение",
+          "loadings": {
+            "agency": 0.45
+          }
+        },
+        "power": {
+          "label_ru": "Власть",
+          "loadings": {
+            "agency": 0.35
+          }
+        },
+        "security": {
+          "label_ru": "Безопасность",
+          "loadings": {
+            "distress": 0.35
+          }
+        },
+        "conformity": {
+          "label_ru": "Конформность",
+          "loadings": {
+            "control": 0.35
+          }
+        },
+        "tradition": {
+          "label_ru": "Традиция",
+          "loadings": {
+            "openness": -0.35
+          }
+        },
+        "benevolence": {
+          "label_ru": "Благожелательность",
+          "loadings": {
+            "affiliation": 0.45
+          }
+        },
+        "universalism": {
+          "label_ru": "Универсализм",
+          "loadings": {
+            "affiliation": 0.35
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    },
+    "reporting_style": {
+      "source_ids": [
+        "mmpi3"
+      ],
+      "dimensions": {
+        "self_presentation": {
+          "label_ru": "Забота о впечатлении",
+          "loadings": {
+            "restraint": 0.5
+          }
+        },
+        "privacy": {
+          "label_ru": "Сдержанность в раскрытии личного",
+          "loadings": {
+            "restraint": 0.5
+          }
+        },
+        "categoricality": {
+          "label_ru": "Категоричность самоописания",
+          "loadings": {
+            "flexibility": -0.35
+          }
+        }
+      },
+      "unknown_dimensions": {}
+    }
+  }
+}
