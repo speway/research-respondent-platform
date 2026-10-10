@@ -4,7 +4,7 @@
 
 Repository: `speway/research-respondent-platform` (now public; verified 2026-10-10). App root: `research-respondent-platform/`.
 PR #1 is merged; Issue #2 is closed. Do not repeat the seven historical pipeline fixes.
-Current task branch: `feat/issue-4-protected-preview`, stacked on `fix/issue-3-security-review` / PR #7, based on main `dabed376d36080bc31e466f6907c7172faab2e06`.
+Current task branch: `feat/browser-workbench` / PR #9, stacked on `feat/issue-4-protected-preview` / PR #8, then `fix/issue-3-security-review` / PR #7. Main baseline is `dabed376d36080bc31e466f6907c7172faab2e06`.
 Main CI evidence: https://github.com/speway/research-respondent-platform/actions/runs/38050403851 (SUCCESS).
 
 `CHATGPT_HANDOFF.md`, app README status tables and `RESEARCH_INTEGRITY.md` contain dated pre-GitHub observations. They are historical evidence, not the current repository/deployment state. Append corrections to the historical activity log; do not remove old entries.
@@ -96,10 +96,39 @@ Concurrent draft PR #6 (`codex/psychological-persona-integration`) is separate w
 
 ## Next three tasks
 
-1. Review Issue #3 / PR #7; after acceptance, retarget stacked PR #8 to main and resolve any documentation overlap with PR #6.
+1. Review PR #7, then stacked PRs #8/#9; retarget after accepted merges and coordinate overlap with PR #6. The dictionary copy is byte-identical to PR #6.
 2. Obtain official storage integration access/provider approval for the concrete `PERSISTENCE_PLAN.md`; existing integration lookup is forbidden. Do not use personal credentials or infer billing approval.
 3. Implement the approved durable database boundary in verified slices and test multi-instance persistence plus actual restore before enabling research sign-in. Keep production disabled pending explicit owner approval.
 
 ## Working rules
 
 Use one main agent. Work in bounded patches: inspect → patch → tests → documentation → commit → PR. Keep applied migrations immutable. Do not force push or write directly to main. No real responses may be replaced or filled with generated values. Every pass claim must name its tested source commit and actual command result.
+
+## Browser workbench batch — 2026-10-10 UTC
+
+Owner requested a usable first-trial site and linked the persona-skill shared chat. The shared URL was read successfully using HTTP and parsed shared messages; it describes PR #6 and the modeled-persona skill, not an attached empirical answer database. No records from the conversation or skill were substituted for actual answers.
+
+Checked application source: `cfe539dc6224399f1496c71cac9333996a974c13`; PR #9: https://github.com/speway/research-respondent-platform/pull/9.
+Modified/new: `app/workbench/page.tsx`, `app/page.tsx`, `app/login/page.tsx`, `components/{site-nav.tsx,workbench.tsx,workbench.module.css}`, `lib/domain/workbench.ts`, `tests/{unit/workbench.test.ts,http/preview.test.ts,browser/workbench.mjs}`, `tools/psychological-personas/references/dimensions.json`.
+
+Preview home opens `/workbench`. This separate client workspace permits CSV/TSV/flat JSON import, criteria/classification, manual question mappings, a portable JSON agent packet and file-based project save/restore. Application sign-in is not required for this client workflow. Source records remain in tab memory and do not reach the server or research tables. Server research routes and production gates are preserved; no shared cloud persistence or actual Google Forms submission is claimed. See `BROWSER_WORKBENCH.md` for operator instructions and limits.
+
+The dictionary is reused unchanged from PR #6 at `037bbbe1b0212d36627c51e51e5a094e17e2c861`; its Git blob `49846ebba67284f035a888dc6a646233fc6da9a7` was independently checked. 17 groups / 169 labels are searchable; selecting a label does not generate a measured response. PR #6 has not been merged/overwritten and its worker is not deployed by this batch.
+
+| Check on source above | Actual result |
+| --- | --- |
+| Locked install with matching local Node headers | exit 0; lockfile unchanged |
+| Lint / TypeScript | exit 0 / exit 0 |
+| Unit and integration tests | exit 0; 181/181 pass, zero skips |
+| Production build | exit 0; 20 routes |
+| HTTP smoke on rebuilt artifact | exit 0; 16/16 pass, zero skips |
+| Real Chromium/Playwright workflow | exit 0; full import/filter/map/download/hash/restore/origin/library/mobile flow; no page errors, POSTs or research writes |
+
+Initial browser run timed out on the ID selector because a wrapped select label included its options; explicit accessible names fixed the boundary and the full run passed. The added MJS verifier initially failed lint on implicit globals; explicit Node imports and browser callback declarations fixed it. These failed initial runs are not reported as passing. Desktop/mobile captures were inspected; no horizontal page overflow at 390px.
+
+Storage integration access is still HTTP 403. The client workbench provides immediate trials while the durable database and live form transport remain unresolved. Vercel SSO protection is retained; no production deployment was performed. Public GitHub source contains only disposable test fixtures and dictionary definitions, never actual participant records.
+
+Application-source GitHub CI SUCCESS: https://github.com/speway/research-respondent-platform/actions/runs/38054284615. Actual job readback confirmed every install/native/lint/typecheck/test/build/HTTP step succeeded.
+Protected Preview deployment `dpl_Hu5qCRMXDAt3w9XERiMbCrB2oJ8p` is READY on the checked application SHA, target null (Preview).
+Stable deployment URL: https://research-respondent-platform-lro81x47q-spw1.vercel.app/workbench
+Official protected fetch: workbench 200 with file-picker/menu and no password input; health 200 with integrity ok, four migrations, no drift, durable false and research sign-in disabled; participant route still redirects to the disabled research login (fetch final 200). Temporary official share access was prepared for the owner; its bearer URL is not recorded in GitHub.
