@@ -1,0 +1,78 @@
+# Continuous integration: install, lint, typecheck, test, production build.
+#
+# Notes that matter for this repository:
+#   - package.json declares `engines.node >= 22` and the test scripts rely on
+#     `node --experimental-strip-types`, so the job pins Node 22.
+#   - pnpm is pinned to the version that produced and validated pnpm-lock.yaml
+#     (lockfileVersion 9.0). Use `--frozen-lockfile` so CI never silently
+#     resolves different dependency versions.
+#   - better-sqlite3 is a native module. pnpm may skip dependency build scripts
+#     depending on its allow-build policy; the explicit load check below fails
+#     fast with a clear message instead of surfacing later as a confusing test
+#     error. See docs/SETUP.md for the local equivalent.
+#   - Tests use in-memory or throwaway SQLite databases; DATABASE_FILE is set to
+#     a workspace path so any accidental default-path access stays inside the
+#     job and never touches a developer database.
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, typecheck, test, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      DATABASE_FILE: ${{ github.workspace }}/data/ci-placeholder.db
+      NEXT_TELEMETRY_DISABLED: "1"
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 11.7.0
+          run_install: false
+
+      - name: Set up Node.js 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: pnpm
+
+      - name: Install dependencies (frozen lockfile)
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify the native SQLite binding
+        run: |
+          node -e "require('better-sqlite3'); console.log('better-sqlite3 native binding loaded')"
+
+      - name: Lint
+        run: pnpm run lint
+
+      - name: Typecheck
+        run: pnpm run typecheck
+
+      - name: Unit and integration tests
+        run: pnpm test
+
+      - name: Production build
+        run: pnpm run build
+
+      # The HTTP smoke suite boots `next start` against a throwaway database, so
+      # it runs only after a successful build and only when tests/http exists.
+      - name: HTTP smoke tests (when present)
+        if: ${{ hashFiles('tests/http/*.test.ts') != '' }}
+        run: pnpm run test:http

@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Next.js
+.next/
+**/.next/
+out/
+dist/
+
+# Environment variables
+.env
+.env.*
+!**/.env.example
+
+# Databases
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs and caches
+*.log
+coverage/
+*.tsbuildinfo
+
+# Operating system
+.DS_Store
+Thumbs.db

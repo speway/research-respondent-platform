@@ -1,0 +1,46 @@
+{
+  "name": "research-respondent-platform",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Research Respondent Platform - source-backed participant registry, psychometric assessment, cohort engine, Google Forms mapping and multi-agent task orchestration.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "next dev --port 4310",
+    "build": "next build",
+    "start": "next start --port 4310",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "node --experimental-strip-types --test tests/unit/*.test.ts tests/integration/*.test.ts",
+    "test:unit": "node --experimental-strip-types --test tests/unit/*.test.ts",
+    "test:integration": "node --experimental-strip-types --test tests/integration/*.test.ts",
+    "test:http": "node --experimental-strip-types --test tests/http/*.test.ts",
+    "db:migrate": "node --experimental-strip-types scripts/migrate.ts",
+    "db:status": "node --experimental-strip-types scripts/migrate.ts --status",
+    "bootstrap": "node --experimental-strip-types scripts/bootstrap.ts",
+    "verify": "npm run lint && npm run typecheck && npm test && npm run build"
+  },
+  "dependencies": {
+    "better-sqlite3": "13.0.3",
+    "next": "16.4.0",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "server-only": "0.0.1",
+    "zod": "4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "@tailwindcss/postcss": "4.3.3",
+    "@types/better-sqlite3": "9.6.0",
+    "@types/node": "24.10.1",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "eslint": "9.39.5",
+    "eslint-plugin-react-hooks": "7.0.1",
+    "tailwindcss": "4.3.3",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.46.2"
+  }
+}
