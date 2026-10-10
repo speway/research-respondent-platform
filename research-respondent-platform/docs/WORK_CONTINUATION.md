@@ -4,7 +4,7 @@
 
 Repository: `speway/research-respondent-platform` (now public; verified 2026-10-10). App root: `research-respondent-platform/`.
 PR #1 is merged; Issue #2 is closed. Do not repeat the seven historical pipeline fixes.
-Current task branch: `feat/browser-workbench` / PR #9, stacked on `feat/issue-4-protected-preview` / PR #8, then `fix/issue-3-security-review` / PR #7. Main baseline is `dabed376d36080bc31e466f6907c7172faab2e06`.
+Current task branch: `feat/agent-workbench-automation` / PR #10, stacked on `feat/browser-workbench` / PR #9, then `feat/issue-4-protected-preview` / PR #8 and `fix/issue-3-security-review` / PR #7. Main baseline is `dabed376d36080bc31e466f6907c7172faab2e06` (reverified 2026-10-10).
 Main CI evidence: https://github.com/speway/research-respondent-platform/actions/runs/38050403851 (SUCCESS).
 
 `CHATGPT_HANDOFF.md`, app README status tables and `RESEARCH_INTEGRITY.md` contain dated pre-GitHub observations. They are historical evidence, not the current repository/deployment state. Append corrections to the historical activity log; do not remove old entries.
@@ -96,9 +96,9 @@ Concurrent draft PR #6 (`codex/psychological-persona-integration`) is separate w
 
 ## Next three tasks
 
-1. Review PR #7, then stacked PRs #8/#9; retarget after accepted merges and coordinate overlap with PR #6. The dictionary copy is byte-identical to PR #6.
-2. Obtain official storage integration access/provider approval for the concrete `PERSISTENCE_PLAN.md`; existing integration lookup is forbidden. Do not use personal credentials or infer billing approval.
-3. Implement the approved durable database boundary in verified slices and test multi-instance persistence plus actual restore before enabling research sign-in. Keep production disabled pending explicit owner approval.
+1. Review PR #7, then stacked PRs #8/#9/#10; retarget after accepted merges and coordinate overlap with PR #6. Do not overwrite its worker/schema; the dictionary copy remains byte-identical.
+2. Obtain official storage integration/provider access, then implement and test the durable database, persistent worker/receipt boundary, multi-instance behavior and actual restore according to `PERSISTENCE_PLAN.md`. Current integration lookup is forbidden; do not infer billing or production approval.
+3. With an explicitly authorized destination and source, verify the browser adapter on the actual form. Expand observed matrix/dropdown controls and documented instrument-item mappings in bounded tested slices; keep missing/ambiguous values blocked and no blind submission retries. Hosted AI dispatch/batch queues are still unimplemented.
 
 ## Working rules
 
@@ -132,3 +132,36 @@ Application-source GitHub CI SUCCESS: https://github.com/speway/research-respond
 Protected Preview deployment `dpl_Hu5qCRMXDAt3w9XERiMbCrB2oJ8p` is READY on the checked application SHA, target null (Preview).
 Stable deployment URL: https://research-respondent-platform-lro81x47q-spw1.vercel.app/workbench
 Official protected fetch: workbench 200 with file-picker/menu and no password input; health 200 with integrity ok, four migrations, no drift, durable false and research sign-in disabled; participant route still redirects to the disabled research login (fetch final 200). Temporary official share access was prepared for the owner; its bearer URL is not recorded in GitHub.
+
+## Agent automation batch — 2026-10-10 UTC
+
+Owner requested a flow where an agent receives the source and form link and operates the panel itself. PR #10: https://github.com/speway/research-respondent-platform/pull/10 . Branch is `feat/agent-workbench-automation`, based on PR #9; PRs #6–#9 remain open and have not been overwritten or merged. Main is unchanged.
+
+Initial executor source `19fd61eeba1f893a9bda94ad85800c610bcace5e` passed all local checks (190 unit/integration, 17 HTTP) and GitHub CI https://github.com/speway/research-respondent-platform/actions/runs/38056864815. Actual job readback confirmed both new browser-tool installation and browser workflows passed, in addition to locked install/native/lint/types/tests/build/HTTP.
+
+Current checked application source: `9bf7661ae0987bc4651f029e1c9753479e6c3621`. The second slice adds published structural schemas, a contract-drift regression and the operator guide. Modified/new: `.github/workflows/ci.yml`, `components/{workbench.tsx,use-agent-workbench.ts}`, `lib/domain/{workbench.ts,agent-workbench.ts}`, `public/.well-known/{rrp-agent.json,rrp-agent-task.schema.json,rrp-observed-form.schema.json}`, `scripts/export-agent-schemas.ts`, `tools/browser-agent/{runner.mjs,file-journal.mjs}`, `tests/{unit/agent-workbench.test.ts,unit/agent-journal.test.ts,http/preview.test.ts,browser/agent-workbench.mjs}`; docs `AGENT_AUTOMATION.md`, `BROWSER_WORKBENCH.md`, README and historical handoff.
+
+| Check | Actual local result |
+| --- | --- |
+| `pnpm install --frozen-lockfile` with matching local Node headers | exit 0; application dependency/lock files unchanged |
+| `pnpm run lint` / `pnpm run typecheck` | exit 0 / exit 0 |
+| `pnpm test` | exit 0; 191/191, zero skips |
+| `pnpm run build` | exit 0; 20 app routes plus public manifest/schemas |
+| `pnpm run test:http` on final rebuilt artifact | exit 0; 17/17, zero skips; manifest and both public schemas checked |
+| Actual Chromium workbench regression | exit 0; existing source/filter/map/export/restore/origin/dictionary/mobile flow unchanged |
+| Actual Chromium agent executor | exit 0; visible read → automatic mapping → literal two-section fill/verification → fixture confirmation; default no-write, missing-answer halt, malformed input preserving state, stale/concurrent commands, expired/out-of-scope grant denial, durable journal, uncertain result/repeat-submit denial, mobile; no page errors/POSTs/research writes |
+
+The browser verifier uses an intercepted, explicitly isolated UI fixture, not a live Google Form. It was run against the production-built Next app and actual Chromium. No real source records, participant answers, credentials, cookie/session artifacts or receipt files were committed. The initial new JS lint failure was undeclared URL/window globals; explicit Node URL import and declared browser callback globals fixed it before passing verification.
+
+`window.respondentWorkbench.execute` is a versioned same-tab bridge, not a remote public-data API. It accepts source tasks and visible-form observations, auto-selects an unambiguous ID header, matches exact IDs or qualified section/question labels, and validates literal answer/options/ranges. Bare headings are accepted only for a complete non-repeating map. No fuzzy match, topic-based answer inference or silently dropping incomplete records. CSV/restored-project modeled-origin denial closes the existing JSON-only gap. Every manual workspace edit invalidates the live observation; saved projects require a new read. See `AGENT_AUTOMATION.md` for shapes and behavior.
+
+The portable browser executor supports text and single-choice questions and reobserves each section. An explicit grant binds recipient, one participant, source hash, expiry and authorization evidence reference. Submission also requires an atomic persistent journal; only visible response-recorded confirmation succeeds, and uncertain/reserved outcomes never automatically resubmit. This is local duplicate protection, not a distributed exactly-once guarantee; separate stores, changed hashes or URL variants are not reconciled.
+
+Preview has no hosted model/background worker, multi-user persistence or batch queue. More complex controls/verified instrument-key mappings and live compatibility remain unverified. Existing server task permissions, migrations and production fail-closed gates are unchanged. Issue #4 and official storage-access HTTP 403 remain unresolved; no production or paid provisioning is authorized by this batch.
+
+Final application-source CI SUCCESS: https://github.com/speway/research-respondent-platform/actions/runs/38057231467 . Actual job/step readback confirmed locked install, native SQLite, lint, TypeScript, unit/integration, production build, HTTP smoke, isolated browser install and both browser scripts succeeded.
+
+Final protected deployment `dpl_4Re45WFV1EYUQz2XnnF9uTFb2eHo` is READY, target null (Preview), Git source `9bf7661ae0987bc4651f029e1c9753479e6c3621`.
+URL: https://research-respondent-platform-p5gqj3uzd-spw1.vercel.app/workbench . Official protected fetches: workbench 200 with Automation menu/source picker and no password field; manifest and both schemas 200 with the expected protocol/strict object contracts; health 200 with integrity ok, four migrations/no pending/no drift, isolated-preview, durable false, research sign-in disabled; participant route still follows its denial redirect to the disabled login. These deployed checks are HTTP/content checks; actual interactive browser evidence is local and GitHub CI on this source.
+
+Vercel protection readback remains SSO enabled for all deployments. An official temporary owner share link was prepared; its bearer URL is not committed. No production deployment, participant database, credentials or billing change occurred. Final documentation-only head CI must also be recorded in PR #10 after its actual completion.
