@@ -58,6 +58,13 @@ try {
  await panel.setViewportSize({width:390,height:844});
  assert.equal(await panel.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth),true);
  if(process.env.BROWSER_SCREENSHOT_DIR) await panel.screenshot({path:process.env.BROWSER_SCREENSHOT_DIR+"/agent-link-controls.png",fullPage:true});
+ // Context cannot silently change between introduction/read/preparation/verified fill.
+ for (const phase of ["introduction","prepared_section","verified_section"]) {
+  await assert.rejects(runFormTask({workbenchPage:panel,formPage:form,task,participantRef:"fixture-1",grant,onProgress:async (event) => {
+   if(event.status===phase) { const state=await command({command:"status"}); await command({command:"load",expectedRevision:state.revision,task:{...task,source:{name:"changed.json",text:JSON.stringify([{...values,"Block / Number":33}])}}}); }
+  }}),/Workbench changed/);
+  assert.equal(await form.evaluate(() => window.submits),0);
+ }
  const badText = JSON.stringify([{...values,"Block / Number":17}]);
  const blocked = await runFormTask({workbenchPage:panel,formPage:form,task:{...task,source:{name:"bad.json",text:badText}},participantRef:"fixture-1"}); assert.equal(blocked.status,"blocked"); assert.equal(await form.getByRole("spinbutton").inputValue(),"");
  // Missing optional checkbox values must not transmit a draft selection.

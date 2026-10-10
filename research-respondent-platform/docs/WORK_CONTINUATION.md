@@ -272,3 +272,24 @@ route as tested in this batch. No paid provisioning, live response submission,
 production publish or respondent source upload occurred.
 
 Cloud Browser also opened the protected workbench through official temporary owner access: the actual Preview rendered Respondent Lab, all six navigation items and source picker, with no application email/password fields and no loaded participant data. The owner link expires according to the provider and is not committed. Final documentation-only head CI will be recorded in PR #11 after completion.
+
+## Follow-up: freeze source context throughout execution — 2026-10-10 UTC
+
+Documentation head `19dd5c9e4d1752c4de55ef25881983bd7d17406a` also passed
+all CI steps (https://github.com/speway/research-respondent-platform/actions/runs/38075572646).
+Final review found a real race: a source changed between section reads could be
+adopted by the next observation, while the grant still referred to the original
+source. The executor now binds the run to its starting source hash, URL and
+revision, permits only its own observation revision increments, freezes its
+local grant copy and checks context after progress callbacks before fill/Next.
+Async progress callbacks are awaited. Any external load/target/clear/filter/map
+edit stops the run. Actual Chromium regression changes the source during intro,
+preparation and verified-fill callbacks and verifies failure before subsequent
+navigation/submission; no fixture submit. Existing grant/receipt behavior remains.
+
+Modified `tools/browser-agent/runner.mjs`, `tests/browser/agent-controls.mjs` and
+this continuation. Rechecked frozen install, lint, TypeScript, 197/197 tests,
+production build, 17/17 HTTP and all three actual Chromium scripts: exit 0,
+zero skips. This follow-up must be saved/deployed and its official commit/CI
+read back before referring to the final Preview as including the context guard.
+No additional resources, participant values or live submissions were used.

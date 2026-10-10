@@ -190,12 +190,20 @@ async function advance(page) {
  * journal.claim must atomically reserve a durable key; uncertainty never auto-retries.
  */
 async function executeFormTask({ workbenchPage, formPage, task = null, formUrl = null, participantRef, grant = null, journal = null, onProgress = () => {} }) {
+  if (grant) grant = Object.freeze({ ...grant });
   const command = (input) => workbenchPage.evaluate((c) => window.respondentWorkbench.execute(c), input);
   await workbenchPage.waitForFunction(() => window.respondentWorkbench?.protocol === "rrp.workbench-agent.v1");
   let status = await command({ command: "status" });
   if (task && formUrl) throw new Error("Provide a task or a link using the configured source, not both.");
   status = task ? await command({ command: "load", expectedRevision: status.revision, task }) : await command({ command: "target", expectedRevision: status.revision, formUrl });
   const recipient = status.formUrl;
+  const sourceSha256 = status.source.sha256;
+  let expectedRevision = status.revision;
+  const assertContext = async () => {
+    const current = await command({ command: "status" });
+    if (current.revision !== expectedRevision || current.source?.sha256 !== sourceSha256 || current.formUrl !== recipient) throw new Error("Workbench changed during execution; stop before the next write or navigation.");
+    return current;
+  };
   // Validate declared permission before even opening the recipient tab.
   if (grant && (!allowedUrl(recipient) || grant.formUrl !== recipient || grant.participantRef !== participantRef || grant.sourceSha256 !== status.source.sha256 || !grant.evidenceReference?.trim() || !Number.isFinite(Date.parse(grant.expiresAt)) || Date.parse(grant.expiresAt) <= Date.now() || grant.mayFill !== true || typeof grant.maySubmit !== "boolean" || grant.maxSubmissions !== 1)) throw new Error("Fill grant is missing, expired, or outside recipient/participant/source scope.");
   if (grant?.maySubmit && (!journal || typeof journal.claim !== "function" || typeof journal.finish !== "function")) throw new Error("Submission requires an atomic durable receipt journal.");
@@ -203,30 +211,34 @@ async function executeFormTask({ workbenchPage, formPage, task = null, formUrl =
   const seen = new Set();
   for (let sectionNumber = 1; sectionNumber <= 100; sectionNumber++) {
     const read = await readVisibleSection(formPage, { requestedUrl: recipient, sectionNumber });
+    status = await assertContext();
     if (read.introduction) {
       if (seen.has(read.key)) throw new Error("Repeated introduction; stop navigation.");
       seen.add(read.key);
-      onProgress({ status: "introduction", sectionNumber });
+      await onProgress({ status: "introduction", sectionNumber });
+      await assertContext();
       await advance(formPage); continue;
     }
     const { observation, groups } = read;
     const key = signature(observation);
     if (seen.has(key)) throw new Error("Repeated section; no blind navigation retry.");
     seen.add(key);
-    status = await command({ command: "status" });
     status = await command({ command: "observe", expectedRevision: status.revision, observation });
+    expectedRevision = status.revision;
     if (status.status !== "ready") return { status: "blocked", sectionNumber, problems: status.problems, externalSubmission: false };
     const plan = await command({ command: "plan", expectedRevision: status.revision });
     const respondent = plan.respondents.find((r) => r.participantRef === participantRef);
     if (!respondent) throw new Error("Explicit participant does not belong to the selected source records.");
-    onProgress({ status: "prepared_section", sectionNumber, questions: respondent.actions.length });
+    await onProgress({ status: "prepared_section", sectionNumber, questions: respondent.actions.length });
+    await assertContext();
     if (!grant) return { status: "prepared", sectionNumber, plan, externalSubmission: false };
     if (Date.parse(grant.expiresAt) <= Date.now()) throw new Error("Grant expired while processing; stop before the next write.");
     if ((await command({ command: "status" })).revision !== status.revision) throw new Error("Workbench changed before fill; recompute from the current source.");
     if (signature((await readVisibleSection(formPage, { requestedUrl: recipient, sectionNumber })).observation) !== key) throw new Error("Form changed before fill; reobserve its visible questions.");
     await fillAndVerify(formPage, groups, respondent.actions);
     if ((await command({ command: "status" })).revision !== status.revision) throw new Error("Workbench changed during fill; stop before navigation or submission.");
-    onProgress({ status: "verified_section", sectionNumber, questions: respondent.actions.length });
+    await onProgress({ status: "verified_section", sectionNumber, questions: respondent.actions.length });
+    await assertContext();
     const next = nextButton(formPage);
     if (await next.count()) {
       await advance(formPage);
