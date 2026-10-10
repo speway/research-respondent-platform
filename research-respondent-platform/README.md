@@ -360,3 +360,10 @@ access/sign-in remain disabled; participant files stay in the user's tab unless
 explicitly exported. Current checked application: 204 tests, 17 HTTP checks,
 lint/TypeScript/build and all three actual Chromium scripts pass. Final GitHub
 commit and verified primary/Preview URLs are recorded in WORK_CONTINUATION.
+
+Primary panel: **https://research-respondent-platform.vercel.app/workbench**
+(READY, opens without registration; unsigned browser and HTTP 200 verified).
+Protected Preview: https://research-respondent-platform-4cjnlbwjs-spw1.vercel.app/workbench .
+Both deploy checked application `92912a389e5819c050870d89b146e39b9322bb3c`,
+whose CI run 38080225043 passed every step. PR #12 preserves the changes;
+server participant storage and hosted background execution remain unavailable.

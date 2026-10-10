@@ -329,3 +329,40 @@ Actual local final application checks: frozen install exit 0; lint and TypeScrip
 Storage: initial new-store request was rejected by auto-review for separate billing scope; after the owner's explicit reauthorization, the official request returned Vercel 403. No Blob store, anonymous paid route or recurring resource was created. CLI unavailable; dashboard shows sign-in, with no credential entry. Permission is already granted; service access is the remaining blocker. The prepared journal contains only immutable budget hashes, not answers or identities. Hosted background execution and server source storage remain false.
 
 Next three tasks: (1) verify GitHub CI and protected Preview, then publish/read back the data-free primary panel with protected preview/unique URLs; (2) complete official storage authorization and test immutable private reservations under actual concurrency before enabling an authenticated queue; (3) connect durable source/consent/receipt lookup and run an explicitly consented full live-form task using factual answers.
+
+### Verified primary release and source CI
+
+Checked application commit: `92912a389e5819c050870d89b146e39b9322bb3c`.
+GitHub CI https://github.com/speway/research-respondent-platform/actions/runs/38080225043
+SUCCESS: actual job readback confirms locked install/native binding, lint/types,
+204 tests, production build, 17 HTTP checks, browser installation and all three
+actual Chromium workflows succeeded. PR #12 is ready and mergeable, based on
+PR #11: https://github.com/speway/research-respondent-platform/pull/12 .
+Main branch was not changed; the owner-authorized public release is pinned to
+the reviewed task-branch application source.
+
+Protected Preview `dpl_Bdx7NHduZ2nZxA6gGfYraD8mBz4t` is READY, target null, pinned
+to that source: https://research-respondent-platform-4cjnlbwjs-spw1.vercel.app/workbench .
+Official protected panel/manifest/schema/health checks returned 200; health
+confirmed isolated-preview, durable false, sign-in false, integrity ok and four
+migrations with no drift. Sensitive research routes were not fetched remotely.
+
+At the owner's explicit request, data-free production panel deployment
+`dpl_91rXUEvZnKBkMw5vzmdVCo8Df394` is READY, target production, same source.
+The existing primary alias was assigned and official readback binds it to this
+deployment/project. Project SSO is enabled with
+`prod_deployment_urls_and_all_previews`: primary aliases public, previews and
+unique production deployment URLs protected; password protection disabled.
+Canonical site: https://research-respondent-platform.vercel.app/workbench .
+Fresh unsigned Cloud Browser navigation from `/` reached that exact URL and
+rendered the six-item menu/source picker, no application/Vercel login. Automation
+tab rendered the live protocol controls; no data loaded or writes performed.
+Independent curl with no cookie/auth/bypass returned HTTP 200 at the same
+post-redirect URL, panel text present, password fields and Vercel login absent.
+No participant database or responses were published. Production research DB
+health remains intentionally unavailable (public panel works without it).
+
+Only a documentation commit follows this application source; its CI will be
+recorded in PR metadata after actual completion. Existing owner authorization
+for storage and further development persists; the remaining blocker is provider
+403/service sign-in, not missing blanket permission.
