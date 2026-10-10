@@ -264,3 +264,10 @@ pnpm start      # next start --port 4310
 - `[ ]` Are all external services, costs and sensitive-data handling requirements approved? (No DPIA, retention schedule review or instrument licensing review has been performed.)
 - `[ ]` Which 5 navigation destinations (`/cohorts`, `/forms`, `/agents`, `/audit`, `/settings`) are in scope for the next batch, and should the nav hide them until they exist?
 - `[ ]` May a production build (`pnpm build`) be run in a batch where `app/` is stable, so the HTTP smoke suite can be executed against a real build artifact?
+
+
+## 14. GitHub continuation — 2026-10-10 UTC
+
+Repository is now `speway/research-respondent-platform` (private), app root `research-respondent-platform/`. PR #1 is merged and Issue #2 is closed; its seven historical failures are already fixed. Main source `dabed376d36080bc31e466f6907c7172faab2e06` has successful CI. GitHub and Vercel are officially connected and preview preparation is authorized; production with participant data is not authorized. These facts supersede the pre-GitHub open questions above.
+
+Issue #3 source `06c608321c4a9f6c4cc557a213fdca3fb2f627f5`: fresh-db migration status regression; consent/export filtering; study-scoped source loading; ownership and role guards; session-expiry validation; JSONL serialization. Local checks: lint 0, TypeScript 0, 173 tests passed, build 0, 11 HTTP tests passed using a disposable DB. HTTP actions use multipart envelopes; owning-admin mutation succeeds while foreign-admin mutation does not. All navigation destinations including audit/settings exist. Vercel project created with all-deployment SSO, no deployment yet; storage integration lookup is blocked by HTTP 403. See `WORK_CONTINUATION.md` for current state, blockers and next tasks. No real answers were generated or externally submitted.

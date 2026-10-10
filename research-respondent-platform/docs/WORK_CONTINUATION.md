@@ -31,22 +31,41 @@ The first native SQLite install failed because the restricted environment could 
 
 No actual participant records, credentials, local databases or exports were committed. No external forms were submitted. No deployment was performed in this batch.
 
-## Open findings for Issue #3
+## Verified security batch: Issue #3 (2026-10-10 UTC)
 
-- Export runner computes an excluded-consent list but currently does not filter those participants from export content. Fix and add regression tests before using real data.
-- Mapping source loader ignores study scope and currently keeps only one answer per instrument rather than all answers in its latest session. Check multiple sessions/items and cross-study isolation.
-- Review organization ownership at server-action boundaries, scoped role grants, export approval, session expiry, and consent expiry/revocation.
-- `/audit` and `/settings` already exist; do not recreate them. Extend permission/HTTP checks.
+Checked source commit: `06c608321c4a9f6c4cc557a213fdca3fb2f627f5` on `fix/issue-3-security-review`.
+Modified: `app/actions/{agents,audit,cohorts,forms,import,library,participants,studies}.ts`, `app/api/health/route.ts`, `lib/domain/types.ts`, `lib/repo/{org,participants}.ts`, `lib/services/{authz,cohorts,exports-runner,orchestration,ownership,preflight-context}.ts`, `tests/integration/security.test.ts`, `tests/http/smoke.test.ts`.
+
+- Consent gates now filter actual export rows per participant/study; withdrawal cannot fall back to an older grant or blanket consent. Invalid/equal expiry dates fail closed. Withdrawal returns its persisted record ID for audit.
+- Shared provenance sources without participant-linked sessions are omitted conservatively; sources shared across studies are omitted from study-specific exports. Raw source metadata/free-text are not guaranteed anonymous; review content before sharing.
+- Latest-session mapping keeps every item, scopes answers/scores to the requested study and avoids mixing scores from an older selected session.
+- Fixed-query ownership guards protect supplied study/participant/form/library/cohort/agent/export IDs. Task mutations check organization ownership. Study roles no longer grant global study administration; consequential permissions retain their assigned study scope. Participant-wide edits require a grant in an enrolled study.
+- Snapshot creation requires write permission. Export approval/read actions check ownership and permissions. JSONL is serialized as one object per line.
+- Session expiry is validated; health errors no longer echo DB paths/errors. Cookie flags and tampered-session denial are checked over HTTP.
+- Audit/settings routes already existed and rendered successfully; they were not recreated. Audit exports UI remains a read-only monitor; export actions not wired to that page are tested through services, not misreported as a live UI flow.
+
+| Command on this source | Actual result |
+| --- | --- |
+| `pnpm run lint` | exit 0 |
+| `pnpm run typecheck` | exit 0 |
+| `pnpm test` | exit 0; 173/173, 0 skipped |
+| `pnpm run build` | exit 0; 19 routes |
+| `pnpm run test:http` | exit 0; 11/11, 0 skipped |
+
+The HTTP suite now sends real multipart server-action requests. A foreign administrator's study update is denied without changing the record; identical arguments succeed for the owning administrator. An initial attempt to test export actions over HTTP failed because those actions are not registered in the current read-only audit page; the corrected test exercises the live study action. The first new security-fixture run failed from incomplete fixture attributes, then passed after fixing the fixture. No failed runs are claimed as successful.
+
+Organization-scoped list/read pages remain the existing organization-sharing model; this batch does not claim per-study isolation for every aggregate read. Real-data deployment still requires the persistence and security review in Issue #4.
 
 ## Issue #4 boundary
 
 Persistent storage on Vercel is unresolved. Current `better-sqlite3` file data is appropriate only on persistent infrastructure, not ordinary Vercel functions. Do not label an ephemeral preview DB durable.
+Vercel project `research-respondent-platform` / `prj_QImIDlAL2gWdBGOVUayiUjVkeO2r` was created in team `team_ztfiT5yPQ2DPmzYfb4ZWyp6W`, with Next.js, Node 24, app root and SSO protection for all deployments. No deployment yet. Listing storage integrations returned HTTP 403 (forbidden); no authenticated Vercel CLI is installed. Do not assume a persistent resource exists.
 Only prepare a preview without real research data; require human review of Issue #3 and a documented persistent store/recovery plan before production. Use official connected service authorization; never ask for tokens in chat. Do not change billing, deploy production or submit forms without explicit authorization.
 
 ## Next three tasks
 
-1. Fix the verified consent/export and mapping-scope defects with focused security regression tests.
-2. Run lint, TypeScript, all unit/integration tests, production build and HTTP smoke again; update this file and open an Issue #3 PR.
+1. Review/merge the Issue #3 PR after its GitHub CI passes.
+2. Stage a fail-closed, read-only Vercel Preview with no participant records; verify its real URL.
 3. Continue Issue #4: persistence/recovery plan and safe Vercel Preview; record verified URLs and precise remaining blockers. Keep production disabled.
 
 ## Working rules

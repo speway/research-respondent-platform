@@ -326,3 +326,8 @@ scripts/              migrate.ts (db:migrate / db:status), bootstrap.ts
 tests/                unit/, integration/, http/ and helpers/
 docs/                 SETUP.md, DATA_MODEL.md, RESEARCH_INTEGRITY.md
 ```
+
+
+### GitHub status correction (2026-10-10)
+
+This app is tracked in `speway/research-respondent-platform`; PR #1 is merged and Issue #2 is closed. Historical verification counts and missing-route notes above predate current GitHub work. Issue #3 continuation source `06c608321c4a9f6c4cc557a213fdca3fb2f627f5` passes 173 unit/integration tests and 11 production HTTP checks; audit/settings routes exist. Current instructions, checked commits, permission boundaries and Vercel/persistence blockers are in `docs/WORK_CONTINUATION.md`. Preview authorization does not authorize production deployment or external form submission.
