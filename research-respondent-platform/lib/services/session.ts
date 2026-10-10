@@ -5,6 +5,7 @@
  * resolves the actor through `requireActor`, so no screen renders without an
  * authenticated, authorized identity.
  */
+import { hostingMode } from "./hosting-policy.ts";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import type { Db } from "../../db/index.ts";
@@ -30,6 +31,7 @@ export interface AuthContext {
 }
 
 export async function getCurrentAuth(): Promise<AuthContext | null> {
+  if (hostingMode(process.env) !== "persistent-local") return null;
   const store = await cookies();
   const token = store.get(SESSION_COOKIE)?.value;
   if (!token) {
@@ -62,6 +64,7 @@ export async function signIn(input: {
   userAgent?: string | null;
   ipHint?: string | null;
 }): Promise<{ ok: true; token: string } | { ok: false; reason: string }> {
+  if (hostingMode(process.env) !== "persistent-local") return { ok: false, reason: "Sign-in is disabled in this infrastructure preview." };
   const db = getDb();
   const user = authenticate(db, input.email, input.password);
   if (!user) {

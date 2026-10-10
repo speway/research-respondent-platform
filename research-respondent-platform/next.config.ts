@@ -6,6 +6,8 @@ const nextConfig: NextConfig = {
   // actions or route handlers.
   serverExternalPackages: ["better-sqlite3"],
   typedRoutes: false,
+  // Native SQLite runtime loads these immutable files after deployment.
+  outputFileTracingIncludes: { "/*": ["./db/migrations/*.sql", "./db/pragmas.sql"] },
 };
 
 export default nextConfig;

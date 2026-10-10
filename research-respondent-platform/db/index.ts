@@ -15,7 +15,7 @@ export type Db = Database.Database;
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 /** Project root = the directory that contains package.json / db / lib. */
-export const PROJECT_ROOT = resolve(HERE, "..");
+export const PROJECT_ROOT = existsSync(join(process.cwd(), "db", "pragmas.sql")) ? process.cwd() : resolve(HERE, "..");
 export const MIGRATIONS_DIR = join(PROJECT_ROOT, "db", "migrations");
 const PRAGMAS_FILE = join(PROJECT_ROOT, "db", "pragmas.sql");
 
@@ -87,12 +87,12 @@ export interface MigrationFile {
 }
 
 export function loadMigrationFiles(dir: string = MIGRATIONS_DIR): MigrationFile[] {
-  const files = readdirSync(dir)
+  const files = readdirSync(/* turbopackIgnore: true */ dir)
     .filter((name) => name.endsWith(".sql"))
     .sort((a, b) => a.localeCompare(b, "en"));
   return files.map((name) => {
     const path = join(dir, name);
-    const sql = readFileSync(path, "utf8");
+    const sql = readFileSync(/* turbopackIgnore: true */ path, "utf8");
     return {
       id: name.replace(/\.sql$/, ""),
       path,

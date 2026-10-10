@@ -2,6 +2,7 @@
  * Health probe: reports process liveness plus database reachability and
  * migration state. Deliberately exposes no research data.
  */
+import { hostingMode } from "../../../lib/services/hosting-policy.ts";
 import { NextResponse } from "next/server";
 import { getDb } from "../../../lib/db-context.ts";
 import { migrationStatus } from "../../../db/index.ts";
@@ -25,6 +26,7 @@ export async function GET() {
           migrationsPending: pending,
           checksumDrift: drift,
         },
+        hosting: { mode: hostingMode(process.env), durable: hostingMode(process.env) === "persistent-local", signInEnabled: hostingMode(process.env) === "persistent-local" },
         timestamp: new Date().toISOString(),
       },
       { status: healthy ? 200 : 503 },

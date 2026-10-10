@@ -4,6 +4,7 @@
  * Next.js dev mode reloads modules; the connection is cached on globalThis so a
  * reload does not leak file handles or lose the WAL writer lock.
  */
+import { hostingMode } from "./services/hosting-policy.ts";
 import { openDatabase, runMigrations, type Db } from "../db/index.ts";
 
 const GLOBAL_KEY = "__researchRespondentPlatformDb__";
@@ -11,9 +12,11 @@ const GLOBAL_KEY = "__researchRespondentPlatformDb__";
 type GlobalWithDb = typeof globalThis & { [GLOBAL_KEY]?: Db };
 
 export function getDb(): Db {
+  const mode = hostingMode(process.env);
+  if (mode === "blocked-production") throw new Error("Durable deployment storage is not configured.");
   const container = globalThis as GlobalWithDb;
   if (!container[GLOBAL_KEY]) {
-    const db = openDatabase();
+    const db = openDatabase(mode === "isolated-preview" ? { file: ":memory:" } : {});
     container[GLOBAL_KEY] = db;
   }
   return container[GLOBAL_KEY];
