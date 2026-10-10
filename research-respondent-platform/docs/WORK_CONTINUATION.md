@@ -1,5 +1,14 @@
 # ChatGPT Work continuation plan
 
+## Merged baseline (verified 2026-10-10 UTC)
+
+- Main commit: `b9f1da32947c57958dbea52dc03509a1093b015a` (squash merge of PR #1).
+- GitHub Actions on main: https://github.com/speway/research-respondent-platform/actions/runs/38050216368 **SUCCESS**.
+- Last verified main gates: dependencies PASS; native SQLite binding PASS; lint PASS; typecheck PASS; tests **165/165 PASS**; production build PASS; HTTP smoke suite **9/9 PASS**.
+- Issue #2 completed. Continue with https://github.com/speway/research-respondent-platform/issues/3 and then https://github.com/speway/research-respondent-platform/issues/4.
+- No production deployment was performed, and hosted persistent storage remains unresolved. Do not use the current file-backed SQLite architecture for production participant data on Vercel.
+
+
 > **Current operational handoff (2026-10-10).** This file supersedes stale repository/deployment status inside `docs/CHATGPT_HANDOFF.md`. No unexecuted test or release is described as successful.
 
 ## Current verified acceptance result (2026-10-10 UTC)
@@ -14,7 +23,7 @@
 - `pnpm run build`: PASS
 - `pnpm run test:http`: **9/9 PASS** (authenticated production app on temporary DB)
 - Status: all automated CI gates satisfied **for the tested commit**. This is not equivalent to a production security review.
-- Issue #2 (pipeline integration failures): resolved on this branch. Next focus: Issue #3 (migration status, authorization review), then Issue #4 (persistent production database and Vercel preview).
+- Issue #2 (pipeline integration failures): **closed, merged and verified on main**. Next focus: Issue #3 (migration status, authorization review), then Issue #4 (persistent production database and Vercel preview).
 - No deployment, user-data import or external Google Forms submissions were performed.
 - Recent fixes: persisted agent task ID now matches the validated task-contract ID; derived-score cohort SQL joins the assessment session; identity lawful-basis validation rejects whitespace; tests distinguish missing mapped values from unmapped fields; remaining test expectations now match actual persisted IDs and absence of external receipts; `/audit` and `/settings` are authenticated read-only operational pages.
 - Keep `main` and private research data protected. Before real participant data is used, perform a security review and implement durable storage / backup.
@@ -25,7 +34,7 @@
 - **P1:** https://github.com/speway/research-respondent-platform/issues/3 — migration status regression, missing UI routes, authorization checks.
 - **P2:** https://github.com/speway/research-respondent-platform/issues/4 — durable database and safe Vercel preview.
 
-Issue #2 has passing CI on the branch; next start with Issue #3. The cleanup PR is https://github.com/speway/research-respondent-platform/pull/1; it is a draft and should remain unmerged until the acceptance checks pass.
+Issue #2 is closed as completed. The cleanup PR https://github.com/speway/research-respondent-platform/pull/1 was merged into main as commit `b9f1da32947c57958dbea52dc03509a1093b015a`. Next start with Issue #3.
 
 ## Latest verified GitHub Actions result (2026-10-10 UTC)
 
