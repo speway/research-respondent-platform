@@ -708,7 +708,7 @@ test("identity data requires a lawful basis and never leaks into analytic tables
         contactHandle: null,
         lawfulBasis: "",
       }),
-    /lawful_basis/i,
+    (error: unknown) => isDomainError(error, "participant.missing_lawful_basis"),
     "an empty lawful basis must not be storable",
   );
 
@@ -852,7 +852,11 @@ test("an out-of-range answer is excluded and counted, never silently neutralised
 
 test("cohort evaluation keeps unknown consent indeterminate and includes the participant only after consent", () => {
   const w = world();
-  const consentRule = fixtureConsentRule(w.studyId);
+  // Runtime traces are keyed by the persisted criterion row ID, not the source JSON rule ID.
+  const criteria = listCriteria(w.db, w.studyId);
+  const consentCriterion = criteria.find((row) => row.label === "Study consent granted");
+  const ageCriterion = criteria.find((row) => row.label === "Age at enrolment 18+");
+  assert.ok(consentCriterion && ageCriterion);
 
   const before = getStudyCohortPreview(w.db, w.studyId, w.pi);
   assert.equal(before.denominator, 1);
@@ -869,11 +873,11 @@ test("cohort evaluation keeps unknown consent indeterminate and includes the par
     assert.ok(traceEntry.observed.length > 0, `rule ${traceEntry.ruleId} needs an observed value`);
     assert.ok(traceEntry.expected.length > 0, `rule ${traceEntry.ruleId} needs an expected value`);
   }
-  const consentTrace = evaluation.traces.find((traceEntry) => traceEntry.ruleId === consentRule.id);
+  const consentTrace = evaluation.traces.find((traceEntry) => traceEntry.ruleId === consentCriterion.id);
   assert.ok(consentTrace);
   assert.equal(consentTrace.outcome, "indeterminate");
   assert.match(consentTrace.explanation, /no consent record/i);
-  const ageTrace = evaluation.traces.find((traceEntry) => traceEntry.ruleId === AGE_RULE_ID);
+  const ageTrace = evaluation.traces.find((traceEntry) => traceEntry.ruleId === ageCriterion.id);
   assert.equal(ageTrace?.outcome, "include");
   assert.equal(evaluation.indeterminateReasons.length, 1);
 
@@ -1061,7 +1065,7 @@ test("task orchestration gates approval, blocks external submission and refuses 
   const dryRun = await runTask({ db: w.db, actor: w.pi, taskId: preflightTask.id, adapterId: "local-deterministic" });
   assert.equal(dryRun.result.outcome, "succeeded");
   assert.equal(dryRun.task.state, "succeeded");
-  assert.equal(dryRun.result.externalReceipt?.channel, "none");
+  assert.equal(dryRun.result.externalReceipt ?? null, null, "a local preflight returns no external receipt");
   assert.equal(dryRun.result.evidence.some((entry) => entry.evidenceType === "dry_run_report"), true);
   await assert.rejects(
     () => runTask({ db: w.db, actor: w.pi, taskId: preflightTask.id, adapterId: "local-deterministic" }),
@@ -1111,9 +1115,11 @@ test("authorization denies viewer writes and agent identity access", () => {
   assert.equal(agentDecision.policyCode, "rbac.agent_forbidden");
   assert.match(agentDecision.reason, /human approval is required/);
 
-  // Registering an agent is an organization-scoped permission, not a study data write.
-  const scopedDenied = authorize(w.agent, PERMISSIONS.agentWrite, { studyId: w.studyId });
-  assert.equal(scopedDenied.allowed, true, "agentWrite carries no study-scope requirement");
+  // Registration is organization-scoped, but the actor must still hold agent:write.
+  assert.equal(authorize(w.agent, PERMISSIONS.agentWrite, { studyId: w.studyId }).allowed, false);
+  const authorizedAgent = { ...w.agent, permissions: [...w.agent.permissions, PERMISSIONS.agentWrite] };
+  const scopedAllowed = authorize(authorizedAgent, PERMISSIONS.agentWrite, { studyId: w.studyId });
+  assert.equal(scopedAllowed.allowed, true, "an explicitly granted agentWrite needs no study write grant");
   assert.equal(authorize(w.viewer, PERMISSIONS.studyWrite, { studyId: w.studyId }).allowed, false);
   w.db.close();
 });
