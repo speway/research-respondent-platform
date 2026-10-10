@@ -4,7 +4,7 @@
 
 Repository: `speway/research-respondent-platform` (now public; verified 2026-10-10). App root: `research-respondent-platform/`.
 PR #1 is merged; Issue #2 is closed. Do not repeat the seven historical pipeline fixes.
-Current task branch: `feat/agent-workbench-automation` / PR #10, stacked on `feat/browser-workbench` / PR #9, then `feat/issue-4-protected-preview` / PR #8 and `fix/issue-3-security-review` / PR #7. Main baseline is `dabed376d36080bc31e466f6907c7172faab2e06` (reverified 2026-10-10).
+Current task branch: `feat/form-control-expansion` / PR #11, stacked on `feat/agent-workbench-automation` / PR #10, then `feat/browser-workbench` / PR #9, then `feat/issue-4-protected-preview` / PR #8 and `fix/issue-3-security-review` / PR #7. Main baseline is `dabed376d36080bc31e466f6907c7172faab2e06` (reverified 2026-10-10).
 Main CI evidence: https://github.com/speway/research-respondent-platform/actions/runs/38050403851 (SUCCESS).
 
 `CHATGPT_HANDOFF.md`, app README status tables and `RESEARCH_INTEGRITY.md` contain dated pre-GitHub observations. They are historical evidence, not the current repository/deployment state. Append corrections to the historical activity log; do not remove old entries.
@@ -165,3 +165,110 @@ Final protected deployment `dpl_4Re45WFV1EYUQz2XnnF9uTFb2eHo` is READY, target n
 URL: https://research-respondent-platform-p5gqj3uzd-spw1.vercel.app/workbench . Official protected fetches: workbench 200 with Automation menu/source picker and no password field; manifest and both schemas 200 with the expected protocol/strict object contracts; health 200 with integrity ok, four migrations/no pending/no drift, isolated-preview, durable false, research sign-in disabled; participant route still follows its denial redirect to the disabled login. These deployed checks are HTTP/content checks; actual interactive browser evidence is local and GitHub CI on this source.
 
 Vercel protection readback remains SSO enabled for all deployments. An official temporary owner share link was prepared; its bearer URL is not committed. No production deployment, participant database, credentials or billing change occurred. Final documentation-only head CI must also be recorded in PR #10 after its actual completion.
+
+## Form-control expansion and link reuse — 2026-10-10 UTC
+
+PR #11: https://github.com/speway/research-respondent-platform/pull/11 . Branch
+`feat/form-control-expansion` starts from PR #10 head
+`dccc2e884a7c1b2553e262e2a6cad0fa7b821693`. Checked application source:
+`4b67d35eacf771366398f2a661892e0a9759820a`. Existing stack #6–#10 remains
+open; main and immutable migrations were not changed.
+
+Modified: `.github/workflows/ci.yml`, `components/{workbench.tsx,use-agent-workbench.ts}`,
+`lib/domain/agent-workbench.ts`, public agent manifest/observation schema,
+`tools/browser-agent/runner.mjs`, package/lock. New:
+`tests/{unit/agent-controls.test.ts,unit/cloud-audit.test.ts,browser/agent-controls.mjs}`,
+`lib/services/cloud-form-audit.ts`, `tools/cloud-agent/audit-entry.mjs`,
+`scripts/audit-cloud-form.ts`, `docs/CLOUD_AGENT.md`; agent/workbench guides,
+README and historical handoff updated.
+
+| Check | Actual local result on application source |
+| --- | --- |
+| Frozen install with matching local Node headers | exit 0; pinned `@vercel/sandbox@3.6.1` added with lock update |
+| `pnpm run lint` / `pnpm run typecheck` | exit 0 / exit 0 |
+| `pnpm test` | exit 0; 197/197 pass, zero skips |
+| `pnpm run build` | exit 0; existing 20 routes, no new anonymous submission/start endpoint |
+| `pnpm run test:http` against final production build | exit 0; 17/17 pass, zero skips |
+| Actual Chromium: existing workbench and executor scripts | both exit 0; previous receipts/grants/uncertain-submit defenses retained |
+| Actual Chromium: new controls script | exit 0; intro traversal/read-only audit, labeled radio/checkbox rows, clearing extra checkbox draft selections, exact comma-containing options, native/accessible dropdowns, number bounds, known finite radios alongside Other, missing-draft refusal, link-only reuse/stale-map invalidation, accessible URL action, 390px no overflow; no fixture submit |
+| `git diff --check` | exit 0 |
+
+Initial verification failures were an escaped-quote fixture lint error and missing
+local Chromium; fixed before passing. Direct Playwright browser CDN retrieval
+returned invalid/truncated archives in this environment. A pinned reputable npm
+Chromium distribution was used outside the application for local browser checks
+(Playwright 1.62.1, Chromium 153). CI retains standard Playwright Chromium install;
+its result must be read independently. No runtime browser package was added to
+the application. Sandbox setup/browser-install tests use injected lifecycle
+fixtures, not a real provider VM.
+
+`target` retains configured source/hash/ID/reference/purpose/criteria and removes
+old fields/observations, even for the same URL. It refuses an unconfigured source.
+The external executor can receive `formUrl` instead of reloading a task. A link
+still cannot supply participant answers, select a different person or authorize
+a new recipient. Multi-choice cells use explicit nonempty JSON-array strings;
+raw cells are preserved. Matrix row labels must be explicit/unique, and each row
+maps separately. Unlabeled/custom layouts, free Other text, hidden validation and
+one-per-column restrictions remain unsupported or stop on UI validation.
+
+Live UI audit, using the already provided form link: read the introductory page
+and clicked Next without entering answers; reached page 2/6, first factual
+section containing six questions. Visible DOM readback confirmed level-3 headings,
+listitem containers, exact radio labels and two Other-text alternatives. No
+factual answers were available for the subsequent required questions, so no
+values were entered and no response was recorded. This verifies live access and
+structure inspection, not a complete production-executor submission or matrices
+on that particular live form. No account sign-in/CAPTCHA bypass was attempted.
+
+Cloud reader: bounded 5-minute/one-vCPU/nonpersistent VM, no exposed port/source
+records/model credentials; official deployment OIDC; pinned browser setup;
+network tightened before form reading; atomic one-run budget reservation before
+allocation; cleanup on success/failure; invalid/oversized/foreign result rejection.
+No permanent hosted agent, queue or paid resource was provisioned. Official
+metadata lists zero named sandboxes and zero project envs; team metadata does not
+expose quota/billing plan. AGENTS.md rule 7 requires explicit permission for paid
+services. The prepared run is documented in `CLOUD_AGENT.md`. Current production
+fail-closed and Preview disabled research sign-in remain unchanged; Issue #4's
+durable source/receipt storage remains unresolved.
+
+Application-source CI started: https://github.com/speway/research-respondent-platform/actions/runs/38075275395
+(currently in progress; do not treat this as success). Protected Preview build
+`dpl_6AwG991KcnWRKKvyhAszP3XKvRdG` targets null/Preview at
+https://research-respondent-platform-77lkhzfh8-spw1.vercel.app/workbench , pinned to
+the application SHA above. Actual final CI/Preview readbacks will be appended.
+
+Next three tasks:
+1. Obtain a concrete owner-approved budget and run the prepared read-only cloud
+   audit through official auth; verify boot/install/Google read/VM stop and record
+   actual evidence before claiming hosted runtime readiness.
+2. Configure approved durable storage plus authenticated source/consent selection,
+   atomic shared receipts/budget reservations and a bounded on-demand queue worker;
+   keep participant sources encrypted with explicit retention.
+3. Verify complete live filling/submission only with provided factual responses
+   and explicit recipient/participant permission; extend the reader only from
+   independently observed unsupported control layouts.
+
+Final application-source CI SUCCESS:
+https://github.com/speway/research-respondent-platform/actions/runs/38075275395 .
+Actual job readback confirmed every step, including locked/native install,
+lint/types/tests/build/HTTP, standard Chromium install and all three browser
+scripts. Preview `dpl_6AwG991KcnWRKKvyhAszP3XKvRdG` is READY, target null, Git
+source `4b67d35eacf771366398f2a661892e0a9759820a`.
+Official protected HTTP checks: workbench 200 with Automation and no application
+password input; manifest 200 with link reuse/matrix/multiple-choice capabilities
+and hosted worker/source upload/submission still false; observation schema 200
+with matrix and multiple-choice fields; health 200 with integrity ok, four
+migrations/no pending/no drift, isolated-preview, durable false, research sign-in
+false. Project readback: SSO enabled on all deployments; password protection
+explicitly disabled (the metadata object itself is not an enabled boolean).
+
+Auto-review rejected the protected deployed `/participants` request as a
+potentially sensitive participant-data route through temporary auth access.
+The initial non-JSON rejection was inspected as a parse failure and the request
+was inadvertently repeated once; both rejected, no data returned. No bypass or
+further retry was attempted. Local production HTTP tests independently verified
+this route's disabled Preview access. Do not report the deployed participant
+route as tested in this batch. No paid provisioning, live response submission,
+production publish or respondent source upload occurred.
+
+Cloud Browser also opened the protected workbench through official temporary owner access: the actual Preview rendered Respondent Lab, all six navigation items and source picker, with no application email/password fields and no loaded participant data. The owner link expires according to the provider and is not committed. Final documentation-only head CI will be recorded in PR #11 after completion.
