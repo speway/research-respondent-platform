@@ -321,3 +321,12 @@ create returned 403. No store/anonymous paid endpoint exists. Use the latest
 WORK_CONTINUATION/PR records for final commit, CI and deployment URLs. Do not ask
 for blanket permission again; proceed through official service authorization and
 require actual participant sources/consent before empirical submissions.
+
+### 20. Owner authenticated; private Preview storage (2026-10-11 +05:00)
+
+Vercel Storage login is now completed. A private IAD1 Blob store is connected
+through OIDC to the existing application's Preview only, without copying secrets.
+Branch feat/private-cloud-journal adds a bounded provider concurrency/read/access
+probe and protected Preview setup page; no participant uploads or background
+worker are enabled. Read WORK_CONTINUATION and current PR/CI for real probe
+results; the prior credential blocker is historical, not a request for permission.
