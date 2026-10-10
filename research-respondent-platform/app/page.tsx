@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
+import { hostingMode } from "../lib/services/hosting-policy.ts";
 import { Panel, Metric, Chip, formatDateTime, stateTone } from "../components/ui.tsx";
 import { requireAuth } from "../lib/services/session.ts";
 import { listStudies, studyOverviewCounts } from "../lib/repo/studies.ts";
@@ -12,6 +14,7 @@ import { assessRetention } from "../lib/repo/exports.ts";
 export const dynamic = "force-dynamic";
 
 export default async function OverviewPage() {
+  if (hostingMode(process.env) === "isolated-preview") redirect("/workbench");
   const { db, actor } = await requireAuth();
   const organizationId = actor.organizationId;
 
