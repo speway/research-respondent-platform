@@ -2,13 +2,30 @@
 
 > **Current operational handoff (2026-10-10).** This file supersedes stale repository/deployment status inside `docs/CHATGPT_HANDOFF.md`. No unexecuted test or release is described as successful.
 
+## Current verified acceptance result (2026-10-10 UTC)
+
+- **Validated source commit:** `146991f741f92d552f1d53b8d988af9cf42e2eea`
+- **GitHub Actions evidence:** https://github.com/speway/research-respondent-platform/actions/runs/38050032327
+- `pnpm install --frozen-lockfile`: PASS
+- Native `better-sqlite3` check: PASS
+- `pnpm run lint`: PASS
+- `pnpm run typecheck`: PASS
+- `pnpm test`: **165/165 PASS**
+- `pnpm run build`: PASS
+- `pnpm run test:http`: **9/9 PASS** (authenticated production app on temporary DB)
+- Status: all automated CI gates satisfied **for the tested commit**. This is not equivalent to a production security review.
+- Issue #2 (pipeline integration failures): resolved on this branch. Next focus: Issue #3 (migration status, authorization review), then Issue #4 (persistent production database and Vercel preview).
+- No deployment, user-data import or external Google Forms submissions were performed.
+- Recent fixes: persisted agent task ID now matches the validated task-contract ID; derived-score cohort SQL joins the assessment session; identity lawful-basis validation rejects whitespace; tests distinguish missing mapped values from unmapped fields; remaining test expectations now match actual persisted IDs and absence of external receipts; `/audit` and `/settings` are authenticated read-only operational pages.
+- Keep `main` and private research data protected. Before real participant data is used, perform a security review and implement durable storage / backup.
+
 ## Tracked GitHub issues
 
 - **P0:** https://github.com/speway/research-respondent-platform/issues/2 — restore seven failing pipeline integration tests.
 - **P1:** https://github.com/speway/research-respondent-platform/issues/3 — migration status regression, missing UI routes, authorization checks.
 - **P2:** https://github.com/speway/research-respondent-platform/issues/4 — durable database and safe Vercel preview.
 
-Start with Issue #2. The cleanup PR is https://github.com/speway/research-respondent-platform/pull/1; it is a draft and should remain unmerged until the acceptance checks pass.
+Issue #2 has passing CI on the branch; next start with Issue #3. The cleanup PR is https://github.com/speway/research-respondent-platform/pull/1; it is a draft and should remain unmerged until the acceptance checks pass.
 
 ## Latest verified GitHub Actions result (2026-10-10 UTC)
 
