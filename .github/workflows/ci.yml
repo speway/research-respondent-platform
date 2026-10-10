@@ -62,3 +62,14 @@ jobs:
 
       - name: HTTP smoke suite
         run: pnpm run test:http
+
+      - name: Install isolated browser tooling
+        run: |
+          npm install --prefix "$RUNNER_TEMP/rrp-browser" --no-save --ignore-scripts playwright@1.62.1
+          node "$RUNNER_TEMP/rrp-browser/node_modules/playwright/cli.js" install --with-deps chromium
+
+      - name: Verify browser workbench and agent execution
+        run: |
+          export PLAYWRIGHT_MODULE="file://$RUNNER_TEMP/rrp-browser/node_modules/playwright/index.mjs"
+          node --experimental-strip-types tests/browser/workbench.mjs
+          node --experimental-strip-types tests/browser/agent-workbench.mjs

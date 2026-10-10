@@ -4,8 +4,10 @@ import { useMemo, useRef, useState } from "react";
 import { buildPacket, emptyWorkspace, MAX_FILE_BYTES, parseSource, preparationProblems, restoreWorkspace, selectedRows, type FieldMapping, type Rule, type Workspace } from "../lib/domain/workbench.ts";
 import dictionary from "../tools/psychological-personas/references/dimensions.json";
 import styles from "./workbench.module.css";
+import { useAgentWorkbench } from "./use-agent-workbench.ts";
+import { buildAgentPlan } from "../lib/domain/agent-workbench.ts";
 
-const sections = ["База ответов", "Отбор и классификация", "Карта формы", "Пакет для агента", "Психологический справочник"];
+const sections = ["База ответов", "Отбор и классификация", "Карта формы", "Пакет для агента", "Психологический справочник", "Автоматизация"];
 const groupNames: Record<string, string> = { bfi2_facets: "Большая пятёрка · BFI-2", ipip_neo_facets: "IPIP-NEO", hexaco_facets: "HEXACO", cattell_concepts: "Кеттелл · 16PF", pts_concepts: "Стреляу · PTS", rtt_concepts: "Стреляу · RTT", atq_concepts: "Темперамент · ATQ", tci_concepts: "TCI", self_regulation: "Саморегуляция", emotion_regulation: "Эмоциональная регуляция", impulsivity: "Импульсивность", resources: "Ресурсы", attachment: "Привязанность", coping_tendencies: "Совладание", mpq_concepts: "MPQ", value_priorities: "Ценностные приоритеты", reporting_style: "Стиль самоотчёта" };
 const operators: Array<[Rule["op"], string]> = [["eq", "Равно"], ["ne", "Не равно"], ["contains", "Содержит"], ["gte", "Не меньше"], ["lte", "Не больше"], ["present", "Заполнено"], ["missing", "Отсутствует"]];
 
@@ -17,7 +19,8 @@ function download(name: string, data: unknown) {
 function message(error: unknown) { return error instanceof Error ? error.message : "Не удалось обработать файл."; }
 
 export function Workbench() {
-  const [workspace, setWorkspace] = useState<Workspace>(emptyWorkspace);
+  const agent = useAgentWorkbench();
+  const { workspace, setWorkspace } = agent;
   const [section, setSection] = useState(0);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
@@ -28,6 +31,7 @@ export function Workbench() {
   const importSequence = useRef(0);
   const sourceInput = useRef<HTMLInputElement>(null);
   const projectInput = useRef<HTMLInputElement>(null);
+  const agentInput = useRef<HTMLInputElement>(null);
   const rows = useMemo(() => selectedRows(workspace), [workspace]);
   const problems = useMemo(() => preparationProblems(workspace), [workspace]);
   const dataset = workspace.dataset;
@@ -67,6 +71,17 @@ export function Workbench() {
   function editField(index: number, patch: Partial<FieldMapping>) { update({ fields: workspace.fields.map((field, i) => i === index ? { ...field, ...patch } : field) }); }
   function exportPacket() { try { download("form-agent-packet.json", buildPacket(workspace)); setNotice("Пакет скачан. Ответы во внешнюю форму не отправлялись."); setError(""); } catch (cause) { setError(message(cause)); } }
   const selectedCount = rows.length;
+  async function loadAgentTask(file: File | undefined) {
+    if (!file) return;
+    setError(""); setNotice(""); setBusy(true);
+    try {
+      if (file.size > MAX_FILE_BYTES * 3) throw new Error("Задание превышает 15 МБ.");
+      const task: unknown = JSON.parse(await file.text());
+      await agent.execute({ command: "load", expectedRevision: agent.revision, task });
+      setNotice("Задание загружено. Агент может прочитать форму и сопоставить ответы через программный вход.");
+    } catch (cause) { setError(message(cause)); }
+    finally { setBusy(false); if (agentInput.current) agentInput.current.value = ""; }
+  }
 
   return <div className={styles.shell} lang="ru">
     <aside className={styles.sidebar}>
@@ -100,6 +115,15 @@ export function Workbench() {
         const dimensions = Object.entries(definition.dimensions).filter(([key, d]) => `${key} ${d.label_ru} ${groupNames[group]}`.toLocaleLowerCase("ru").includes(search.toLocaleLowerCase("ru")));
         return dimensions.length ? <div key={group}><h3>{groupNames[group] ?? group}</h3><div>{dimensions.map(([key, d]) => <button key={key} title="Использовать как название критерия" onClick={() => { setDraft({ ...draft, label: d.label_ru }); setSection(1); setNotice(`Название критерия: ${d.label_ru}. Выберите измеренный столбец и условие.`); }}>{d.label_ru}</button>)}</div></div> : null;
       })}</div></div></section> : null}
+
+      {section === 5 ? <section className={styles.panel}><div className={styles.panelTitle}><h2>Рабочее место агента</h2><span>Открытый протокол · v1</span></div><div className={styles.content}>
+        <p>Передайте агенту ссылку на эту панель, исходную базу и задачу. Через программный вход он загрузит данные, прочитает видимые вопросы формы, автоматически найдёт однозначные соответствия и проверит план заполнения.</p>
+        <p>Браузерный исполнитель поддерживает текст и одиночный выбор. Для каждого нового раздела он заново читает вопросы и проверяет введённые значения. Неоднозначные столбцы и отсутствующие ответы останавливают проход.</p>
+        <div className={styles.actions}><a className="btn" href="/.well-known/rrp-agent.json" target="_blank" rel="noreferrer">Инструкция для агента</a><button className="btn" disabled={busy} onClick={() => agentInput.current?.click()}>Открыть задание агента</button><input type="file" accept=".json" ref={agentInput} className={styles.hidden} aria-label="Задание агента" onChange={(e) => void loadAgentTask(e.target.files?.[0])} /></div>
+        <div className={styles.checks}><h3>{agent.observation ? agent.problems.length ? "Проход остановлен" : "План готов" : "Программный вход готов"}</h3><p>Версия панели: {agent.revision}. Последняя команда: {agent.lastCommand || "ещё не поступала"}.</p>{agent.observation ? <><p>Прочитана форма: {agent.observation.title}. {agent.observation.scope === "visible_section" ? "Проверен текущий видимый раздел." : "Передана полная карта формы."}</p>{agent.problems.length ? <ul>{agent.problems.slice(0, 15).map((p, i) => <li key={i}>{p}</li>)}</ul> : <p>Карта и варианты проверены. Можно передать план браузерному исполнителю.</p>}</> : <p>Ожидается чтение формы агентом. Ссылка сама по себе не запускает облачного исполнителя.</p>}</div>
+        <button className="btn btn-primary" disabled={agent.problems.length > 0} onClick={() => { try { download("browser-agent-plan.json", buildAgentPlan(workspace, agent.observation)); setNotice("План скачан. Отправка во внешнюю форму ещё не выполнялась."); } catch (cause) { setError(message(cause)); } }}>Скачать проверенный план</button>
+        <p className={styles.footnote}>Исполнитель работает в браузере агента. Отправка доступна только для явно разрешённого получателя и участников; подтверждение результата читается в форме. В Preview нет постоянно работающего облачного агента.</p>
+      </div></section> : null}
 
       {dataset && [0, 1].includes(section) ? <section className={styles.panel}><div className={styles.panelTitle}><h2>Предпросмотр записей</h2><span>{rows.length} после отбора · первые 8 столбцов</span></div><div className={styles.tableScroll}><table className="data-table"><thead><tr><th>Строка источника</th>{headers.slice(0, 8).map((h) => <th key={h}>{h}</th>)}</tr></thead><tbody>{shownRows.map((row) => <tr key={row.line}><td>{row.line}</td>{row.values.slice(0, 8).map((value, i) => <td key={i}>{value === null ? <span className={styles.missing}>нет ответа</span> : String(value)}</td>)}</tr>)}</tbody></table></div>{!rows.length ? <p className={styles.content}>Нет записей, соответствующих критериям.</p> : null}<div className={styles.pagination}><button className="btn" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)}>Назад</button><span>{shownPage + 1} / {Math.max(1, Math.ceil(rows.length / 20))}</span><button className="btn" disabled={(shownPage + 1) * 20 >= rows.length} onClick={() => setPage(shownPage + 1)}>Далее</button></div></section> : null}
       <footer className={styles.footer}><span>Данные остаются в этой вкладке. Скачайте проект, чтобы продолжить после закрытия.</span><button disabled={busy} onClick={() => { ++importSequence.current; setWorkspace(emptyWorkspace()); setPage(0); setNotice("База и настройки удалены из текущей вкладки."); setError(""); }}>Очистить рабочую панель</button></footer>

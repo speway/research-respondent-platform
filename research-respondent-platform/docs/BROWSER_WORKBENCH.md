@@ -6,11 +6,12 @@ The existing application now includes `/workbench`. Vercel Preview home redirect
 
 1. **База ответов:** upload your CSV UTF-8, TSV or flat JSON file. One record per participant; unique headings. Save XLSX as CSV UTF-8 first. Choose the participant ID column and describe the source.
 2. **Отбор и классификация:** choose columns, operators and group labels. Combine criteria with all/any. Criteria change the selection and separate classification labels; they never rewrite source answers.
-3. **Карта формы:** enter the Google Forms link, add exact questions and map each to a source column. Set required flags according to the actual form. Questions are mapped manually in this version; the URL does not automatically read the form.
+3. **Карта формы:** for manual preparation, enter the Google Forms link, add exact questions and map each to a source column. Set required flags according to the actual form. The URL alone does not start a worker; an external agent can now read and automatically map the form using the Automation protocol below.
 4. **Пакет для агента:** describe the task. Resolve displayed blockers, then download JSON. Required missing answers must be obtained from participants. Check the recipient permission and exact answer options before asking an agent to fill a form.
 5. **Сохранить проект:** download a JSON project containing the base and settings. Use **Открыть проект** to restore it. Without that file, closing/reloading the tab loses the in-memory workspace.
+6. **Автоматизация:** give the external browser agent this panel URL, source file, destination and purpose. The versioned command bridge supports programmatic load/read/map/check/plan without manual panel edits. A portable browser adapter supports text and single-choice section filling with an explicit scoped grant. Discovery: `/.well-known/rrp-agent.json`; full workflow and limits: [`AGENT_AUTOMATION.md`](AGENT_AUTOMATION.md).
 
-The file is processed only on the user's device. There is no server upload, cloud sync, browser storage or external form submission in this feature. The clear button drops the active workspace; downloaded files remain under the user's control. Only explicitly mapped columns enter an agent packet. Source data in a saved project remains private to the user; never add real project files to GitHub.
+The file is processed only in the workbench tab. There is no server upload, cloud sync or browser storage. The site itself does not submit forms; the new external browser adapter can do so within an explicit grant and durable receipt journal. The clear button drops the active workspace; downloaded files remain under the user's control. Only explicitly mapped columns enter an agent packet. Source data in a saved project remains private to the user; never add real project files to GitHub. Form observations are transient; restoring a saved project requires a fresh agent read before an automated plan.
 
 ## Source integrity and limits
 
