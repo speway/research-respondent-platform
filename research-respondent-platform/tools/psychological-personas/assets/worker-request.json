@@ -1,0 +1,14 @@
+{
+  "protocol_version": "1",
+  "request_id": "education-example",
+  "operation": "generate",
+  "data_origin": "modeled",
+  "parameters": {
+    "count": 4,
+    "seed": 42,
+    "age_min": 18,
+    "age_max": 25,
+    "topic": "education",
+    "conditions": { "stress": 50, "support": 50, "fatigue": 30 }
+  }
+}

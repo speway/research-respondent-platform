@@ -323,6 +323,25 @@ describe("HTTP smoke: production server on a throwaway database", { skip: SKIP_R
     assert.match(denial.detail_json, /invalid_credentials_or_inactive/);
   });
 
+  it("persona schema requires authentication and exposes only modeled definitions", async () => {
+    const path = "/api/personas/schema";
+    const anonymous = await httpGet(requireServer().baseUrl, path);
+    assert.equal(anonymous.status, 401);
+    const tables = ["participant", "consent_record", "observed_answer", "derived_score"];
+    const counts = () => tables.map((table) => countRows(`SELECT COUNT(*) AS n FROM ${table}`));
+    const before = counts();
+    const response = await httpGet(requireServer().baseUrl, path, { cookie: requireCookie() });
+    assert.equal(response.status, 200);
+    const schema = JSON.parse(response.body) as { data_origin: string; groups: Record<string, { dimensions: object }>; topics: string[] };
+    assert.equal(schema.data_origin, "modeled");
+    assert.equal(Object.keys(schema.groups).length, 17);
+    assert.equal(Object.values(schema.groups).reduce((n, g) => n + Object.keys(g.dimensions).length, 0), 169);
+    assert.equal(schema.topics.length, 6);
+    assert.deepEqual(counts(), before);
+    const post = await httpPost(requireServer().baseUrl, path, {}, { cookie: requireCookie() });
+    assert.equal(post.status, 405, "schema endpoint must expose no write/generation path");
+  });
+
   it("9. after shutdown the throwaway database is intact and then removed", async () => {
     const active = requireServer();
     const dbFile = active.dbFile;

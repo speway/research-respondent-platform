@@ -45,6 +45,11 @@ jobs:
       - name: Install locked dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Set up Python persona worker
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
       - name: Verify native SQLite module
         run: node -e "require('better-sqlite3'); console.log('SQLite native binding available')"
 
