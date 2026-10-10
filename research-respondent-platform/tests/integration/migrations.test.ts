@@ -10,6 +10,20 @@ function memoryDb() {
   return openDatabase({ file: ":memory:" });
 }
 
+test("migration status on an unmigrated database reports pending without writing metadata", () => {
+  const db = openDatabase({ file: ":memory:", migrate: false });
+  try {
+    const before = db.prepare("SELECT name FROM sqlite_master ORDER BY name").all();
+    const status = migrationStatus(db);
+    assert.equal(status.length, loadMigrationFiles().length);
+    assert.ok(status.length > 0);
+    assert.ok(status.every(row => !row.applied && row.appliedAt === null && row.checksumMatches === null));
+    assert.deepEqual(db.prepare("SELECT name FROM sqlite_master ORDER BY name").all(), before);
+  } finally {
+    db.close();
+  }
+});
+
 test("all migrations apply cleanly to a fresh database", () => {
   const db = memoryDb();
   const status = migrationStatus(db);
