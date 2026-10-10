@@ -2,6 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { participantConsentDecision } from "../../lib/services/exports-runner.ts";
+import { assertOwned, assertStudyChild } from "../../lib/services/ownership.ts";
 import { requireAuth } from "../../lib/services/session.ts";
 import { PERMISSIONS, assertAuthorized } from "../../lib/services/authz.ts";
 import { recordAudit } from "../../lib/services/audit.ts";
@@ -117,6 +119,7 @@ export async function captureFormVersionAction(formData: FormData): Promise<Acti
   try {
     assertAuthorized(actor, PERMISSIONS.mappingWrite);
     const externalFormId = String(formData.get("externalFormId") ?? "");
+    assertOwned(db, actor, "form", externalFormId);
     const versionLabel = String(formData.get("versionLabel") ?? "").trim();
     const revisionId = String(formData.get("revisionId") ?? "").trim();
     const fieldsJson = String(formData.get("fieldsJson") ?? "").trim();
@@ -213,8 +216,13 @@ export async function upsertMappingAction(formData: FormData): Promise<ActionRes
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const externalFormVersionId = String(formData.get("externalFormVersionId") ?? "");
+    assertOwned(db, actor, "formVersion", externalFormVersionId);
     const externalFormFieldId = String(formData.get("externalFormFieldId") ?? "");
+    assertOwned(db, actor, "formField", externalFormFieldId);
+    const fieldVersion = db.prepare("SELECT external_form_version_id FROM external_form_field WHERE id = ?").get(externalFormFieldId) as { external_form_version_id: string };
+    if (fieldVersion.external_form_version_id !== externalFormVersionId) throw new DomainError("auth.denied", "Field does not belong to the selected form version.");
     assertAuthorized(actor, PERMISSIONS.mappingWrite, { studyId });
     const mappingKind = String(formData.get("mappingKind") ?? "unmapped");
     const parsedKind = z
@@ -280,7 +288,9 @@ export async function validateMappingAction(formData: FormData): Promise<ActionR
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const externalFormVersionId = String(formData.get("externalFormVersionId") ?? "");
+    assertOwned(db, actor, "formVersion", externalFormVersionId);
     assertAuthorized(actor, PERMISSIONS.mappingWrite, { studyId });
     const fields = listFormFields(db, externalFormVersionId);
     const mappings = listFieldMappings(db, studyId, externalFormVersionId);
@@ -362,8 +372,11 @@ export async function preflightAction(formData: FormData): Promise<ActionResult>
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const participantId = String(formData.get("participantId") ?? "");
+    assertOwned(db, actor, "participant", participantId);
     const externalFormVersionId = String(formData.get("externalFormVersionId") ?? "");
+    assertOwned(db, actor, "formVersion", externalFormVersionId);
     assertAuthorized(actor, PERMISSIONS.mappingRead, { studyId });
     const report = buildParticipantPreflight(db, { studyId, participantId, externalFormVersionId });
     recordAudit(db, {
@@ -405,9 +418,9 @@ function buildParticipantPreflight(
     .prepare(
       `SELECT status, consent_version, withdrawn_at FROM consent_record
        WHERE participant_id = ? AND (study_id = ? OR study_id IS NULL)
-       ORDER BY recorded_at DESC LIMIT 1`,
+       ORDER BY CASE WHEN study_id = ? THEN 0 ELSE 1 END, recorded_at DESC, rowid DESC LIMIT 1`,
     )
-    .get(input.participantId, input.studyId) as
+    .get(input.participantId, input.studyId, input.studyId) as
     | { status: string; consent_version: string; withdrawn_at: string | null }
     | undefined;
   return buildPreflight({
@@ -418,7 +431,7 @@ function buildParticipantPreflight(
     mappings: mappings.map(toMappingCandidate),
     context,
     consent: {
-      status: consentRow?.status ?? "none",
+      status: participantConsentDecision(db, input.participantId, input.studyId).allowed ? "granted" : "inactive",
       version: consentRow?.consent_version ?? null,
       withdrawnAt: consentRow?.withdrawn_at ?? null,
     },
@@ -431,7 +444,9 @@ export async function deleteMappingAction(formData: FormData): Promise<ActionRes
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const mappingId = String(formData.get("mappingId") ?? "");
+    assertStudyChild(db, studyId, "mapping", mappingId);
     assertAuthorized(actor, PERMISSIONS.mappingWrite, { studyId });
     const removed = deleteFieldMapping(db, mappingId);
     recordAudit(db, {

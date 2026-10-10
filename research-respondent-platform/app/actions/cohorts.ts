@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { assertOwned } from "../../lib/services/ownership.ts";
 import { requireAuth } from "../../lib/services/session.ts";
 import { PERMISSIONS, assertAuthorized } from "../../lib/services/authz.ts";
 import { createStudySegment, snapshotSegment, updateSegmentRules } from "../../lib/services/cohorts.ts";
@@ -21,6 +22,7 @@ export async function createSegmentAction(formData: FormData): Promise<ActionRes
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const name = String(formData.get("name") ?? "").trim();
     const description = String(formData.get("description") ?? "").trim();
     const rulesJson = String(formData.get("rulesJson") ?? "").trim();
@@ -62,6 +64,7 @@ export async function updateSegmentRulesAction(formData: FormData): Promise<Acti
   const { db, actor } = await requireAuth();
   try {
     const segmentId = String(formData.get("segmentId") ?? "");
+    assertOwned(db, actor, "segment", segmentId);
     const rulesJson = String(formData.get("rulesJson") ?? "").trim();
     let rawRules: unknown;
     try {
@@ -92,6 +95,7 @@ export async function snapshotSegmentAction(formData: FormData): Promise<ActionR
   const { db, actor } = await requireAuth();
   try {
     const segmentId = String(formData.get("segmentId") ?? "");
+    assertOwned(db, actor, "segment", segmentId);
     assertAuthorized(actor, PERMISSIONS.cohortRead);
     const { snapshot } = snapshotSegment(db, actor, segmentId);
     revalidatePath("/cohorts");
@@ -109,6 +113,7 @@ export async function deleteSegmentAction(formData: FormData): Promise<ActionRes
   const { db, actor } = await requireAuth();
   try {
     const segmentId = String(formData.get("segmentId") ?? "");
+    assertOwned(db, actor, "segment", segmentId);
     const segment = getSegment(db, segmentId);
     if (!segment) {
       return { ok: false, message: "Cohort not found." };
@@ -127,6 +132,7 @@ export async function previewRulesAction(formData: FormData): Promise<ActionResu
   const { db, actor } = await requireAuth();
   try {
     const studyId = String(formData.get("studyId") ?? "");
+    assertOwned(db, actor, "study", studyId);
     const rulesJson = String(formData.get("rulesJson") ?? "").trim();
     assertAuthorized(actor, PERMISSIONS.cohortRead, { studyId });
     let rawRules: unknown;

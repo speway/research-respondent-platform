@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
+import { assertOwned } from "../../lib/services/ownership.ts";
 import { requireAuth } from "../../lib/services/session.ts";
 import { PERMISSIONS, assertAuthorized } from "../../lib/services/authz.ts";
 import { recordAudit } from "../../lib/services/audit.ts";
@@ -85,6 +86,7 @@ export async function planImportAction(formData: FormData): Promise<ActionResult
     const instrumentVersionId = String(formData.get("instrumentVersionId") ?? "");
     const studyIdRaw = String(formData.get("studyId") ?? "");
     const studyId = studyIdRaw || null;
+    if (studyId) assertOwned(db, actor, "study", studyId);
     if (!instrumentVersionId) {
       return {
         ok: false,
@@ -267,6 +269,7 @@ export async function commitImportAction(formData: FormData): Promise<ActionResu
       discardDraft(db, draftId);
       return { ok: false, message: "This import draft expired. Re-upload the export to continue." };
     }
+    if (draft.study_id) assertOwned(db, actor, "study", draft.study_id);
     assertAuthorized(actor, PERMISSIONS.importCommit, { studyId: draft.study_id });
 
     const plan = parseDraftPlan(draft);

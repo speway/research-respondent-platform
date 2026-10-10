@@ -38,6 +38,7 @@ import {
 import { buildIdempotencyKey, hashContract, retryPolicy, validateContract } from "../domain/task-flow.ts";
 import { resolveAdapter } from "../domain/adapters/index.ts";
 import { recordAudit } from "./audit.ts";
+import { assertOwned } from "./ownership.ts";
 import { assertAuthorized, PERMISSIONS } from "./authz.ts";
 
 export interface BuildContractInput {
@@ -54,6 +55,9 @@ export interface BuildContractInput {
 }
 
 export function buildTaskContract(input: BuildContractInput): AgentTaskContract {
+  assertOwned(input.db, input.actor, "study", input.studyId);
+  assertOwned(input.db, input.actor, "participant", input.participantId);
+  if (input.externalFormVersionId) assertOwned(input.db, input.actor, "formVersion", input.externalFormVersionId);
   const taskId = newId("ctr");
   const expiresAt = new Date(Date.now() + (input.expiresInHours ?? 72) * 3600_000).toISOString();
   const study = input.db.prepare("SELECT code FROM study WHERE id = ?").get(input.studyId) as { code: string } | undefined;
@@ -219,6 +223,7 @@ export function createTaskFromPreflight(input: CreateTaskInput): AgentTaskRow {
 }
 
 export function validateTask(db: Db, actor: Actor, taskId: string): AgentTaskRow {
+  assertOwned(db, actor, "task", taskId);
   const task = requireTask(db, taskId);
   assertAuthorized(actor, PERMISSIONS.taskExecute, { studyId: task.study_id });
   const contract = JSON.parse(task.contract_json) as AgentTaskContract;
@@ -262,6 +267,7 @@ export function validateTask(db: Db, actor: Actor, taskId: string): AgentTaskRow
 }
 
 export function approveTask(db: Db, actor: Actor, taskId: string, note: string): AgentTaskRow {
+  assertOwned(db, actor, "task", taskId);
   const task = requireTask(db, taskId);
   assertAuthorized(actor, PERMISSIONS.taskApprove, { studyId: task.study_id });
   if (!note.trim()) {
@@ -292,6 +298,7 @@ export function approveTask(db: Db, actor: Actor, taskId: string, note: string):
 }
 
 export function queueTask(db: Db, actor: Actor, taskId: string): AgentTaskRow {
+  assertOwned(db, actor, "task", taskId);
   const task = requireTask(db, taskId);
   assertAuthorized(actor, PERMISSIONS.taskExecute, { studyId: task.study_id });
   if (task.requires_approval === 1 && task.approved_at === null) {
@@ -348,6 +355,7 @@ export interface RunTaskOutcome {
 
 export async function runTask(input: RunTaskInput): Promise<RunTaskOutcome> {
   const { db, actor } = input;
+  assertOwned(db, actor, "task", input.taskId);
   const task = requireTask(db, input.taskId);
   assertAuthorized(actor, PERMISSIONS.taskExecute, { studyId: task.study_id });
 
@@ -490,6 +498,7 @@ export async function runTask(input: RunTaskInput): Promise<RunTaskOutcome> {
 }
 
 export function retryTask(db: Db, actor: Actor, taskId: string): AgentTaskRow {
+  assertOwned(db, actor, "task", taskId);
   const task = requireTask(db, taskId);
   assertAuthorized(actor, PERMISSIONS.taskExecute, { studyId: task.study_id });
   if (task.state !== "failed" && task.state !== "needs_review") {
@@ -523,6 +532,7 @@ export function retryTask(db: Db, actor: Actor, taskId: string): AgentTaskRow {
 }
 
 export function cancelTask(db: Db, actor: Actor, taskId: string, reason: string): AgentTaskRow {
+  assertOwned(db, actor, "task", taskId);
   const task = requireTask(db, taskId);
   assertAuthorized(actor, PERMISSIONS.taskExecute, { studyId: task.study_id });
   const next = updateTaskState(db, taskId, { state: "cancelled", finishedAt: nowIso(), lastError: reason });

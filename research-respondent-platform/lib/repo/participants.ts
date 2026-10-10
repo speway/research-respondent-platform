@@ -413,7 +413,7 @@ export function recordConsent(
         `SELECT id FROM consent_record
          WHERE participant_id = ? AND ((study_id IS NULL AND ? IS NULL) OR study_id = ?)
            AND status = 'granted' AND withdrawn_at IS NULL
-         ORDER BY recorded_at DESC LIMIT 1`,
+         ORDER BY recorded_at DESC, rowid DESC LIMIT 1`,
       )
       .get(input.participantId, input.studyId, input.studyId) as { id: string } | undefined;
 
@@ -448,12 +448,12 @@ export function recordConsent(
     );
   });
   tx();
-  return { id, supersededConsentId };
+  return { id: supersededConsentId ?? id, supersededConsentId };
 }
 
 export function listConsentRecords(db: Db, participantId: string): ConsentRow[] {
   return db
-    .prepare("SELECT * FROM consent_record WHERE participant_id = ? ORDER BY recorded_at DESC")
+    .prepare("SELECT * FROM consent_record WHERE participant_id = ? ORDER BY recorded_at DESC, rowid DESC")
     .all(participantId) as ConsentRow[];
 }
 

@@ -16,7 +16,8 @@ import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { after, before, describe, it } from "node:test";
 import { bootstrap } from "../../lib/services/bootstrap.ts";
-import { createStudy } from "../../lib/repo/studies.ts";
+import { createOrganization, createUser, createSession } from "../../lib/repo/org.ts";
+import { createStudy, getStudy } from "../../lib/repo/studies.ts";
 import { openDatabase } from "../../db/index.ts";
 import {
   PROJECT_ROOT,
@@ -158,6 +159,11 @@ describe("HTTP smoke: production server on a throwaway database", { skip: SKIP_R
     const cookie = sessionCookieFrom(login.response);
     assert.ok(cookie, `login must set a session cookie; status ${login.response.status}, location ${String(login.response.location)}`);
     assert.equal(login.response.body.includes(ADMIN_PASSWORD), false, "the response must never echo the password");
+    const header = login.response.setCookie.find((value) => value.startsWith("rrp_session="));
+    assert.ok(header);
+    assert.match(header, /HttpOnly/i);
+    assert.match(header, /SameSite=Lax/i);
+    assert.match(header, /Secure/i);
     sessionCookie = cookie;
 
     const home = await httpGet(requireServer().baseUrl, "/", { cookie });
@@ -266,7 +272,7 @@ describe("HTTP smoke: production server on a throwaway database", { skip: SKIP_R
       // between the anonymous call and the authenticated control.
       const envelope = { [`$ACTION_ID_${ref.id}`]: "", ...fields };
       const rowsBefore = countRows(`SELECT COUNT(*) AS n FROM ${table}`);
-      const anonymous = await httpPost(requireServer().baseUrl, route, envelope);
+      const anonymous = await httpPost(requireServer().baseUrl, route, envelope, { multipart: true });
       const rowsAfter = countRows(`SELECT COUNT(*) AS n FROM ${table}`);
 
       if (rowsAfter !== rowsBefore) {
@@ -281,7 +287,7 @@ describe("HTTP smoke: production server on a throwaway database", { skip: SKIP_R
 
       // Positive control: the identical request with a session must get past the
       // auth gate, otherwise the refusal above would prove nothing.
-      const authenticated = await httpPost(requireServer().baseUrl, route, envelope, { cookie: requireCookie() });
+      const authenticated = await httpPost(requireServer().baseUrl, route, envelope, { cookie: requireCookie(), multipart: true });
       if (refusedToLogin(authenticated)) {
         violations.push(`${label}: the authenticated control was ALSO refused (${describeResponse(authenticated)}), so the refusal above is not evidence of an auth gate`);
       }
@@ -321,6 +327,31 @@ describe("HTTP smoke: production server on a throwaway database", { skip: SKIP_R
       .get() as { detail_json: string } | undefined;
     assert.ok(denial, "the denial row must be readable");
     assert.match(denial.detail_json, /invalid_credentials_or_inactive/);
+  });
+
+  it("tampered session cookies cannot render authenticated data", async () => {
+    const response = await httpGet(requireServer().baseUrl, "/audit", { cookie: requireCookie() + "tampered" });
+    assert.ok([302, 303, 307, 308].includes(response.status));
+    assert.match(response.location ?? "", /\/login/);
+    for (const marker of RESEARCH_DATA_MARKERS) assert.equal(response.body.includes(marker), false);
+  });
+
+  it("foreign organization cannot update a study through a real server action", async () => {
+    const db = requireServer().db;
+    const foreignOrg = createOrganization(db, { name: "Foreign HTTP fixture" });
+    const foreignUser = createUser(db, { organizationId: foreignOrg.id, email: "foreign@example.test", displayName: "Fixture", password: "fixture-password-123", roles: [{ role: "admin" }] });
+    const cookie = `rrp_session=${createSession(db, foreignUser.id).token}`;
+    const study = createStudy(db, { organizationId, code: "BOUNDARY", title: "Boundary fixture", researchQuestion: "Verify organization boundary", createdBy: adminUserId });
+    const foreignStudy = createStudy(db, { organizationId: foreignOrg.id, code: "FOREIGN", title: "Foreign fixture", researchQuestion: "Verify organization boundary", createdBy: foreignUser.id });
+    const ref = serverActionRefsFromBuild().find((entry) => entry.exportedName === "updateStudyAction");
+    assert.ok(ref, "the real study update action must be registered");
+    const envelope = { [`$ACTION_ID_${ref.id}`]: "", studyId: study.id, title: "Authorized change", researchQuestion: "Verify real action authorization", status: "draft" };
+    const foreign = await httpPost(requireServer().baseUrl, `/studies/${foreignStudy.id}`, envelope, { cookie, multipart: true });
+    assert.equal(foreign.status, 200, "the action must return a handled denial");
+    assert.equal(getStudy(db, study.id)?.title, "Boundary fixture", "foreign administrator cannot change another organization's study");
+    const permitted = await httpPost(requireServer().baseUrl, `/studies/${study.id}`, envelope, { cookie: requireCookie(), multipart: true });
+    assert.equal(permitted.status, 200);
+    assert.equal(getStudy(db, study.id)?.title, "Authorized change", "same arguments succeed for owning administrator");
   });
 
   it("9. after shutdown the throwaway database is intact and then removed", async () => {

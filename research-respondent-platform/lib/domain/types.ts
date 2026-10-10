@@ -699,6 +699,8 @@ export interface Actor {
   organizationId: string;
   /** Permission scopes: "study:<id>:write", "export:create", ... */
   permissions: string[];
+  /** Consequential role permissions restricted to explicit studies. */
+  permissionStudyScopes?: Record<string, string[]>;
 }
 
 export interface AuthorizationDecision {

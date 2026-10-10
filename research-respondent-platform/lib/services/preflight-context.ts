@@ -53,10 +53,10 @@ export function loadMappingSourceContext(db: Db, input: PreflightContextInput): 
        FROM observed_answer oa
        JOIN item_definition it ON it.id = oa.item_definition_id
        JOIN assessment_session s ON s.id = oa.assessment_session_id
-       WHERE oa.participant_id = ?
-       ORDER BY s.created_at DESC, it.order_index`,
+       WHERE oa.participant_id = ? AND s.study_id = ?
+       ORDER BY s.created_at DESC, s.rowid DESC, it.order_index`,
     )
-    .all(input.participantId) as Array<{
+    .all(input.participantId, input.studyId) as Array<{
     item_definition_id: string;
     item_code: string;
     question_text: string;
@@ -79,17 +79,18 @@ export function loadMappingSourceContext(db: Db, input: PreflightContextInput): 
   }>;
 
   const keepLatest = input.latestSessionPerInstrument !== false;
-  const seenInstruments = new Set<string>();
+  const latestSessions = new Map<string, string>();
   const answers: MappingSourceContext["answers"] = [];
   for (const row of answerRows) {
     if (input.timepointLabel && row.timepoint_label !== input.timepointLabel) {
       continue;
     }
     if (keepLatest) {
-      if (seenInstruments.has(row.instrument_version_id)) {
+      const latest = latestSessions.get(row.instrument_version_id);
+      if (latest && latest !== row.assessment_session_id) {
         continue;
       }
-      seenInstruments.add(row.instrument_version_id);
+      latestSessions.set(row.instrument_version_id, row.assessment_session_id);
     }
     answers.push({
       itemDefinitionId: row.item_definition_id,
@@ -118,10 +119,10 @@ export function loadMappingSourceContext(db: Db, input: PreflightContextInput): 
        FROM derived_score ds
        JOIN scale_definition sd ON sd.id = ds.scale_definition_id
        JOIN assessment_session s ON s.id = ds.assessment_session_id
-       WHERE ds.participant_id = ? AND ds.superseded_by_id IS NULL
+       WHERE ds.participant_id = ? AND s.study_id = ? AND ds.superseded_by_id IS NULL
        ORDER BY ds.computed_at DESC`,
     )
-    .all(input.participantId) as Array<{
+    .all(input.participantId, input.studyId) as Array<{
     scale_code: string;
     scale_title: string;
     raw_score: number | null;
@@ -142,7 +143,7 @@ export function loadMappingSourceContext(db: Db, input: PreflightContextInput): 
     }
     const key = `${row.instrument_version_id}:${row.scale_code}`;
     if (keepLatest) {
-      if (seenScores.has(key)) {
+      if ((latestSessions.has(row.instrument_version_id) && latestSessions.get(row.instrument_version_id) !== row.assessment_session_id) || seenScores.has(key)) {
         continue;
       }
       seenScores.add(key);
