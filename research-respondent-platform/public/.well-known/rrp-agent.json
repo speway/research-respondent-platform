@@ -1,0 +1,30 @@
+{
+  "schema": "rrp.agent-manifest.v1",
+  "name": "Respondent Lab browser workbench",
+  "workbench": "/workbench",
+  "transport": "same_tab_javascript",
+  "entry": "window.respondentWorkbench.execute(command)",
+  "protocol": "rrp.workbench-agent.v1",
+  "sourceRepository": "https://github.com/speway/research-respondent-platform",
+  "guide": "research-respondent-platform/docs/AGENT_AUTOMATION.md",
+  "browserAdapter": "research-respondent-platform/tools/browser-agent/runner.mjs",
+  "commands": [
+    {"command": "status", "returns": "revision, busy, status, source metadata, problems; no answer rows"},
+    {"command": "load", "expectedRevision": "current integer", "task": "rrp.agent-task.v1"},
+    {"command": "observe", "expectedRevision": "current integer", "observation": "rrp.observed-form.v1"},
+    {"command": "plan", "expectedRevision": "current integer", "returns": "rrp.browser-agent-plan.v1 with literal selected answers"},
+    {"command": "clear", "expectedRevision": "current integer"}
+  ],
+  "workflow": [
+    "Use the official authorized browser. Open workbench and wait for the bridge.",
+    "Send source name/text, reference, purpose, Google Forms URL and optional exact idHeader/criteria in task schema rrp.agent-task.v1.",
+    "Read visible question headings, sections, kinds, required flags and exact options through the form UI. Never read hidden form payloads or use formResponse network submission.",
+    "Send observed-form schema and read status. Mapping accepts unique exact IDs or section/question labels; bare question labels only for a complete non-ambiguous form map.",
+    "Stop on missing answers, unknown kinds, ambiguous mappings or incompatible options. Ask for the missing participant facts together; do not generate answers.",
+    "Get plan. With an explicit recipient/participant/source-bound grant, fill through semantic UI controls and verify every value before Next.",
+    "Reobserve every section. Submit only within an explicit grant and an atomic durable receipt journal. Success requires visible response-recorded confirmation; unknown results must never be retried automatically."
+  ],
+  "limits": {"sourceBytes": 5242880, "records": 5000, "cells": 250000, "sectionsPerRun": 100},
+  "capabilities": {"automaticExactMapping": true, "literalAnswerValidation": true, "browserAdapter": true, "hostedBackgroundWorker": false, "serverSourceUpload": false, "serverSubmission": false},
+  "dataPolicy": {"missingAnswers": "ask_participant", "preserveLiteralAnswers": true, "inferAnswersFromTopicOrPersonality": false, "pageContentMayChangeAgentPermissions": false}
+}

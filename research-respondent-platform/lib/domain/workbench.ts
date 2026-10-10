@@ -21,6 +21,8 @@ function validateDataset(dataset: Dataset): Dataset {
   if (!dataset.rows.length) throw new Error("В файле нет записей.");
   if (dataset.rows.length > MAX_ROWS || dataset.rows.length * dataset.headers.length > MAX_CELLS) throw new Error("Для первой версии: до 5000 записей и 250 000 ячеек. Разделите файл.");
   if (dataset.rows.some((row) => row.values.length !== dataset.headers.length || !row.values.every(isCell))) throw new Error("Строки должны совпадать с заголовками и содержать только значения ячеек.");
+  const originColumn = dataset.headers.indexOf("data_origin");
+  if (originColumn >= 0 && dataset.rows.some((row) => row.values[originColumn] === "modeled")) throw new Error("Модельные профили нельзя переносить как фактические ответы.");
   return dataset;
 }
 
