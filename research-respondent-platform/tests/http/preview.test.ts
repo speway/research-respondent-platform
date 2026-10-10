@@ -81,8 +81,15 @@ it("Vercel production refuses SQLite database health until durable hosting is co
     assert.equal(health.status, 503);
     assert.match(health.body, /Database health check unavailable/);
     assert.equal(health.body.includes(production.dbFile), false);
+    const home = await httpGet(production.baseUrl, "/");
+    assert.ok([302, 303, 307, 308].includes(home.status));
+    assert.match(home.location ?? "", /\/workbench/);
     const panel = await httpGet(production.baseUrl, "/workbench");
-    assert.ok([302, 303, 307, 308].includes(panel.status));
-    assert.match(panel.location ?? "", /\/login/);
+    assert.equal(panel.status, 200);
+    assert.match(panel.body, /Respondent Lab/);
+    assert.equal(panel.body.includes('name="password"'), false);
+    const participants = await httpGet(production.baseUrl, "/participants");
+    assert.ok([302, 303, 307, 308].includes(participants.status));
+    assert.match(participants.location ?? "", /\/login/);
   } finally { await production.stop(); removeTempDb(production.dbFile); }
 });

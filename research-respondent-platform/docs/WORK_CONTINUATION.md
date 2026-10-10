@@ -315,3 +315,69 @@ documentation-head CI outcome will be recorded in the PR body after completion,
 without triggering a further documentation commit solely to record that commit's
 own CI. Next tasks remain the owner-approved one-run cloud audit, durable
 protected queue/source/receipt integration, and a consented full live form test.
+
+## Cloud runtime verified; open primary panel requested — 2026-10-10 UTC
+
+Continuation branch `feat/cloud-runtime-validation` starts from PR #11 head `349cd0d30f5442db387e2966eda55b636f17e861`; GitHub reservation commit `89c4eca565671886b3f58494507686af006cb778` preceded one explicitly approved VM allocation. `docs/CLOUD_RUNTIME_VERIFICATION.md` records actual command failures/repairs, successful sandboxed browser read of section 2 of the live supplied form, exit 0, no answer writes/submission, and independently verified cleanup in 239781 ms. This is real provider/browser evidence; it is not a hosted SDK/OIDC Function, participant worker or full live-form compatibility claim.
+
+Changes: `lib/services/cloud-form-audit.ts`, new `tools/cloud-agent/prepare-ubuntu.mjs`, new `read-only-policy.mjs` and declarations, `audit-entry.mjs`, traced tool assets in `next.config.ts`, new private budget journal, pinned `@vercel/blob` 2.8.1/lock, cloud/setup/network/budget tests. The deployment path uses static policy imports and files under application cwd. Approval expiry is rechecked after a slow reservation before allocating. Provider create-only journal failures stop allocation; no distributed provider claim is asserted without a real storage collision test.
+
+The owner explicitly requested an open primary site and reauthorized all project work after the infrastructure permission rejection. Public cloud homepage now redirects to `/workbench`; that data-free client panel is accessible in production as well as Preview. Server session/RBAC and SQLite production blocking remain intact; no participant source is uploaded or automatically stored. Production HTTP tests verify panel 200/no password fields/home redirect, protected research redirect and DB health 503. Public release will use only the checked Git commit and the existing project/team/domain; Preview and unique deployment URLs should remain protected.
+
+Actual local final application checks: frozen install exit 0; lint and TypeScript exit 0; 204/204 unit/integration tests, zero skips; production build exit 0; 17/17 HTTP tests, zero skips; all three actual Chromium scripts exit 0 on isolated fixtures. Initial lint found missing Node console/URL globals and was corrected through explicit Node imports/stdout; no ignored failures. Chromium was restored from verified pinned npm package after scratch `/tmp` cleanup. The React review retains cheap hosting guards before auth awaits, adds no client/backend SDK imports, and preserves UI/hooks/accessibility.
+
+Storage: initial new-store request was rejected by auto-review for separate billing scope; after the owner's explicit reauthorization, the official request returned Vercel 403. No Blob store, anonymous paid route or recurring resource was created. CLI unavailable; dashboard shows sign-in, with no credential entry. Permission is already granted; service access is the remaining blocker. The prepared journal contains only immutable budget hashes, not answers or identities. Hosted background execution and server source storage remain false.
+
+Next three tasks: (1) verify GitHub CI and protected Preview, then publish/read back the data-free primary panel with protected preview/unique URLs; (2) complete official storage authorization and test immutable private reservations under actual concurrency before enabling an authenticated queue; (3) connect durable source/consent/receipt lookup and run an explicitly consented full live-form task using factual answers.
+
+### Verified primary release and source CI
+
+Checked application commit: `92912a389e5819c050870d89b146e39b9322bb3c`.
+GitHub CI https://github.com/speway/research-respondent-platform/actions/runs/38080225043
+SUCCESS: actual job readback confirms locked install/native binding, lint/types,
+204 tests, production build, 17 HTTP checks, browser installation and all three
+actual Chromium workflows succeeded. PR #12 is ready and mergeable, based on
+PR #11: https://github.com/speway/research-respondent-platform/pull/12 .
+Main branch was not changed; the owner-authorized public release is pinned to
+the reviewed task-branch application source.
+
+Protected Preview `dpl_Bdx7NHduZ2nZxA6gGfYraD8mBz4t` is READY, target null, pinned
+to that source: https://research-respondent-platform-4cjnlbwjs-spw1.vercel.app/workbench .
+Official protected panel/manifest/schema/health checks returned 200; health
+confirmed isolated-preview, durable false, sign-in false, integrity ok and four
+migrations with no drift. Sensitive research routes were not fetched remotely.
+
+At the owner's explicit request, data-free production panel deployment
+`dpl_91rXUEvZnKBkMw5vzmdVCo8Df394` is READY, target production, same source.
+The existing primary alias was assigned and official readback binds it to this
+deployment/project. Project SSO is enabled with
+`prod_deployment_urls_and_all_previews`: primary aliases public, previews and
+unique production deployment URLs protected; password protection disabled.
+Canonical site: https://research-respondent-platform.vercel.app/workbench .
+Fresh unsigned Cloud Browser navigation from `/` reached that exact URL and
+rendered the six-item menu/source picker, no application/Vercel login. Automation
+tab rendered the live protocol controls; no data loaded or writes performed.
+Independent curl with no cookie/auth/bypass returned HTTP 200 at the same
+post-redirect URL, panel text present, password fields and Vercel login absent.
+No participant database or responses were published. Production research DB
+health remains intentionally unavailable (public panel works without it).
+
+Only a documentation commit follows this application source; its CI will be
+recorded in PR metadata after actual completion. Existing owner authorization
+for storage and further development persists; the remaining blocker is provider
+403/service sign-in, not missing blanket permission.
+
+### Official authentication continuation — after primary release
+
+Documentation head `b04ce05e80a32c0b093a32c59243a14ec47134ba` CI run
+38080517227 SUCCESS; every job step independently read back. Unauthenticated
+Preview curl returned 302 to protection, while canonical primary panel returned
+200; public production DB health returned the intended 503 generic refusal.
+The owner selected Google using secure browserAuth. Identifier/password entry
+was handled by the native protected credential surface; no values were read,
+stored or logged by the agent. Google reported an incorrect password, so Vercel
+service sign-in is not established. An official browser handoff is being
+prepared for this specific authentication blocker; do not retry credentials or
+switch methods automatically. Storage and hosted background queue remain
+unconfigured; the primary site continues to work without registration.
+The following documentation-only commit does not change deployed app source.
