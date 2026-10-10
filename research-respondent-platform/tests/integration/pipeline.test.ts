@@ -538,7 +538,7 @@ function mappingContext(db: Db, session: SessionRow, participantId: string, item
       scaleTitle: score.scale_title,
       rawScore: score.raw_score,
       transformedScore: score.transformed_score,
-      computability: score.computability,
+      computability: score.computability as MappingSourceContext["scores"][number]["computability"],
       algorithmVersion: score.algorithm_version,
       sessionId: session.id,
     })),
@@ -922,7 +922,7 @@ test("form preflight fails the required field with a documented missing source a
   assert.equal(optional.outcome, "pass");
   assert.equal(optional.resolvedValue, "5");
 
-  assert.equal(report.submissionAllowedByPlatform, false);
+  assert.equal(report.authorization.submissionAllowedByPlatform, false);
   assert.equal(report.blockingReasons.length > 0, true);
   assert.ok(report.blockingReasons.some((reason) => reason.includes(MISSING_SOURCE_MESSAGE)));
   assert.match(report.authorization.submissionBlockedReason ?? "", /external submission blocked/);
