@@ -425,3 +425,29 @@ OIDC storage probe; (2) connect and verify bounded durable hosted read-only form
 execution; (3) integrate a protected consented source/receipt store before any
 factual participant form submission. Main remains the last verified public,
 data-free workbench. No participant data was published.
+
+### Actual provider probe and CI readback
+
+Checked application SHA `a32fdd1b38d35446601894257cf2663266dbdc40`.
+CI run 38081968153 SUCCESS; every job step, including the three Chromium
+workflows, independently read back. Protected Preview
+`dpl_qgcxsb57nGmeuxkBCSJ5EbNuqCms` READY, target null, same pinned source:
+https://research-respondent-platform-90o7zl4x5-spw1.vercel.app/cloud/setup .
+The already authenticated owner browser opened this page directly, clicked the
+one-time server action, and observed the persisted report at
+2026-10-10T20:00:55.628Z: contenders=8, acknowledged=1, rejected=7, privateRead,
+anonymousReadDenied, repeatDenied all true. A subsequent browser DOM observation
+read the report from the refreshed page, not the action return value alone.
+Screenshot `docs/evidence/private-storage-probe.jpg` contains only operational
+status (no credentials, private URLs or respondent records).
+
+An additional connector HTTP check was rejected by auto-review because that tool
+would create a temporary authentication-bypass link. No bypass was created or
+retried. This does not invalidate the actual official-login browser evidence.
+The owner then requested fewer repeated checks; subsequent stages use one final
+check pass and one actual deployed flow, with further runs only to fix failures.
+
+Hosted Workflow SDK setup is the next separate coding batch, not yet deployed
+by this verified store change. Installing pinned workflow 5.2.0 identified three
+compiler build scripts requiring explicit package-manager allowBuilds entries;
+that repair and its application code belong to the next branch/PR.
