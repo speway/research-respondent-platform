@@ -53,7 +53,6 @@ import {
   listAnswers,
   listAnswersWithItems,
   listDerivedScores,
-  listItems,
   persistAnswers,
   scoreAndPersistSession,
   type ItemRow,

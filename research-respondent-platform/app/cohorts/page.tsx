@@ -19,7 +19,6 @@ export default async function CohortsPage({
   const { db, actor } = await requireAuth();
   const studies = listStudies(db, actor.organizationId);
   const selectedStudyId = studyId ?? studies[0]?.id ?? null;
-  const selectedStudy = studies.find((study) => study.id === selectedStudyId) ?? null;
   const segments = listSegments(db, actor.organizationId).filter((segment) =>
     selectedStudyId ? segment.study_id === selectedStudyId : true,
   );

@@ -16,7 +16,7 @@ const RIGHTS_TONES: Record<string, "verified" | "partial" | "blocked" | "neutral
 };
 
 export default async function LibraryPage() {
-  const { db, actor } = await requireAuth();
+  const { db } = await requireAuth();
   const instruments = listInstruments(db);
   const versionRows = instruments.flatMap((instrument) =>
     listInstrumentVersions(db, instrument.id).map((version) => ({ instrument, version })),
