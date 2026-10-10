@@ -328,6 +328,10 @@ export function upsertPrivateIdentity(
     recordedBy?: string | null;
   },
 ): void {
+  const basis = input.lawfulBasis.trim();
+  if (!basis) {
+    throw new DomainError("participant.missing_lawful_basis", "Private identity requires a documented lawful basis.");
+  }
   const timestamp = nowIso();
   const email = input.contactEmail?.trim().toLowerCase() ?? null;
   if (email) {
@@ -358,7 +362,7 @@ export function upsertPrivateIdentity(
     email,
     input.contactPhone,
     input.contactHandle,
-    input.lawfulBasis,
+    basis,
     input.retentionUntil ?? null,
     input.recordedBy ?? null,
     timestamp,

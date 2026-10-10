@@ -167,7 +167,8 @@ export function authorize(actor: Actor, permission: Permission, subject?: { stud
   if (subject?.studyId) {
     const scoped = actor.permissions.includes(`study:${subject.studyId}:write`);
     const globalWrite = actor.permissions.includes(PERMISSIONS.studyWrite);
-    const writeIntent = permission.endsWith(":write") || permission === PERMISSIONS.importCommit;
+    // Agent registration is organization-scoped; it is not a write to a study's research data.
+    const writeIntent = (permission.endsWith(":write") && permission !== PERMISSIONS.agentWrite) || permission === PERMISSIONS.importCommit;
     if (writeIntent && !scoped && !globalWrite) {
       return {
         allowed: false,

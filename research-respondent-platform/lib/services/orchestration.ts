@@ -35,7 +35,6 @@ import {
   updateTaskState,
   type AgentTaskRow,
 } from "../repo/tasks.ts";
-import { buildPreflight } from "../domain/mapping.ts";
 import { buildIdempotencyKey, hashContract, retryPolicy, validateContract } from "../domain/task-flow.ts";
 import { resolveAdapter } from "../domain/adapters/index.ts";
 import { recordAudit } from "./audit.ts";
@@ -363,7 +362,7 @@ export async function runTask(input: RunTaskInput): Promise<RunTaskOutcome> {
     throw new DomainError("task.not_runnable", `Task is ${task.state}; queue or approve it before running.`);
   }
   if (task.expires_at && Date.parse(task.expires_at) < Date.now()) {
-    const expired = updateTaskState(db, task.id, { state: "expired", lastError: "expired before execution" });
+    updateTaskState(db, task.id, { state: "expired", lastError: "expired before execution" });
     recordAudit(db, {
       organizationId: actor.organizationId,
       actor,

@@ -305,7 +305,8 @@ export function createAgentTask(
   }
   const timestamp = nowIso();
   const row: AgentTaskRow = {
-    id: newId("tsk"),
+    // The persisted task ID must be exactly the ID sealed into its signed/hashed contract.
+    id: input.contract.taskId,
     organization_id: input.organizationId,
     study_id: input.studyId,
     participant_id: input.participantId,

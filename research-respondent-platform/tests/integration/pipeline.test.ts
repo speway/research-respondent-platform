@@ -53,7 +53,6 @@ import {
   listAnswers,
   listAnswersWithItems,
   listDerivedScores,
-  listItems,
   persistAnswers,
   scoreAndPersistSession,
   type ItemRow,
@@ -539,7 +538,7 @@ function mappingContext(db: Db, session: SessionRow, participantId: string, item
       scaleTitle: score.scale_title,
       rawScore: score.raw_score,
       transformedScore: score.transformed_score,
-      computability: score.computability,
+      computability: score.computability as MappingSourceContext["scores"][number]["computability"],
       algorithmVersion: score.algorithm_version,
       sessionId: session.id,
     })),
@@ -605,7 +604,8 @@ test("a study, protocol version and criterion are created and the stored rule pa
   // The same JSON must round-trip through the strict runtime parser.
   const reparsed = parseRule(JSON.parse(consentCriterion.rule_json));
   assert.deepEqual(reparsed, parsed);
-  assert.equal(reparsed.id, consentCriterion.id);
+  // Rule identifiers are stable within the JSON definition; database criterion IDs are separate.
+  assert.equal(reparsed.id, CONSENT_RULE_ID);
 
   const protocols = w.db
     .prepare("SELECT COUNT(*) AS total FROM study_protocol_version WHERE study_id = ?")
@@ -708,14 +708,12 @@ test("identity data requires a lawful basis and never leaks into analytic tables
         contactHandle: null,
         lawfulBasis: "",
       }),
-    /lawful_basis/i,
+    (error: unknown) => isDomainError(error, "participant.missing_lawful_basis"),
     "an empty lawful basis must not be storable",
   );
 
-  // KNOWN GAP (reported to the lead, not fixed here): upsertPrivateIdentity
-  // (lib/repo/participants.ts:318) performs no lawful-basis validation of its own, so a
-  // whitespace-only basis passes the SQLite CHECK and is stored. The assertion below pins
-  // the current behaviour; when the repo adds a guard this expectation must be inverted.
+  // A whitespace-only lawful basis is not a documented lawful basis.
+  // Both the repository guard and database constraints must keep identity out.
   const gap = createParticipant(w.db, {
     organizationId: w.orgId,
     pseudonym: "FIX-902",
@@ -724,15 +722,19 @@ test("identity data requires a lawful basis and never leaks into analytic tables
     evidenceLocator: "sheet1!A11",
     consent: { studyId: null, version: "fixture-consent-v1", basis: "written_signed", status: "granted" },
   });
-  upsertPrivateIdentity(w.db, {
-    participantId: gap.participant.id,
-    fullName: null,
-    contactEmail: "whitespace.basis@example.test",
-    contactPhone: null,
-    contactHandle: null,
-    lawfulBasis: "   ",
-  });
-  assert.equal(getPrivateIdentity(w.db, gap.participant.id)?.lawful_basis, "   ");
+  assert.throws(
+    () => upsertPrivateIdentity(w.db, {
+      participantId: gap.participant.id,
+      fullName: null,
+      contactEmail: "whitespace.basis@example.test",
+      contactPhone: null,
+      contactHandle: null,
+      lawfulBasis: "   ",
+    }),
+    (error: unknown) => isDomainError(error, "participant.missing_lawful_basis"),
+    "a whitespace-only lawful basis must be refused before database persistence",
+  );
+  assert.equal(getPrivateIdentity(w.db, gap.participant.id), undefined);
 
   const identity = getPrivateIdentity(w.db, w.participantId);
   assert.ok(identity, "the fixture participant must have a restricted identity record");
@@ -850,7 +852,11 @@ test("an out-of-range answer is excluded and counted, never silently neutralised
 
 test("cohort evaluation keeps unknown consent indeterminate and includes the participant only after consent", () => {
   const w = world();
-  const consentRule = fixtureConsentRule(w.studyId);
+  // Runtime traces are keyed by the persisted criterion row ID, not the source JSON rule ID.
+  const criteria = listCriteria(w.db, w.studyId);
+  const consentCriterion = criteria.find((row) => row.label === "Study consent granted");
+  const ageCriterion = criteria.find((row) => row.label === "Age at enrolment 18+");
+  assert.ok(consentCriterion && ageCriterion);
 
   const before = getStudyCohortPreview(w.db, w.studyId, w.pi);
   assert.equal(before.denominator, 1);
@@ -867,11 +873,11 @@ test("cohort evaluation keeps unknown consent indeterminate and includes the par
     assert.ok(traceEntry.observed.length > 0, `rule ${traceEntry.ruleId} needs an observed value`);
     assert.ok(traceEntry.expected.length > 0, `rule ${traceEntry.ruleId} needs an expected value`);
   }
-  const consentTrace = evaluation.traces.find((traceEntry) => traceEntry.ruleId === consentRule.id);
+  const consentTrace = evaluation.traces.find((traceEntry) => traceEntry.ruleId === consentCriterion.id);
   assert.ok(consentTrace);
   assert.equal(consentTrace.outcome, "indeterminate");
   assert.match(consentTrace.explanation, /no consent record/i);
-  const ageTrace = evaluation.traces.find((traceEntry) => traceEntry.ruleId === AGE_RULE_ID);
+  const ageTrace = evaluation.traces.find((traceEntry) => traceEntry.ruleId === ageCriterion.id);
   assert.equal(ageTrace?.outcome, "include");
   assert.equal(evaluation.indeterminateReasons.length, 1);
 
@@ -923,7 +929,7 @@ test("form preflight fails the required field with a documented missing source a
   assert.equal(optional.outcome, "pass");
   assert.equal(optional.resolvedValue, "5");
 
-  assert.equal(report.submissionAllowedByPlatform, false);
+  assert.equal(report.authorization.submissionAllowedByPlatform, false);
   assert.equal(report.blockingReasons.length > 0, true);
   assert.ok(report.blockingReasons.some((reason) => reason.includes(MISSING_SOURCE_MESSAGE)));
   assert.match(report.authorization.submissionBlockedReason ?? "", /external submission blocked/);
@@ -932,7 +938,8 @@ test("form preflight fails the required field with a documented missing source a
   assert.equal(report.payload[w.optionalFieldId], "5");
   assert.equal(w.requiredFieldId in report.payload, false);
   assert.equal(report.counts.fail, 1);
-  assert.equal(report.counts.unmappedRequired, 1);
+  // This field is mapped, but its documented answer is missing; it is not "unmapped".
+  assert.equal(report.counts.unmappedRequired, 0);
   assert.equal(report.counts.missingSource, 1);
   w.db.close();
 });
@@ -1058,7 +1065,7 @@ test("task orchestration gates approval, blocks external submission and refuses 
   const dryRun = await runTask({ db: w.db, actor: w.pi, taskId: preflightTask.id, adapterId: "local-deterministic" });
   assert.equal(dryRun.result.outcome, "succeeded");
   assert.equal(dryRun.task.state, "succeeded");
-  assert.equal(dryRun.result.externalReceipt?.channel, "none");
+  assert.equal(dryRun.result.externalReceipt ?? null, null, "a local preflight returns no external receipt");
   assert.equal(dryRun.result.evidence.some((entry) => entry.evidenceType === "dry_run_report"), true);
   await assert.rejects(
     () => runTask({ db: w.db, actor: w.pi, taskId: preflightTask.id, adapterId: "local-deterministic" }),
@@ -1108,9 +1115,11 @@ test("authorization denies viewer writes and agent identity access", () => {
   assert.equal(agentDecision.policyCode, "rbac.agent_forbidden");
   assert.match(agentDecision.reason, /human approval is required/);
 
-  // A study-scoped write grant is required for a write into a study the actor cannot write.
-  const scopedDenied = authorize(w.agent, PERMISSIONS.agentWrite, { studyId: w.studyId });
-  assert.equal(scopedDenied.allowed, true, "agentWrite carries no study-scope requirement");
+  // Registration is organization-scoped, but the actor must still hold agent:write.
+  assert.equal(authorize(w.agent, PERMISSIONS.agentWrite, { studyId: w.studyId }).allowed, false);
+  const authorizedAgent = { ...w.agent, permissions: [...w.agent.permissions, PERMISSIONS.agentWrite] };
+  const scopedAllowed = authorize(authorizedAgent, PERMISSIONS.agentWrite, { studyId: w.studyId });
+  assert.equal(scopedAllowed.allowed, true, "an explicitly granted agentWrite needs no study write grant");
   assert.equal(authorize(w.viewer, PERMISSIONS.studyWrite, { studyId: w.studyId }).allowed, false);
   w.db.close();
 });
@@ -1146,8 +1155,15 @@ test("observed_answer and audit_event remain append-only on a live database", ()
     "audit_event must reject deletes",
   );
 
-  const derivedId = listDerivedScores(w.db, { sessionId: w.sessionT1.id })[0]?.id;
+  // Scores are materialized explicitly; world() only documents observed answers.
+  const scored = scoreAndPersistSession(w.db, w.sessionT1.id, { computedBy: w.admin.id });
+  const derivedId = scored.persistedScoreIds[0];
   assert.ok(derivedId);
+  assert.throws(
+    () => w.db.prepare("UPDATE derived_score SET raw_score = 999 WHERE id = ?").run(derivedId),
+    /immutable|append-only|cannot be (modified|updated)/i,
+    "derived scores must not be rewritten after computation",
+  );
   w.db.close();
 });
 

@@ -45,7 +45,7 @@ export interface PlanInput {
   qualityFlags?: string[];
 }
 
-const HEADER_ITEM_PATTERN = /^\s*(?:var\d+\s*)?(\d{1,3})\b[\s.:)\-]*(.*)$/i;
+const HEADER_ITEM_PATTERN = /^\s*(?:var\d+\s*)?(\d{1,3})\b[\s.:)-]*(.*)$/i;
 
 /**
  * Suggests a role for each column. Suggestions are deterministic; the operator
@@ -422,7 +422,7 @@ export function normaliseTimestamp(raw: string | number | boolean | null): strin
     const parsed = new Date(/[Zz]|[+-]\d{2}:?\d{2}$/.test(isoCandidate) ? isoCandidate : `${isoCandidate}Z`);
     return Number.isNaN(parsed.getTime()) ? null : parsed.toISOString();
   }
-  const european = /^(\d{2})[.\/](\d{2})[.\/](\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/.exec(text);
+  const european = /^(\d{2})[./](\d{2})[./](\d{4})(?:[ T](\d{2}):(\d{2})(?::(\d{2}))?)?$/.exec(text);
   if (european) {
     const [, day, month, year, hour = "00", minute = "00", second = "00"] = european;
     const parsed = new Date(
