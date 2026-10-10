@@ -381,3 +381,73 @@ prepared for this specific authentication blocker; do not retry credentials or
 switch methods automatically. Storage and hosted background queue remain
 unconfigured; the primary site continues to work without registration.
 The following documentation-only commit does not change deployed app source.
+
+## Private cloud journal continuation — 2026-10-11 Asia/Tashkent
+
+Owner completed official Vercel sign-in and reauthorized project continuation.
+The existing handed-off browser visibly opened the authenticated Storage page.
+Created `rrp-cloud-audit-private`, private, IAD1, ID `store_F58ZIfpJrCilBpT3`;
+connection readback confirms exactly `research-respondent-platform`, Preview only,
+OIDC, BLOB_STORE_ID/BLOB_WEBHOOK_PUBLIC_KEY, no read-write token env requested.
+Official env metadata independently confirms the two Preview variables. Provider
+catalog GET still returns 404 for the visible store; do not call that success or
+create a duplicate store. Native UI checkbox hit testing failed; visual targeting
+and refreshed state confirmed Production unchecked before connection.
+
+Branch `feat/private-cloud-journal` is stacked on PR #12 official head
+`cda304ceed923cd2674f77423a36c0c9653d3d3c`; local checkout preserves that source.
+New preview policy requires VERCEL=1, VERCEL_ENV=preview, an explicit diagnostic
+flag and a valid store ID. `/cloud/setup` is absent in production/unconfigured
+Preview; server action repeats the guard and Next enforces same-origin POST.
+Only this branch's Preview flag is configured; official first env request failed
+because the branch did not exist, then succeeded after official branch creation.
+The existing project must retain SSO protection for Preview deployments.
+
+The bounded probe reserves one immutable marker before eight concurrent claims,
+requires exactly one acknowledgement/seven rejections, reads the marker back,
+checks anonymous private-URL denial and repeat rejection, persists and rereads a
+strict small report. Existing reports are read-only; failed/uncertain probes do
+not allocate a VM or retry. No respondent source, answer, cookie, token or raw
+provider error is returned. This is not a participant database or a background
+worker; manifest capabilities remain false until those paths are verified.
+
+Files: new cloud-preview-policy/private-cloud-probe services, cloud setup page
+and action, Preview-only workbench link, unit fault/concurrency tests and HTTP
+route/direct-action denial tests. Initial TypeScript nullable-return and misplaced
+HTTP-test variable errors were fixed before final checks. Frozen install exit 0;
+final lint/types exit 0; 208 unit/integration tests and 18 HTTP checks, zero skips;
+production build exit 0. All three existing actual Chromium fixture scripts
+passed (no live response submissions). Provider probe/deployment/CI remain pending
+at this commit; their actual results will be appended after readback.
+
+Next three tasks: (1) deploy protected Preview and execute/read back the actual
+OIDC storage probe; (2) connect and verify bounded durable hosted read-only form
+execution; (3) integrate a protected consented source/receipt store before any
+factual participant form submission. Main remains the last verified public,
+data-free workbench. No participant data was published.
+
+### Actual provider probe and CI readback
+
+Checked application SHA `a32fdd1b38d35446601894257cf2663266dbdc40`.
+CI run 38081968153 SUCCESS; every job step, including the three Chromium
+workflows, independently read back. Protected Preview
+`dpl_qgcxsb57nGmeuxkBCSJ5EbNuqCms` READY, target null, same pinned source:
+https://research-respondent-platform-90o7zl4x5-spw1.vercel.app/cloud/setup .
+The already authenticated owner browser opened this page directly, clicked the
+one-time server action, and observed the persisted report at
+2026-10-10T20:00:55.628Z: contenders=8, acknowledged=1, rejected=7, privateRead,
+anonymousReadDenied, repeatDenied all true. A subsequent browser DOM observation
+read the report from the refreshed page, not the action return value alone.
+Screenshot `docs/evidence/private-storage-probe.jpg` contains only operational
+status (no credentials, private URLs or respondent records).
+
+An additional connector HTTP check was rejected by auto-review because that tool
+would create a temporary authentication-bypass link. No bypass was created or
+retried. This does not invalidate the actual official-login browser evidence.
+The owner then requested fewer repeated checks; subsequent stages use one final
+check pass and one actual deployed flow, with further runs only to fix failures.
+
+Hosted Workflow SDK setup is the next separate coding batch, not yet deployed
+by this verified store change. Installing pinned workflow 5.2.0 identified three
+compiler build scripts requiring explicit package-manager allowBuilds entries;
+that repair and its application code belong to the next branch/PR.
