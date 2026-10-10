@@ -233,6 +233,7 @@ pnpm start      # next start --port 4310
 | 2026-10-10T10:49Z | DeepSeek (cohort-engineer) | Captured the final snapshot of a moving tree | acceptance command + `tsc --noEmit` + app listing | 165 tests / 154 pass / 11 fail (new `tests/integration/pipeline.test.ts` 1/12, `tests/http/smoke.test.ts` 8/9); `tsc` 3 errors in those test files; `app/` = 23 files / 13 pages, leaving `/agents`, `/audit`, `/settings` without pages |
 | 2026-10-10T10:50Z | DeepSeek (cohort-engineer) | Revised this handoff to the latest snapshot (no source files touched) | `docs/CHATGPT_HANDOFF.md` | Sections 1, 4, 5, 7, 9, 10 updated; defects D4-D8 recorded with the commands and timestamps that produced them |
 | `[pending]` | `[next agent]` | Fix D1, clear D3, return D8 to green | `[paths]` | `[command output]` |
+| 2026-10-10T12:22Z | Codex Work (persona integration) | Added isolated modeled-persona JSON worker, TS contract, authenticated schema and integration guide on task branch | baseline main `dabed376`; `lib/domain/personas.ts`, `tools/psychological-personas`, `app/api/personas/schema`, tests; see `docs/WORK_CONTINUATION.md` | install/native SQLite/lint/typecheck/build exit 0; unit+integration 173/173; HTTP 10/10; no merge/deployment/research-data writes |
 
 ## 10. Next three executable tasks
 

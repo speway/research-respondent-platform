@@ -1,5 +1,19 @@
 # ChatGPT Work continuation plan
 
+## Persona integration task branch (verified 2026-10-10T12:22Z)
+
+- **Baseline main:** `dabed376d36080bc31e466f6907c7172faab2e06`, tree `f4655f1e50594ab686d4bc9fb2d9bd592373a247`; rechecked unchanged before publication. Source copied to an isolated checkout with all 106 tracked blobs verified against GitHub blob hashes. No edits in the other chat's checkout.
+- **Branch:** `codex/psychological-persona-integration`. This is a reviewable integration proposal, not a merge or deployment.
+- **Primary task:** connect `generate-psychological-personas` via a portable Python JSON worker and a pure TypeScript simulation boundary; keep generated material out of empirical research records.
+- **Changed paths:** `.github/workflows/ci.yml` (Python 3.12); app `package.json`; `lib/domain/personas.ts`; `app/api/personas/schema/route.ts`; `tools/psychological-personas/{scripts/personas.py,scripts/worker.py,references/dimensions.json,references/sources.json,assets/worker-request.json,manifest.json}`; `tests/integration/personas.test.ts`; `tests/http/smoke.test.ts`; `docs/PSYCHOLOGICAL_PERSONAS.md`, this continuation file and one appended activity-log row in `docs/CHATGPT_HANDOFF.md`.
+- **Implemented:** exact generate/adapt/validate jobs; 17 groups/169 authored coordinates; lossless decimal-string uint64 seeds; matching Python/TS core digest; immutable identity/core/history across topic adaptation; origin/unknown-data guards; explicit transport injection; authenticated read-only schema GET. No migration, database schema, empirical import or form adapter changes.
+- **Local toolchain:** Node 24.19.0, pnpm 11.25.0, Python 3.12.14. Initial locked install exited 1 during node-gyp header extraction (`fchown EINVAL`). Downloaded the same Node 24.19.0 headers into scratch with `tar --no-same-owner`; retry `npm_config_nodedir=<scratch headers> pnpm install --frozen-lockfile` exited **0**. No lockfile/dependency changes. Real in-memory SQLite check exited **0**.
+- **Final commands (all actual exit 0):** `pnpm run lint`; `pnpm run typecheck`; `pnpm test` **173/173 PASS, 0 skipped**; `NEXT_TELEMETRY_DISABLED=1 pnpm run build`; `pnpm run test:http` **10/10 PASS, 0 skipped**; `git diff --check`. Python/JS integration includes all six topics, reproducibility, adaptation idempotence, tamper/seed/origin rejection and pinned source hashes. HTTP includes schema 401/200/405 and unchanged research tables.
+- **Skill checks:** creator validation PASS; standalone generator verified on 500 modeled personas and 169 coordinates, reproducibility/count-prefix/core preservation/input corruption checks PASS. Source snapshot is explicit; no automatic skill-code synchronization is installed.
+- **Limits / next work:** generation transport is not deployed or registered. No UI generator or simulation persistence exists. Python must run outside Vercel functions; persistent research DB work remains issue #4. The current repo remains a real-participant research system; simulations require a separate labeled store if persistence is added.
+- **Next three tasks:** (1) review this PR and preserve the simulation/research boundary; (2) implement an authorized bounded external worker transport and a separate simulation UI/store if requested; (3) continue existing issues #3/#4 for authentication/status and persistent hosting before production deployment.
+
+
 ## Merged baseline (verified 2026-10-10 UTC)
 
 - Main commit: `b9f1da32947c57958dbea52dc03509a1093b015a` (squash merge of PR #1).

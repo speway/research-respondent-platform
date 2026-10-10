@@ -20,6 +20,7 @@
     "db:migrate": "node --experimental-strip-types scripts/migrate.ts",
     "db:status": "node --experimental-strip-types scripts/migrate.ts --status",
     "bootstrap": "node --experimental-strip-types scripts/bootstrap.ts",
+    "personas:worker": "python3 tools/psychological-personas/scripts/worker.py",
     "verify": "npm run lint && npm run typecheck && npm test && npm run build"
   },
   "dependencies": {

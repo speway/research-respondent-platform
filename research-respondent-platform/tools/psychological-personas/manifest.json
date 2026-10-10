@@ -1,0 +1,13 @@
+{
+  "skill": "generate-psychological-personas",
+  "model_version": "1.0.0",
+  "protocol_version": "1",
+  "source_status": "explicit_snapshot_update_only",
+  "sha256": {
+    "scripts/personas.py": "f77184b70a801c9f497fdda77b852c25f937592cc962f82e9cac2204c6206caa",
+    "scripts/worker.py": "22d99f3b1ba357c675b485bfef410920ae3af4957d03cd975d8a7f975e363bbc",
+    "references/dimensions.json": "e03bf1bba6064fb36c00574541649d5c2e444469c0c41241e97a65365c68357f",
+    "references/sources.json": "37adb897bfc98f59eac4640cee0a30f01c8c576e9bd9fa49169d8a500f2f4f20",
+    "assets/worker-request.json": "113e2f368d1bd0098e23b84850dafc7551d8a97819c00c2493e8f77860903004"
+  }
+}
