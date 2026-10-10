@@ -1,0 +1,32 @@
+# Repository-wide ignore rules. Applies to the app in the nested directory.
+**/node_modules/
+**/.next/
+**/.vercel/
+**/dist/
+**/out/
+**/coverage/
+**/*.tsbuildinfo
+**/*.log
+**/.DS_Store
+**/Thumbs.db
+**/.Rhistory
+
+# Secrets and local credentials
+**/.env
+**/.env.*
+!**/.env.example
+**/*service-account*.json
+**/*credentials*.json
+**/*.pem
+**/*.key
+
+# Never commit local databases or research data exports
+**/data/
+**/*.db
+**/*.db-journal
+**/*.db-wal
+**/*.db-shm
+**/*.sqlite
+**/*.sqlite3
+**/*.sqlite-wal
+**/*.sqlite-shm

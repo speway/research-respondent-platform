@@ -1,9 +1,8 @@
 packages:
-  - '.'
+  - "."
 
+# pnpm v11: install scripts must be explicitly approved.
+# The obsolete onlyBuiltDependencies key has intentionally been removed.
 allowBuilds:
-  better-sqlite3: set this to true or false
-
-onlyBuiltDependencies:
-  - better-sqlite3
-  - sharp
+  better-sqlite3: true
+  sharp: true
