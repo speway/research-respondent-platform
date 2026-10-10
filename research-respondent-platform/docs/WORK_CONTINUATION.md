@@ -2,6 +2,25 @@
 
 > **Current operational handoff (2026-10-10).** This file supersedes stale repository/deployment status inside `docs/CHATGPT_HANDOFF.md`. No unexecuted test or release is described as successful.
 
+## Latest verified GitHub Actions result (2026-10-10 UTC)
+
+- CI run: https://github.com/speway/research-respondent-platform/actions/runs/38049379130
+- Source commit tested: `87792568eb49f117b6501d87cf7fb95add3d1224`
+- `pnpm install --frozen-lockfile` **PASS**; native `better-sqlite3` load **PASS**.
+- `pnpm run lint` **PASS** (after correcting 8 ESLint errors on this branch).
+- `pnpm run typecheck` **PASS** (after correcting 2 integration-test typing errors).
+- `pnpm test` **FAIL**: 165 tests, **158 pass and 7 fail**, all seven in `tests/integration/pipeline.test.ts`.
+- Production build and HTTP smoke test: **NOT RUN** (skipped because integration tests failed).
+- Failing cases and reported symptoms:
+  1. Study/protocol/criterion creation: unexpected strict equality assertion.
+  2. Private identity lawful basis: SQLite trigger rejects the write (must preserve the consent/legal-basis invariant).
+  3. Cohort with consent: SQL error `no such column: ds.instrument_version_id`.
+  4. Form preflight with missing source: strict equality assertion mismatch.
+  5. Orchestration blocked external submission: expected block outcome differs (`failed` observed).
+  6. Agent authorization: test asserts agentWrite is not study-scoped; authorization rejects it.
+  7. Append-only answer/audit event: assertion failed.
+- **Next concrete action:** reproduce failures one at a time. Compare test expectations with the protocol, schema and authorization invariants. Repair incorrect SQL and test fixtures as needed; do **not** weaken identity, consent, provenance or submission restrictions to make a test pass. Then rerun all acceptance gates.
+
 ## Verified source-control baseline
 
 - GitHub repository: `speway/research-respondent-platform` (private as inspected on 2026-10-10).
