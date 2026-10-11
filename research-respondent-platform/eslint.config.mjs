@@ -9,6 +9,7 @@ export default tseslint.config(
     ignores: [
       "node_modules/**",
       ".next/**",
+      "app/.well-known/workflow/**",
       "scratch-sqlite-test/**",
       "next-env.d.ts",
       "data/**",

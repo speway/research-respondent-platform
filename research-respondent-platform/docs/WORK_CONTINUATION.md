@@ -550,3 +550,50 @@ is unchanged and accessible without registration; no production participant
 data was deployed. Next three tasks: durable protected source/consent/receipt
 integration; authenticated source selection plus scoped multi-section execution;
 complete live transfer once actual source records/recipient consent are provided.
+
+## 2026-10-11 — Persistent cabinet and scoped server source handoff
+
+Branch `feat/shared-scenario-cabinet` continues canonical PR #14 documentation
+head `2183e2701eba22d7fcce5a2d344fc3c75a94bbc1`; no project restart or SQLite
+migration edits. Latest screenshot showed the external agent had no source in
+its own tab. A private file cabinet now addresses cross-tab/source handoff:
+owner/shared issued-account login, original source and questionnaire upload,
+immutable project settings, existing workbench restore/filter revision, scoped
+24-hour read keys and revocation. Exact endpoint/storage boundaries are in
+CABINET.md and site-served agent-cabinet.md. Questionnaire extraction is not
+claimed; originals are supplied to a capable agent.
+
+Files: new cabinet domain/store/auth/http/proof services, cabinet UI/CSS/page,
+three authenticated API routes, Preview-only bounded provider proof routes,
+isolated integration tests and HTTP refusal checks; small existing workbench,
+bridge/navigation, manifest, ESLint generated-file exclusion and env-example
+updates. Original importer, form executor, research gating and migrations remain.
+
+Actual local checks: frozen install exit 0; lint exit 0; standalone TypeScript
+exit 0; 221/221 unit/integration tests exit 0, no skips/failures; production build
+exit 0 (30 routes); 19/19 production HTTP smoke tests exit 0, no skips/failures;
+diff whitespace check exit 0. Initial lint exposed generated Workflow routes
+(previously Git-ignored but not ESLint-ignored), now explicitly excluded. Initial
+types/build failed on the proof fixture hash literal type and an HTTP helper
+without a headers property; both corrected and final checks passed. Manifest's
+source-upload capability is now authenticated-cabinet only; general hosted
+participant execution/submission remains false. CI/provider readback pending.
+
+Official Vercel create-store connector returned 403; no local authenticated CLI
+was available. The already authorized owner dashboard created the separate
+private IAD1 `rrp-cabinet-private` store `store_PosjkntwlBmxdQZu`, initially empty.
+Connected only the existing research-respondent-platform project to Preview and
+production through official OIDC, sensitive prefixed variables, no permanent
+read-write token, no old-store overwrite. Metadata readback confirms prefixed
+store variables on these targets. Sensitive account configuration contains only
+scrypt hashes; Preview is branch-scoped and separate from production. Plaintext
+access values are returned privately to the owner, never Git or logs. Preview
+proof flag is branch-scoped; it never exposes a production verification route.
+
+No real participant base was supplied or uploaded. The provider proof uses a
+separate isolated verification prefix, not user cabinet rows or live forms. This
+is a private source/file catalog, not a completed relational migration; Issue #4
+remains open. Next three tasks: publish this tested tree and verify the single
+protected cloud proof; update the primary empty-data deployment and verify both
+issued accounts; integrate source-bound consent/receipt storage with hosted
+participant execution after actual source data and recipient scope are available.

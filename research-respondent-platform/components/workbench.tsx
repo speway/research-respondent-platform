@@ -5,7 +5,7 @@ import { buildPacket, emptyWorkspace, MAX_FILE_BYTES, parseSource, preparationPr
 import dictionary from "../tools/psychological-personas/references/dimensions.json";
 import styles from "./workbench.module.css";
 import { useAgentWorkbench } from "./use-agent-workbench.ts";
-import { buildAgentPlan } from "../lib/domain/agent-workbench.ts";
+import { buildAgentPlan, type AgentTask } from "../lib/domain/agent-workbench.ts";
 
 const sections = ["База ответов", "Отбор и классификация", "Карта формы", "Пакет для агента", "Психологический справочник", "Автоматизация"];
 const groupNames: Record<string, string> = { bfi2_facets: "Большая пятёрка · BFI-2", ipip_neo_facets: "IPIP-NEO", hexaco_facets: "HEXACO", cattell_concepts: "Кеттелл · 16PF", pts_concepts: "Стреляу · PTS", rtt_concepts: "Стреляу · RTT", atq_concepts: "Темперамент · ATQ", tci_concepts: "TCI", self_regulation: "Саморегуляция", emotion_regulation: "Эмоциональная регуляция", impulsivity: "Импульсивность", resources: "Ресурсы", attachment: "Привязанность", coping_tendencies: "Совладание", mpq_concepts: "MPQ", value_priorities: "Ценностные приоритеты", reporting_style: "Стиль самоотчёта" };
@@ -18,8 +18,8 @@ function download(name: string, data: unknown) {
 }
 function message(error: unknown) { return error instanceof Error ? error.message : "Не удалось обработать файл."; }
 
-export function Workbench() {
-  const agent = useAgentWorkbench();
+export function Workbench({ initialTask, projectId }: { initialTask?: AgentTask; projectId?: string }) {
+  const agent = useAgentWorkbench(initialTask);
   const { workspace, setWorkspace } = agent;
   const [section, setSection] = useState(0);
   const [notice, setNotice] = useState("");
@@ -83,20 +83,32 @@ export function Workbench() {
     } catch (cause) { setError(message(cause)); }
     finally { setBusy(false); if (agentInput.current) agentInput.current.value = ""; }
   }
+  async function saveToCabinet() {
+    setBusy(true); setError("");
+    try {
+      const response = await fetch("/api/cabinet/catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ command: "snapshot", projectId,
+        settings: { checksum: workspace.checksum, formUrl: workspace.formUrl, purpose: workspace.purpose,
+          idHeader: workspace.idColumn !== null ? workspace.dataset?.headers[workspace.idColumn] : "", match: workspace.match,
+          criteria: workspace.rules.map((rule) => ({ header: workspace.dataset?.headers[rule.column], op: rule.op, value: rule.value, label: rule.label })) } }) });
+      const result = await response.json();
+      if (!response.ok) throw new Error(result.error ?? "Проект не сохранён.");
+      setNotice("Новая версия проекта сохранена в кабинете. Создайте ключ этой версии для агента.");
+    } catch (cause) { setError(message(cause)); } finally { setBusy(false); }
+  }
 
   return <div className={styles.shell} lang="ru">
     <aside className={styles.sidebar}>
       <a className={styles.brand} href="/workbench"><span>Ψ</span><div>Respondent Lab<small>ПАНЕЛЬ ПОДГОТОВКИ</small></div></a>
       <p className={styles.sideLabel}>РАБОЧИЙ ПРОЦЕСС</p>
       <nav aria-label="Меню подготовки">{sections.map((label, index) => <button key={label} type="button" className={section === index ? styles.active : ""} aria-current={section === index ? "page" : undefined} onClick={() => { setSection(index); setError(""); }}><span>{String(index + 1).padStart(2, "0")}</span>{label}</button>)}</nav>
-      <div className={styles.sideNote}><span className={styles.dot} /> На вашем устройстве<p>Файл обрабатывается в браузере. Сервер не получает базу ответов.</p><a href="/login">Основной кабинет ↗</a></div>
+      <div className={styles.sideNote}><span className={styles.dot} /> {projectId ? "Проект из кабинета" : "На вашем устройстве"}<p>{projectId ? "Настройки можно сохранить новой версией. Новые базы и опросники загружайте через кабинет." : "Файл обрабатывается в браузере. Для хранения на сайте загрузите его через кабинет."}</p><a href="/cabinet">Личный кабинет ↗</a></div>
     </aside>
     <div className={styles.main}>
-      <div className={styles.topbar}><span>Исследование / Подготовка</span><div><button className="btn" disabled={!dataset || busy} onClick={() => { download("respondent-project.json", workspace); setNotice("Проект скачан вместе с базой и настройками. Для продолжения загрузите этот файл."); }}>Сохранить проект</button><button className="btn" disabled={busy} onClick={() => projectInput.current?.click()}>Открыть проект</button></div></div>
+      <div className={styles.topbar}><span>Исследование / Подготовка · <a href="/cabinet">Кабинет</a></span><div>{projectId ? <button className="btn btn-primary" disabled={!dataset || busy} onClick={() => void saveToCabinet()}>Сохранить в кабинете</button> : null}<button className="btn" disabled={!dataset || busy} onClick={() => { download("respondent-project.json", workspace); setNotice("Проект скачан вместе с базой и настройками. Для продолжения загрузите этот файл."); }}>Сохранить проект</button><button className="btn" disabled={busy} onClick={() => projectInput.current?.click()}>Открыть проект</button></div></div>
       <input className={styles.hidden} type="file" accept=".json" ref={projectInput} aria-label="Файл сохранённого проекта" onChange={(event) => void load(event.target.files?.[0], true)} />
       <header className={styles.heading}><div><p>ОТ ИСХОДНИКА К ГОТОВОЙ КАРТЕ</p><h1>{sections[section]}</h1><div>База → критерии → вопросы → задание агенту</div></div><span className={styles.badge}>Первичная рабочая версия</span></header>
       <div className={styles.metrics}><div><span>Записи в базе</span><strong>{dataset?.rows.length ?? "—"}</strong><small>{dataset?.name ?? "Загрузите исходный файл"}</small></div><div><span>После отбора</span><strong>{dataset ? selectedCount : "—"}</strong><small>{workspace.rules.length} критериев</small></div><div><span>Вопросы формы</span><strong>{workspace.fields.length || "—"}</strong><small>{workspace.fields.filter((f) => f.column !== null).length} сопоставлено</small></div><div><span>Состояние подготовки</span><strong className={styles.status}>{problems.length ? "В работе" : "Готово"}</strong><small>{problems.length ? "Проверьте пакет для агента" : "Можно скачать пакет"}</small></div></div>
-      {error ? <p className="note note-fail" role="alert">{error}</p> : null}
+      {error || agent.initialError ? <p className="note note-fail" role="alert">{error || agent.initialError}</p> : null}
       {notice ? <p className="note note-ok" role="status">{notice}</p> : null}
       {busy ? <p className="note" role="status">Читаю файл и проверяю структуру…</p> : null}
 
@@ -127,7 +139,7 @@ export function Workbench() {
       </div></section> : null}
 
       {dataset && [0, 1].includes(section) ? <section className={styles.panel}><div className={styles.panelTitle}><h2>Предпросмотр записей</h2><span>{rows.length} после отбора · первые 8 столбцов</span></div><div className={styles.tableScroll}><table className="data-table"><thead><tr><th>Строка источника</th>{headers.slice(0, 8).map((h) => <th key={h}>{h}</th>)}</tr></thead><tbody>{shownRows.map((row) => <tr key={row.line}><td>{row.line}</td>{row.values.slice(0, 8).map((value, i) => <td key={i}>{value === null ? <span className={styles.missing}>нет ответа</span> : String(value)}</td>)}</tr>)}</tbody></table></div>{!rows.length ? <p className={styles.content}>Нет записей, соответствующих критериям.</p> : null}<div className={styles.pagination}><button className="btn" disabled={shownPage === 0} onClick={() => setPage(shownPage - 1)}>Назад</button><span>{shownPage + 1} / {Math.max(1, Math.ceil(rows.length / 20))}</span><button className="btn" disabled={(shownPage + 1) * 20 >= rows.length} onClick={() => setPage(shownPage + 1)}>Далее</button></div></section> : null}
-      <footer className={styles.footer}><span>Данные остаются в этой вкладке. Скачайте проект, чтобы продолжить после закрытия.</span><button disabled={busy} onClick={() => { ++importSequence.current; setWorkspace(emptyWorkspace()); setPage(0); setNotice("База и настройки удалены из текущей вкладки."); setError(""); }}>Очистить рабочую панель</button></footer>
+      <footer className={styles.footer}><span>{projectId ? "Исходник хранится в кабинете. Сохраните изменённые критерии новой версией." : "Данные этой панели остаются в текущей вкладке. Для хранения на сайте используйте кабинет."}</span><button disabled={busy} onClick={() => { ++importSequence.current; setWorkspace(emptyWorkspace()); setPage(0); setNotice("База и настройки удалены из текущей вкладки."); setError(""); }}>Очистить рабочую панель</button></footer>
     </div>
   </div>;
 }

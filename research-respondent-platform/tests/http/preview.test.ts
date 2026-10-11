@@ -66,7 +66,7 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     const manifest = JSON.parse(response.body);
     assert.equal(manifest.protocol, "rrp.workbench-agent.v1");
     assert.equal(manifest.capabilities.hostedBackgroundWorker, false);
-    assert.equal(manifest.capabilities.serverSourceUpload, false);
+    assert.equal(manifest.capabilities.serverSourceUpload, true);
     assert.equal(response.body.includes("preview@example.test"), false);
     assert.equal("source" in manifest, false);
     for (const name of ["task", "observation"]) {
@@ -74,6 +74,21 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
       assert.equal(schema.status, 200);
       assert.equal(JSON.parse(schema.body).additionalProperties, false);
     }
+  });
+  it("cabinet discovery stays public, while files, keys and proof stay closed without configuration", async () => {
+    assert.equal((await httpGet(server.baseUrl, "/cabinet")).status, 200);
+    assert.equal((await httpGet(server.baseUrl, "/agent-cabinet.md")).status, 200);
+    const denied = await fetch(`${server.baseUrl}/api/cabinet/catalog`);
+    assert.equal(denied.status, 503);
+    assert.match(denied.headers.get("cache-control") ?? "", /no-store/);
+    await denied.body?.cancel();
+    assert.equal((await httpGet(server.baseUrl, "/api/cabinet/agent")).status, 401);
+    assert.equal((await httpGet(server.baseUrl, "/cloud/cabinet-check")).status, 404);
+    assert.equal((await httpPost(server.baseUrl, "/cloud/cabinet-check/run", {})).status, 404);
+    const login = await fetch(`${server.baseUrl}/api/cabinet/session`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://untrusted.test" }, body: '{"login":"owner","password":"fixture-only"}' });
+    assert.equal(login.status, 403);
+    const project = await httpGet(server.baseUrl, "/workbench?project=00000000-0000-4000-8000-000000000000");
+    assert.equal(project.status, 307); assert.match(project.location ?? "", /\/cabinet/);
   });
 
   it("a real create-study POST remains refused even with a valid file-database cookie", async () => {
