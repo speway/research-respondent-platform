@@ -393,3 +393,16 @@ install/lint/types/unit/HTTP/build and three old browser flows, but its new
 cabinet browser flow failed selecting the initial source. Accessible select
 labels and visible upload completion are being repaired; do not treat initial
 head as a fully verified release. See continuation for exact CI/Preview IDs.
+
+Repaired application `e2e1d75b84c25ef3f3b922825ee0aa5e65193033` is verified:
+CI `38140457025` passed every step including all four actual Chromium checks.
+New scenario covers upload, merge preview invalidation, version/project, scoped
+agent lineage, conflicts, profile join and mobile using an isolated service.
+Protected Preview `dpl_7wfndkJXrECaDrx55y7ivq8zMCm9` and main production
+`dpl_9LtUDFDRKwptSYr6ZczXMkNs8u6Y` are READY at that SHA. Existing primary alias
+now serves it; HTTPS login/session/catalog/logout/public/disallowed-route checks
+passed. Owner has four previously uploaded source files, team zero, no projects
+at observation; none were changed or submitted. Browser visibly shows the new
+bank controls. This is not evidence of verified source consent or live transfer.
+Operational screenshot contains unselected controls, no source data. Evidence-only
+follow-up does not change the tested application or require a repeated full CI.

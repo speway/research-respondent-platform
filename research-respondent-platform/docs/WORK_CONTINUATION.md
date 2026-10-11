@@ -727,3 +727,52 @@ Normal owner browser reached the protected cabinet HTML; primary still points
 to the previous verified application. No protection/bypass changes. Local
 Playwright installation could not obtain a valid vendor archive, so no local
 Chromium run was achieved; no network-path workaround was attempted.
+
+### Verified respondent bank release
+
+Checked application SHA `e2e1d75b84c25ef3f3b922825ee0aa5e65193033`, tree
+`064b73bcfaad09627aa08b4bdfbc2de8bc302c81`. CI `38140457025` / job
+`114473090696` succeeded on every step: install/native module/lint/types/234
+unit-integration tests/build/20 HTTP and all four actual Chromium scenarios.
+Job log independently confirms the new cabinet flow: upload → preview edit
+invalidation → persisted bank version → project → scoped agent/lineage;
+conflicts, profile join and mobile passed. The new browser transport is an
+isolated in-memory service fixture, not a live provider merge or Google Forms
+submission. Previous three browser scenarios also passed.
+
+Actual exact-SHA protected Preview `dpl_7wfndkJXrECaDrx55y7ivq8zMCm9` READY,
+target null, owner browser cabinet HTML verified at
+https://research-respondent-platform-9c4qpxjbc-spw1.vercel.app/cabinet . No bypass
+or protection weakening. Production `dpl_9LtUDFDRKwptSYr6ZczXMkNs8u6Y` READY,
+target production, same checked application SHA, released through the official
+API. Existing primary alias assigned to it and independently read back matching
+project/deployment IDs. Production account configuration/passwords were unchanged.
+
+Actual HTTPS verification on https://research-respondent-platform.vercel.app,
+exit 0: cabinet/workbench/two CSV templates/command schema/agent guide return 200;
+manifest advertises this branch and bank/readiness features. Both issued accounts
+login, maintain Secure/HttpOnly sessions and read private/no-store catalogs;
+logout invalidates each session. Owner catalog contains four previously uploaded
+source files, shared catalog zero; neither contains a project at this observation.
+No file contents/answers or credentials were printed, uploaded or overwritten by
+this verifier. Valid bank-preview commands for nonexistent source UUIDs return
+404 in both accounts without creating data. Anonymous catalog and lineage API
+return 401; production proof stays 404. These facts supersede the earlier empty
+owner-catalog observation, which predates the owner's uploads.
+
+Owner's existing browser session independently rendered the new bank section,
+with the four source files still listed. Screenshot docs/evidence/respondent-bank-main.jpg
+contains unselected controls/templates only, no source names, rows or keys. It
+records deployed UI presence, not evidence of a completed merge. Main cabinet
+left open for the user. Real source provenance, cross-study participant identity,
+consent evidence, full cloud merge with actual selected sources and live form
+transfer have not been independently validated by this stage. Source uploads are
+not automatically treated as verified consent or compatibility.
+
+This follow-up changes only Git documentation and the operational screenshot;
+application deployment remains pinned to the fully verified SHA above. CI is
+not rerun for this evidence-only follow-up. PR #16 remains open, stacked on #15;
+Issue #4 remains open. Next three tasks: inspect/document uploaded source schemas
+and instrument versions without inferring answers; prepare a compatible scoped
+project and consent/receipt persistence; verify a bounded live transfer only with
+actual source-backed answers and evidenced recipient/participant authorization.
