@@ -39,6 +39,8 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
   it("cloud diagnostics stay unavailable until explicitly configured; direct actions cannot enable them", async () => {
     const page = await httpGet(server.baseUrl, "/cloud/setup");
     assert.equal(page.status, 404);
+    assert.equal((await httpGet(server.baseUrl, "/cloud/audit")).status, 404);
+    assert.equal((await httpPost(server.baseUrl, "/cloud/audit", {})).status, 404);
     const ref = serverActionRefsFromBuild().find((entry) => entry.exportedName === "runStorageProbeAction");
     assert.ok(ref);
     const action = await httpPost(server.baseUrl, "/cloud/setup", { [`$ACTION_ID_${ref.id}`]: "" }, { multipart: true });
@@ -101,6 +103,8 @@ it("Vercel production refuses SQLite database health until durable hosting is co
     const participants = await httpGet(production.baseUrl, "/participants");
     const setup = await httpGet(production.baseUrl, "/cloud/setup");
     assert.equal(setup.status, 404);
+    assert.equal((await httpGet(production.baseUrl, "/cloud/audit")).status, 404);
+    assert.equal((await httpPost(production.baseUrl, "/cloud/audit", {})).status, 404);
     assert.ok([302, 303, 307, 308].includes(participants.status));
     assert.match(participants.location ?? "", /\/login/);
   } finally { await production.stop(); removeTempDb(production.dbFile); }

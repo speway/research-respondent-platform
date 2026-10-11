@@ -1,6 +1,9 @@
 # Repository-wide ignore rules. Applies to the app in the nested directory.
 **/node_modules/
 **/.next/
+**/.workflow-data/
+**/.workflow/
+research-respondent-platform/app/.well-known/workflow/
 **/.vercel/
 **/dist/
 **/out/

@@ -4,5 +4,8 @@ packages:
 # pnpm v11: install scripts must be explicitly approved.
 # The obsolete onlyBuiltDependencies key has intentionally been removed.
 allowBuilds:
+  '@swc/core': true
   better-sqlite3: true
+  cbor-extract: true
+  esbuild: true
   sharp: true
