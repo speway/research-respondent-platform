@@ -372,3 +372,9 @@ Protected Preview: https://research-respondent-platform-4cjnlbwjs-spw1.vercel.ap
 Both deploy checked application `92912a389e5819c050870d89b146e39b9322bb3c`,
 whose CI run 38080225043 passed every step. PR #12 preserves the changes;
 server participant storage and hosted background execution remain unavailable.
+
+Respondent bank accumulation (current branch): the private cabinet previews
+literal merges and exact participant profile joins, refuses conflicts and saves
+immutable versions with source/row lineage for agents. CSV templates and download
+controls are included. See [RESPONDENT_BANK.md](docs/RESPONDENT_BANK.md) for formats,
+limits and unchanged execution/consent requirements.

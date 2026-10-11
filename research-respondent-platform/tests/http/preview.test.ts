@@ -90,6 +90,15 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     const project = await httpGet(server.baseUrl, "/workbench?project=00000000-0000-4000-8000-000000000000");
     assert.equal(project.status, 307); assert.match(project.location ?? "", /\/cabinet/);
   });
+  it("bank templates and command schema are public while mutation and lineage require cabinet authorization", async () => {
+    const schema = await httpGet(server.baseUrl, "/.well-known/rrp-bank-command.schema.json");
+    assert.equal(schema.status, 200); assert.equal(JSON.parse(schema.body).oneOf.length, 2);
+    const template = await httpGet(server.baseUrl, "/bank-templates/participants.csv");
+    assert.equal(template.status, 200); assert.match(template.body, /^participant_id,/);
+    const blocked = await fetch(`${server.baseUrl}/api/cabinet/catalog`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://untrusted.test" }, body: '{"command":"bank_preview","spec":{}}' });
+    assert.equal(blocked.status, 403); await blocked.body?.cancel();
+    assert.equal((await httpGet(server.baseUrl, "/api/cabinet/agent?lineage=11111111-1111-4111-8111-111111111111")).status, 401);
+  });
 
   it("a real create-study POST remains refused even with a valid file-database cookie", async () => {
     const ref = serverActionRefsFromBuild().find((entry) => entry.exportedName === "createStudyAction");

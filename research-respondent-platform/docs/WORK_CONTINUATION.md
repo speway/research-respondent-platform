@@ -652,3 +652,127 @@ No factual source dataset for the supplied Google Form has been provided. Issue
 the earlier stacked PR. Next three tasks: integrate source-bound consent/receipt
 persistence with execution; verify a complete live transfer after actual records
 and recipient scope are provided; complete relational migration and per-user roles.
+
+## 2026-10-11 — respondent bank accumulation and agent source readiness
+
+Checked starting commit: `3275ee2de69ab2ffe4fe74ed8447646c3d171be9`, PR #15
+open/mergeable. Task branch `feat/respondent-bank-versions` continues it; no
+project restart, migration/checksum changes or participant data. The owner asks
+for accumulating previous respondents and easier agent access, then explicitly
+steers toward improvements to site functionality and agent interaction.
+
+Added pure `respondent-bank.ts` planning: exact merge, profile left join, stable
+participant/session tuple keys, identical intra-file deduplication, explicit
+conflicts, missingness preservation and combined limits. Existing importer is
+reused. Private service commits reload original source bytes and bind the preview
+hash to specification/parent hashes/result. One create-only approval reservation
+publishes at most one version. Successful replay returns it; uncertain incomplete
+publication stops. Original files/projects stay immutable. Lineage is persisted,
+hashed/read back before indexing, scoped to the selected source for agent reads;
+parent files are not granted. Original downloads require cabinet authentication.
+
+New cabinet bank component supports file/ID/session-key selection, preview counts,
+conflict blockers and immutable creation, selects the result for a new project,
+with CSV header-only templates. The file list allows downloads/history. Agent
+bundles add readiness counts/blocker codes, source download and lineage links.
+Public manifest/JSON schema/site guide and RESPONDENT_BANK.md describe contract,
+formats and boundaries. The existing browser executor is preserved, including
+per-section observation, exact mapping, source-bound grants and receipt rules.
+
+Actual local results: `pnpm install --frozen-lockfile` exit 0; standalone types
+exit 0; final lint exit 0; 234/234 unit/integration tests exit 0, no skips/failures;
+production build exit 0, 30 routes; 20/20 HTTP tests exit 0, no skips/failures.
+Initial lint found browser-test globals and redundant test string escapes, fixed.
+Initial new unit assertion expected an empty CSV string, but existing importer
+correctly represents empty cells as null; assertion corrected, importer preserved.
+New integration cases prove preview no writes, exact provenance/reopened readback,
+conflict/stale/account refusal, failure before publication, concurrent replay-safe
+commit, agent scope and tampered lineage refusal. New Chromium UI scenario covers
+upload/merge/edit-invalidation/project/agent/conflicts/profile join/mobile. Local
+launch was blocked before UI by absent Chromium; CI installs its pinned browser.
+No claim of a local browser pass, deployed merge pass or live form submission.
+
+New files: domain planner, UI component, public command schema/two templates,
+RESPONDENT_BANK.md, unit suite and browser scenario. Modified: private cabinet
+service/domain/API, cabinet UI/CSS, agent manifest/guide, HTTP/integration suites,
+CI browser step and continuation/handoff documents. Final tiny prompt change and
+documentation are being validated by the pending exact-head CI; do not interpret
+these local counts as proof of a later unchecked Git head.
+
+The bank is immutable versioned tabular files, not a global editable participant
+registry or PostgreSQL migration. No factual response base has been supplied in
+this coding turn. Individual invitations, document extraction, verified consent,
+full live response transfer and always-running submission remain unimplemented;
+Issue #4 stays open. Next three tasks: verify exact-head CI and Preview, release
+the checked application to the existing site, then integrate consent/receipts
+with hosted execution after documented actual responses and recipient scope.
+
+### First exact-head CI and accessibility repair
+
+Published application/checkpoint SHA `66dd7dfad8370a57d431a5523c44ea1055d7d70a`,
+tree `56156178730b7cded13bac1684c1a5a36af06d62`, PR #16 stacked on #15. CI
+`38140059491` passed install/native module/lint/types/234 tests/build/20 HTTP and
+all three existing Chromium scenarios. The new cabinet scenario failed waiting
+for an exact label on the first source select, before merge. Added explicit
+accessible labels to dynamic bank/project selects, a per-upload visible-file
+wait and redacted isolated-fixture diagnostics. The failure is recorded; the
+new flow is not claimed verified until repaired-head browser CI succeeds.
+
+One exact-SHA Preview `dpl_Eit3ctoyxfAzBvkJuyeZMPsTxxMM` is READY at
+https://research-respondent-platform-d5axmtt7v-spw1.vercel.app/cabinet . Official
+env metadata showed cabinet account hashes only on the prior Preview branch;
+moved that existing sensitive Preview configuration to the active task branch
+via metadata-only edit, without reading/changing its value or production hashes.
+Normal owner browser reached the protected cabinet HTML; primary still points
+to the previous verified application. No protection/bypass changes. Local
+Playwright installation could not obtain a valid vendor archive, so no local
+Chromium run was achieved; no network-path workaround was attempted.
+
+### Verified respondent bank release
+
+Checked application SHA `e2e1d75b84c25ef3f3b922825ee0aa5e65193033`, tree
+`064b73bcfaad09627aa08b4bdfbc2de8bc302c81`. CI `38140457025` / job
+`114473090696` succeeded on every step: install/native module/lint/types/234
+unit-integration tests/build/20 HTTP and all four actual Chromium scenarios.
+Job log independently confirms the new cabinet flow: upload → preview edit
+invalidation → persisted bank version → project → scoped agent/lineage;
+conflicts, profile join and mobile passed. The new browser transport is an
+isolated in-memory service fixture, not a live provider merge or Google Forms
+submission. Previous three browser scenarios also passed.
+
+Actual exact-SHA protected Preview `dpl_7wfndkJXrECaDrx55y7ivq8zMCm9` READY,
+target null, owner browser cabinet HTML verified at
+https://research-respondent-platform-9c4qpxjbc-spw1.vercel.app/cabinet . No bypass
+or protection weakening. Production `dpl_9LtUDFDRKwptSYr6ZczXMkNs8u6Y` READY,
+target production, same checked application SHA, released through the official
+API. Existing primary alias assigned to it and independently read back matching
+project/deployment IDs. Production account configuration/passwords were unchanged.
+
+Actual HTTPS verification on https://research-respondent-platform.vercel.app,
+exit 0: cabinet/workbench/two CSV templates/command schema/agent guide return 200;
+manifest advertises this branch and bank/readiness features. Both issued accounts
+login, maintain Secure/HttpOnly sessions and read private/no-store catalogs;
+logout invalidates each session. Owner catalog contains four previously uploaded
+source files, shared catalog zero; neither contains a project at this observation.
+No file contents/answers or credentials were printed, uploaded or overwritten by
+this verifier. Valid bank-preview commands for nonexistent source UUIDs return
+404 in both accounts without creating data. Anonymous catalog and lineage API
+return 401; production proof stays 404. These facts supersede the earlier empty
+owner-catalog observation, which predates the owner's uploads.
+
+Owner's existing browser session independently rendered the new bank section,
+with the four source files still listed. Screenshot docs/evidence/respondent-bank-main.jpg
+contains unselected controls/templates only, no source names, rows or keys. It
+records deployed UI presence, not evidence of a completed merge. Main cabinet
+left open for the user. Real source provenance, cross-study participant identity,
+consent evidence, full cloud merge with actual selected sources and live form
+transfer have not been independently validated by this stage. Source uploads are
+not automatically treated as verified consent or compatibility.
+
+This follow-up changes only Git documentation and the operational screenshot;
+application deployment remains pinned to the fully verified SHA above. CI is
+not rerun for this evidence-only follow-up. PR #16 remains open, stacked on #15;
+Issue #4 remains open. Next three tasks: inspect/document uploaded source schemas
+and instrument versions without inferring answers; prepare a compatible scoped
+project and consent/receipt persistence; verify a bounded live transfer only with
+actual source-backed answers and evidenced recipient/participant authorization.

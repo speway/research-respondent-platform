@@ -372,3 +372,37 @@ deployments, corrected alias mapping and proof screenshots. The site's cabinet
 now generates a project-scoped agent prompt and supplies saved originals. Do not
 require reattaching files once that project key is supplied. Actual dataset and
 external submission grant remain necessary; no source rows were invented.
+
+### 22. Respondent bank versions and agent readiness (2026-10-11)
+
+Continues checked PR #15 head `3275ee2de69ab2ffe4fe74ed8447646c3d171be9` on
+`feat/respondent-bank-versions`. The cabinet now prepares literal source merges
+and exact participant profile joins, blocks conflicting/ambiguous records,
+supports session keys and publishes immutable, hashed source/lineage versions
+with replay-safe approval. Scoped agents get readiness counts, original source
+and lineage downloads. Header-only CSV templates, authenticated file downloads
+and machine contract/site guide are included. No existing executor/migration
+rewrite, participant fabrication or real external submission. Local 234 tests,
+20 HTTP checks, lint/types/build passed; Chromium absent locally, new UI scenario
+awaits installed-browser CI. Current evidence and deployment status belong in
+WORK_CONTINUATION.md; historical claims above remain historical. Global registry,
+relational migration, consent evidence integration and hosted sending remain open.
+
+PR #16 initial head `66dd7dfad8370a57d431a5523c44ea1055d7d70a` had green
+install/lint/types/unit/HTTP/build and three old browser flows, but its new
+cabinet browser flow failed selecting the initial source. Accessible select
+labels and visible upload completion are being repaired; do not treat initial
+head as a fully verified release. See continuation for exact CI/Preview IDs.
+
+Repaired application `e2e1d75b84c25ef3f3b922825ee0aa5e65193033` is verified:
+CI `38140457025` passed every step including all four actual Chromium checks.
+New scenario covers upload, merge preview invalidation, version/project, scoped
+agent lineage, conflicts, profile join and mobile using an isolated service.
+Protected Preview `dpl_7wfndkJXrECaDrx55y7ivq8zMCm9` and main production
+`dpl_9LtUDFDRKwptSYr6ZczXMkNs8u6Y` are READY at that SHA. Existing primary alias
+now serves it; HTTPS login/session/catalog/logout/public/disallowed-route checks
+passed. Owner has four previously uploaded source files, team zero, no projects
+at observation; none were changed or submitted. Browser visibly shows the new
+bank controls. This is not evidence of verified source consent or live transfer.
+Operational screenshot contains unselected controls, no source data. Evidence-only
+follow-up does not change the tested application or require a repeated full CI.
