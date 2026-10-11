@@ -706,3 +706,24 @@ full live response transfer and always-running submission remain unimplemented;
 Issue #4 stays open. Next three tasks: verify exact-head CI and Preview, release
 the checked application to the existing site, then integrate consent/receipts
 with hosted execution after documented actual responses and recipient scope.
+
+### First exact-head CI and accessibility repair
+
+Published application/checkpoint SHA `66dd7dfad8370a57d431a5523c44ea1055d7d70a`,
+tree `56156178730b7cded13bac1684c1a5a36af06d62`, PR #16 stacked on #15. CI
+`38140059491` passed install/native module/lint/types/234 tests/build/20 HTTP and
+all three existing Chromium scenarios. The new cabinet scenario failed waiting
+for an exact label on the first source select, before merge. Added explicit
+accessible labels to dynamic bank/project selects, a per-upload visible-file
+wait and redacted isolated-fixture diagnostics. The failure is recorded; the
+new flow is not claimed verified until repaired-head browser CI succeeds.
+
+One exact-SHA Preview `dpl_Eit3ctoyxfAzBvkJuyeZMPsTxxMM` is READY at
+https://research-respondent-platform-d5axmtt7v-spw1.vercel.app/cabinet . Official
+env metadata showed cabinet account hashes only on the prior Preview branch;
+moved that existing sensitive Preview configuration to the active task branch
+via metadata-only edit, without reading/changing its value or production hashes.
+Normal owner browser reached the protected cabinet HTML; primary still points
+to the previous verified application. No protection/bypass changes. Local
+Playwright installation could not obtain a valid vendor archive, so no local
+Chromium run was achieved; no network-path workaround was attempted.

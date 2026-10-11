@@ -27,10 +27,10 @@ const cabinet = new Cabinet(config, {
 });
 const owner = config.accounts[0];
 const server = await startTestServer({ env: { ...env, VERCEL: "1", VERCEL_ENV: "preview" } });
-let browser;
+let browser; let activePage;
 try {
   browser = await chromium.launch({ headless: true, ...(process.env.BROWSER_EXECUTABLE_PATH ? { executablePath: process.env.BROWSER_EXECUTABLE_PATH } : {}), args: ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"] });
-  const page = await browser.newPage({ viewport: { width: 1360, height: 1000 } }); const errors = [];
+  const page = await browser.newPage({ viewport: { width: 1360, height: 1000 } }); activePage = page; const errors = [];
   page.on("pageerror", (error) => errors.push(error.message));
   await page.route("**/api/cabinet/**", async (route) => {
     const request = route.request(), url = new URL(request.url());
@@ -61,7 +61,9 @@ try {
     await panel.getByLabel("Основание доступа и использования").fill("test-only");
     const response = page.waitForResponse((r) => r.url().endsWith("/catalog") && r.request().method() === "POST");
     await panel.getByRole("button", { name: "Сохранить файл" }).click();
-    assert.equal((await response).status(), 200);
+    const uploaded = await response; assert.equal(uploaded.status(), 200);
+    const fileId = (await uploaded.json()).asset.id;
+    await page.locator(`a[href="/api/cabinet/catalog?asset=${fileId}"]`).waitFor();
     await page.getByRole("status").filter({ hasText: "Файл сохранён" }).waitFor();
   }
   await upload("left.csv", "participant_id,answer\nTEST-A,0\nTEST-B,2\n");
@@ -115,4 +117,7 @@ try {
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
   assert.deepEqual(errors, []);
   log("Cabinet browser: upload → preview invalidation → durable bank version → project → scoped agent/lineage; conflicts and exact profile join; mobile passed.");
+} catch (error) {
+  if (activePage) log("Isolated fixture cabinet failure before returning an agent key:", (await activePage.locator("body").innerText()).replace(/Bearer [A-Za-z0-9_-]+/g, "Bearer [redacted]"));
+  throw error;
 } finally { if (browser) await browser.close(); await server.stop(); removeTempDb(server.dbFile); }

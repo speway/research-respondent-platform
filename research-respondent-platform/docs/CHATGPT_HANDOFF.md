@@ -387,3 +387,9 @@ rewrite, participant fabrication or real external submission. Local 234 tests,
 awaits installed-browser CI. Current evidence and deployment status belong in
 WORK_CONTINUATION.md; historical claims above remain historical. Global registry,
 relational migration, consent evidence integration and hosted sending remain open.
+
+PR #16 initial head `66dd7dfad8370a57d431a5523c44ea1055d7d70a` had green
+install/lint/types/unit/HTTP/build and three old browser flows, but its new
+cabinet browser flow failed selecting the initial source. Accessible select
+labels and visible upload completion are being repaired; do not treat initial
+head as a fully verified release. See continuation for exact CI/Preview IDs.
