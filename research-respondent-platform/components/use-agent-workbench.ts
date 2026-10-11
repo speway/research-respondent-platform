@@ -1,7 +1,7 @@
 "use client";
 import { useCallback, useEffect, useRef, useState, type SetStateAction } from "react";
 import { z } from "zod";
-import { agentProblems, applyObservation, buildAgentPlan, workspaceForTarget, workspaceFromTask, type FormObservation } from "../lib/domain/agent-workbench.ts";
+import { agentProblems, applyObservation, buildAgentPlan, workspaceForTarget, workspaceFromTask, type AgentTask, type FormObservation } from "../lib/domain/agent-workbench.ts";
 import { emptyWorkspace, selectedRows, type Workspace } from "../lib/domain/workbench.ts";
 
 const revision = z.number().int().nonnegative();
@@ -18,10 +18,11 @@ export interface WorkbenchAgent { protocol: "rrp.workbench-agent.v1"; execute(in
 declare global { interface Window { respondentWorkbench?: WorkbenchAgent } }
 
 /** Same-tab control only. This is deliberately not an anonymous server API. */
-export function useAgentWorkbench() {
+export function useAgentWorkbench(initialTask?: AgentTask) {
   const [state, setState] = useState<State>(() => ({ workspace: emptyWorkspace(), observation: null, revision: 0, lastCommand: "" }));
   const current = useRef(state);
   const pending = useRef(false);
+  const [initialError, setInitialError] = useState("");
   const commit = useCallback((workspace: Workspace, observation: FormObservation | null, lastCommand = "") => {
     const next = { workspace, observation, revision: current.current.revision + 1, lastCommand };
     current.current = next;
@@ -66,5 +67,10 @@ export function useAgentWorkbench() {
     window.respondentWorkbench = bridge;
     return () => { if (window.respondentWorkbench === bridge) delete window.respondentWorkbench; };
   }, [execute]);
-  return { ...state, setWorkspace, execute, problems: agentProblems(state.workspace, state.observation) };
+  useEffect(() => {
+    if (!initialTask) return;
+    void execute({ command: "load", expectedRevision: current.current.revision, task: initialTask })
+      .catch((error: unknown) => setInitialError(error instanceof Error ? error.message : "Проект не загружен."));
+  }, [execute, initialTask]);
+  return { ...state, initialError, setWorkspace, execute, problems: agentProblems(state.workspace, state.observation) };
 }

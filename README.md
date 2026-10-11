@@ -45,3 +45,15 @@ Read [`AGENTS.md`](AGENTS.md) and [`WORK_CONTINUATION.md`](research-respondent-p
 ## Research data
 
 Only consented, documented participants and their actual observed answers belong in the study dataset. Derived scores must remain traceable to versions of documented responses and scoring rules. Generated fixtures are allowed only in explicitly isolated test environments and must never be represented as empirical respondents.
+
+## Current public cabinet (2026-10-11)
+
+https://research-respondent-platform.vercel.app/cabinet provides issued-account
+access, private source/questionnaire uploads and scoped agent handoff. No email
+registration is required; owner/shared accounts and environments are isolated.
+The original public preparation panel remains at `/workbench`. This is a private
+file catalog, not a completed migration of legacy SQLite. See
+[the cabinet contract](research-respondent-platform/docs/CABINET.md) and the latest
+[verified continuation](research-respondent-platform/docs/WORK_CONTINUATION.md).
+Application PR #15 has successful CI plus actual provider/public-access checks;
+production account catalogs were verified empty.

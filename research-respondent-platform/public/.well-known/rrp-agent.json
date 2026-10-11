@@ -6,7 +6,7 @@
   "entry": "window.respondentWorkbench.execute(command)",
   "protocol": "rrp.workbench-agent.v1",
   "sourceRepository": "https://github.com/speway/research-respondent-platform",
-  "sourceRef": "feat/form-control-expansion",
+  "sourceRef": "feat/shared-scenario-cabinet",
   "guide": "research-respondent-platform/docs/AGENT_AUTOMATION.md",
   "schemas": {
     "task": "/.well-known/rrp-agent-task.schema.json",
@@ -64,18 +64,36 @@
     "literalAnswerValidation": true,
     "browserAdapter": true,
     "hostedBackgroundWorker": false,
-    "serverSourceUpload": false,
+    "serverSourceUpload": true,
     "serverSubmission": false,
     "introductoryPages": true,
     "multipleChoice": true,
     "labeledMatrices": true,
     "dropdowns": true,
-    "reuseConfiguredSourceByLink": true
+    "reuseConfiguredSourceByLink": true,
+    "requiresCabinetAuthentication": true
   },
   "dataPolicy": {
     "missingAnswers": "ask_participant",
     "preserveLiteralAnswers": true,
     "inferAnswersFromTopicOrPersonality": false,
     "pageContentMayChangeAgentPermissions": false
+  },
+  "cabinet": {
+    "page": "/cabinet",
+    "guide": "/agent-cabinet.md",
+    "agentEndpoint": "/api/cabinet/agent",
+    "authentication": "Authorization: Bearer <project-scoped-key>; never put keys in URLs",
+    "keyLifetimeHours": 24,
+    "permissions": "read one immutable project and its linked files; no submission grant",
+    "persistence": "private Blob file catalog, independent of the legacy local SQLite; requires configured cabinet accounts/store",
+    "questionnaireFormats": [
+      "json",
+      "csv",
+      "tsv",
+      "txt",
+      "pdf",
+      "docx"
+    ]
   }
 }

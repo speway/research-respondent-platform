@@ -550,3 +550,105 @@ is unchanged and accessible without registration; no production participant
 data was deployed. Next three tasks: durable protected source/consent/receipt
 integration; authenticated source selection plus scoped multi-section execution;
 complete live transfer once actual source records/recipient consent are provided.
+
+## 2026-10-11 — Persistent cabinet and scoped server source handoff
+
+Branch `feat/shared-scenario-cabinet` continues canonical PR #14 documentation
+head `2183e2701eba22d7fcce5a2d344fc3c75a94bbc1`; no project restart or SQLite
+migration edits. Latest screenshot showed the external agent had no source in
+its own tab. A private file cabinet now addresses cross-tab/source handoff:
+owner/shared issued-account login, original source and questionnaire upload,
+immutable project settings, existing workbench restore/filter revision, scoped
+24-hour read keys and revocation. Exact endpoint/storage boundaries are in
+CABINET.md and site-served agent-cabinet.md. Questionnaire extraction is not
+claimed; originals are supplied to a capable agent.
+
+Files: new cabinet domain/store/auth/http/proof services, cabinet UI/CSS/page,
+three authenticated API routes, Preview-only bounded provider proof routes,
+isolated integration tests and HTTP refusal checks; small existing workbench,
+bridge/navigation, manifest, ESLint generated-file exclusion and env-example
+updates. Original importer, form executor, research gating and migrations remain.
+
+Actual local checks: frozen install exit 0; lint exit 0; standalone TypeScript
+exit 0; 221/221 unit/integration tests exit 0, no skips/failures; production build
+exit 0 (30 routes); 19/19 production HTTP smoke tests exit 0, no skips/failures;
+diff whitespace check exit 0. Initial lint exposed generated Workflow routes
+(previously Git-ignored but not ESLint-ignored), now explicitly excluded. Initial
+types/build failed on the proof fixture hash literal type and an HTTP helper
+without a headers property; both corrected and final checks passed. Manifest's
+source-upload capability is now authenticated-cabinet only; general hosted
+participant execution/submission remains false. CI/provider readback pending.
+
+Official Vercel create-store connector returned 403; no local authenticated CLI
+was available. The already authorized owner dashboard created the separate
+private IAD1 `rrp-cabinet-private` store `store_PosjkntwlBmxdQZu`, initially empty.
+Connected only the existing research-respondent-platform project to Preview and
+production through official OIDC, sensitive prefixed variables, no permanent
+read-write token, no old-store overwrite. Metadata readback confirms prefixed
+store variables on these targets. Sensitive account configuration contains only
+scrypt hashes; Preview is branch-scoped and separate from production. Plaintext
+access values are returned privately to the owner, never Git or logs. Preview
+proof flag is branch-scoped; it never exposes a production verification route.
+
+No real participant base was supplied or uploaded. The provider proof uses a
+separate isolated verification prefix, not user cabinet rows or live forms. This
+is a private source/file catalog, not a completed relational migration; Issue #4
+remains open. Next three tasks: publish this tested tree and verify the single
+protected cloud proof; update the primary empty-data deployment and verify both
+issued accounts; integrate source-bound consent/receipt storage with hosted
+participant execution after actual source data and recipient scope are available.
+
+### Actual cabinet provider, CI and primary deployment readback
+
+Checked application SHA `1d4985ae08b55bcd83839c70950cc00a8f2c5590`; Git tree
+`536fcc430db2380f0f08cc00247da977e8585b7a` exactly matches the checked local source.
+Published through official GitHub tree/commit/ref tools, PR #15 stacked on #14:
+https://github.com/speway/research-respondent-platform/pull/15 . PR mergeable=true.
+Local Git was reconciled to this official head only after asserting identical
+trees and a clean worktree; the local signature-different checkpoint is retained.
+CI run `38121711092` succeeded on every step, including the locked/native install,
+lint/types/221 tests/build/19 HTTP and all three canonical Chromium checks.
+
+Vercel automatically started the exact Git SHA. The additional manual queued
+Preview `dpl_Buqg969pwMxUMxXmLTxi2vpekSXt` was canceled before building to avoid a
+duplicate. Actual READY protected Preview is `dpl_BAymqmj1aQJsxu2dfRf5DHfQGXAB`,
+target null, pinned to the application SHA above:
+https://research-respondent-platform-lb7p3p0tz-spw1.vercel.app/cloud/cabinet-check .
+The owner browser launched the single bounded proof once. At
+`2026-10-11T07:34:47.447Z` it persisted status verified with nine checks: private
+source persistence, literal source readback, questionnaire download, project key,
+new service instance readback, account isolation, key revocation, session login/
+logout and provider ETag updates. Closed the launch tab; a newly opened tab read
+the persisted result. No external form was contacted or submitted. Software
+fixtures live only under isolated-verification and cannot be loaded by ordinary
+owner/team cabinet accounts. Operational screenshot: docs/evidence/cabinet-cloud-proof.jpg.
+
+Production `dpl_4oitzYStTr64Jt4uqKd3jHY2ajPy` is READY, target production, pinned
+to the same checked application SHA. Its generated aliases were updated, but the
+previous manually assigned primary alias initially still pointed to the old
+`dpl_91rXUEvZnKBkMw5vzmdVCo8Df394` (actual /cabinet 404). Read ownership through
+get-alias, assigned the existing primary alias to the new owned deployment via
+official API, then independently read back the matching project/deployment IDs.
+The browser reloaded and rendered the issued-access cabinet login at:
+https://research-respondent-platform.vercel.app/cabinet .
+No Vercel protection was disabled and no auth-bypass link was used.
+
+Actual HTTPS verification on that primary alias, exit 0: both issued owner/team
+credentials sign in (200), a new request recognizes the session (200), private
+catalogs return 200/no-store and contain zero assets/projects/keys, logout returns
+200 and the previous cookie then returns 401. Both cookies have HttpOnly/Secure/
+SameSite=lax. Public workbench/cabinet/manifest/site guide return 200; anonymous
+catalog and agent API return 401; production cloud proof page returns 404. No
+participant file was uploaded in production. Passwords were returned only to the
+owner, never committed, persisted as plaintext or printed by the verifier.
+Screenshot docs/evidence/cabinet-main.jpg records the public login UI, no secrets.
+
+The resulting flow is one-time upload → project → scoped key/generated prompt →
+agent reads saved source and questionnaires. The file catalog is operational;
+legacy relational migration, individual collaborator attribution, document
+extraction, receipt/consent recovery and hosted participant execution remain open.
+No factual source dataset for the supplied Google Form has been provided. Issue
+#4 remains open; Issue #2 is already closed and Issue #3's implementation is in
+the earlier stacked PR. Next three tasks: integrate source-bound consent/receipt
+persistence with execution; verify a complete live transfer after actual records
+and recipient scope are provided; complete relational migration and per-user roles.
