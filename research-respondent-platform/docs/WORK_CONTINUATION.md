@@ -597,3 +597,58 @@ remains open. Next three tasks: publish this tested tree and verify the single
 protected cloud proof; update the primary empty-data deployment and verify both
 issued accounts; integrate source-bound consent/receipt storage with hosted
 participant execution after actual source data and recipient scope are available.
+
+### Actual cabinet provider, CI and primary deployment readback
+
+Checked application SHA `1d4985ae08b55bcd83839c70950cc00a8f2c5590`; Git tree
+`536fcc430db2380f0f08cc00247da977e8585b7a` exactly matches the checked local source.
+Published through official GitHub tree/commit/ref tools, PR #15 stacked on #14:
+https://github.com/speway/research-respondent-platform/pull/15 . PR mergeable=true.
+Local Git was reconciled to this official head only after asserting identical
+trees and a clean worktree; the local signature-different checkpoint is retained.
+CI run `38121711092` succeeded on every step, including the locked/native install,
+lint/types/221 tests/build/19 HTTP and all three canonical Chromium checks.
+
+Vercel automatically started the exact Git SHA. The additional manual queued
+Preview `dpl_Buqg969pwMxUMxXmLTxi2vpekSXt` was canceled before building to avoid a
+duplicate. Actual READY protected Preview is `dpl_BAymqmj1aQJsxu2dfRf5DHfQGXAB`,
+target null, pinned to the application SHA above:
+https://research-respondent-platform-lb7p3p0tz-spw1.vercel.app/cloud/cabinet-check .
+The owner browser launched the single bounded proof once. At
+`2026-10-11T07:34:47.447Z` it persisted status verified with nine checks: private
+source persistence, literal source readback, questionnaire download, project key,
+new service instance readback, account isolation, key revocation, session login/
+logout and provider ETag updates. Closed the launch tab; a newly opened tab read
+the persisted result. No external form was contacted or submitted. Software
+fixtures live only under isolated-verification and cannot be loaded by ordinary
+owner/team cabinet accounts. Operational screenshot: docs/evidence/cabinet-cloud-proof.jpg.
+
+Production `dpl_4oitzYStTr64Jt4uqKd3jHY2ajPy` is READY, target production, pinned
+to the same checked application SHA. Its generated aliases were updated, but the
+previous manually assigned primary alias initially still pointed to the old
+`dpl_91rXUEvZnKBkMw5vzmdVCo8Df394` (actual /cabinet 404). Read ownership through
+get-alias, assigned the existing primary alias to the new owned deployment via
+official API, then independently read back the matching project/deployment IDs.
+The browser reloaded and rendered the issued-access cabinet login at:
+https://research-respondent-platform.vercel.app/cabinet .
+No Vercel protection was disabled and no auth-bypass link was used.
+
+Actual HTTPS verification on that primary alias, exit 0: both issued owner/team
+credentials sign in (200), a new request recognizes the session (200), private
+catalogs return 200/no-store and contain zero assets/projects/keys, logout returns
+200 and the previous cookie then returns 401. Both cookies have HttpOnly/Secure/
+SameSite=lax. Public workbench/cabinet/manifest/site guide return 200; anonymous
+catalog and agent API return 401; production cloud proof page returns 404. No
+participant file was uploaded in production. Passwords were returned only to the
+owner, never committed, persisted as plaintext or printed by the verifier.
+Screenshot docs/evidence/cabinet-main.jpg records the public login UI, no secrets.
+
+The resulting flow is one-time upload → project → scoped key/generated prompt →
+agent reads saved source and questionnaires. The file catalog is operational;
+legacy relational migration, individual collaborator attribution, document
+extraction, receipt/consent recovery and hosted participant execution remain open.
+No factual source dataset for the supplied Google Form has been provided. Issue
+#4 remains open; Issue #2 is already closed and Issue #3's implementation is in
+the earlier stacked PR. Next three tasks: integrate source-bound consent/receipt
+persistence with execution; verify a complete live transfer after actual records
+and recipient scope are provided; complete relational migration and per-user roles.

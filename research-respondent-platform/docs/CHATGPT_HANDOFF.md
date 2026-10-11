@@ -361,3 +361,14 @@ build, 221 tests and 19 HTTP smoke tests pass. Actual provider proof, CI and pub
 deployment readback are pending. See CABINET.md/WORK_CONTINUATION for boundaries: file catalog, not relational migration; no real participant source or production
 participant data; no general hosted form filling. The cabinet's generated prompt
 and site-served guide avoid requiring every external agent to receive files again.
+
+Actual continuation: application SHA 1d4985ae08b55bcd83839c70950cc00a8f2c5590,
+PR #15, CI 38121711092 SUCCESS including Chromium checks. Protected Preview
+provider proof completed all nine checks on 2026-10-11T07:34:47.447Z and survived
+closing its tab. The primary public alias now serves the same checked source;
+actual issued owner/team login/session/catalog/logout HTTPS checks passed, with
+empty production catalogs and anonymous denial. See WORK_CONTINUATION for exact
+deployments, corrected alias mapping and proof screenshots. The site's cabinet
+now generates a project-scoped agent prompt and supplies saved originals. Do not
+require reattaching files once that project key is supplied. Actual dataset and
+external submission grant remain necessary; no source rows were invented.
