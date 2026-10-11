@@ -3,14 +3,30 @@ import { notFound } from "next/navigation";
 import { cloudDiagnosticsEnabled } from "../../../lib/services/cloud-preview-policy.ts";
 import { privateCloudProbeDependencies, readCloudProbeReport } from "../../../lib/services/private-cloud-probe.ts";
 import { runStorageProbeAction } from "./actions.ts";
+import { getRun } from "workflow/api";
+import type { cloudFormAuditWorkflow } from "../../../workflows/cloud-form-audit.ts";
+import { hostedAuditInput, hostedAuditDependencies, readHostedAudit } from "../../../lib/services/hosted-cloud-audit.ts";
 
 export const dynamic = "force-dynamic";
 export const metadata = { title: "Подключение облачного агента · Respondent Lab" };
-export default async function CloudSetupPage({ searchParams }: { searchParams: Promise<{ probe?: string }> }) {
+export default async function CloudSetupPage({ searchParams }: { searchParams: Promise<{ probe?: string; audit?: string }> }) {
   if (!cloudDiagnosticsEnabled(process.env)) notFound();
   const query = await searchParams;
   let report = null;
   try { report = await readCloudProbeReport(privateCloudProbeDependencies(process.env.BLOB_STORE_ID!)); } catch { /* Unverified until a successful read. */ }
+  const input = hostedAuditInput(process.env);
+  let status = "not_started";
+  let result: Awaited<ReturnType<typeof cloudFormAuditWorkflow>> | null = null;
+  if (input && report) {
+    try {
+      const record = await readHostedAudit(input, hostedAuditDependencies(process.env.BLOB_STORE_ID!, async () => { throw new Error("Read only."); }));
+      if (record) {
+        const run = getRun<Awaited<ReturnType<typeof cloudFormAuditWorkflow>>>(record.runId);
+        status = await run.status;
+        if (status === "completed") result = await run.returnValue;
+      }
+    } catch { status = "unavailable"; }
+  }
   return <section className="mx-auto max-w-2xl space-y-5 py-8">
     <Link href="/workbench">Открыть основную панель</Link>
     <h1 className="text-2xl font-semibold">Подключение облачного агента</h1>
@@ -24,6 +40,16 @@ export default async function CloudSetupPage({ searchParams }: { searchParams: P
       {query.probe === "failed" ? <p role="alert">Проверка не завершена. Облачный запуск остаётся выключенным; повторное выполнение требует проверки служебной записи.</p> : null}
       <form action={runStorageProbeAction}><button className="btn" type="submit">Проверить облачное хранилище</button></form>
     </>}
-    <p>Фоновый исполнитель и загрузка ответов участников ещё не включены.</p>
+    {report && input ? <div className="space-y-3 rounded border p-4">
+      <h2 className="text-xl font-semibold">Фоновое чтение Google Forms</h2>
+      <p>Один облачный запуск до 5 минут. Продолжает работать после закрытия вкладки. Читает первый доступный раздел; ответы не вводит и форму не отправляет.</p>
+      <p>Разрешение действует до <time dateTime={input.approval.expiresAt}>{input.approval.expiresAt}</time>.</p>
+      <p role="status">Статус: {status}</p>
+      {result ? <p>Прочитан раздел {result.sectionNumber}; вопросов: {result.observation.questions.length}. <Link href="/cloud/audit">Открыть результат</Link></p> : null}
+      {query.audit === "failed" ? <p role="alert">Запуск не подтверждён. Повтор автоматически запрещён; требуется проверка служебной записи.</p> : null}
+      {status === "not_started" && query.audit !== "failed" ? <form action="/cloud/audit" method="post"><button className="btn" type="submit">Запустить чтение формы в облаке</button></form> : null}
+      <Link href="/cloud/setup">Обновить статус</Link>
+    </div> : <p>Фоновое чтение ещё не настроено.</p>}
+    <p>Загрузка и отправка ответов участников ещё не включены.</p>
   </section>;
 }

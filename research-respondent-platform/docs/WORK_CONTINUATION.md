@@ -451,3 +451,55 @@ Hosted Workflow SDK setup is the next separate coding batch, not yet deployed
 by this verified store change. Installing pinned workflow 5.2.0 identified three
 compiler build scripts requiring explicit package-manager allowBuilds entries;
 that repair and its application code belong to the next branch/PR.
+
+## Hosted read-only Workflow batch — 2026-10-11 UTC
+
+Continues Issue #4 on `feat/hosted-read-only-workflow`, based on verified PR #13
+head `beb4b2831282946a5c570508e6711d24e394055f`. On resumption the scratch checkout
+contained older PR #11, with none of the uncommitted Workflow files or logs from
+the prior runtime. Recovered the exact GitHub branch through authorized git
+fetch, then restored this bounded implementation; earlier check claims were not
+reused as verification of different files.
+
+Pinned Workflow 5.2.0 and compiler build approvals, wrapped the existing Next
+configuration without changing SQLite or migrations, added one non-retrying
+read-only Workflow step and owner-configured Preview launch/status routes.
+Immutable private launch markers/receipts prevent concurrent or uncertain
+enqueue retries. The independently verified storage report is required before
+launch. Production/unconfigured routes stay 404; same-origin POST ignores
+client-supplied scope. The worker repeats configuration/store gates before the
+existing bounded 5-minute/1-CPU/nonpersistent sandbox reader. No participant
+answers, filling or external response submissions are enabled.
+
+The same branch-scoped approval reference `owner-2026-10-11-hosted-reader-1` is
+retained; its expired value was renewed to 2026-10-11T09:00:00Z following owner
+continuation. No budget marker was deleted and no additional allocation scope
+was created. Preview SSO remains enabled. Public main panel was opened in the
+actual browser without registration; the authenticated browser also read the
+saved storage proof directly from PR #13 Preview.
+
+Changed: generated ignores; package/lock/compiler approvals; next.config;
+hosted-cloud-audit service; workflows/cloud-form-audit; app/cloud/audit route;
+cloud/setup launch/status UI; four concurrency/expiry/uncertainty unit tests;
+HTTP refusal coverage; README and hosted/external-agent trial docs.
+
+| Actual check on restored application source | Result |
+| --- | --- |
+| Frozen install | exit 0 after explicitly allowing compiler scripts; initial add exited 1 on approvals |
+| Lint / TypeScript | exit 0 / exit 0 |
+| Unit and integration tests | exit 0; 212/212, zero skips/failures |
+| Production build | exit 0; 24 routes including Workflow and scoped audit routes |
+| Production HTTP smoke | exit 0; 18/18, zero skips/failures |
+
+Do not call this a verified hosted runtime until provider execution, actual
+Google read, result readback and VM cleanup are observed. CI will run the three
+canonical Chromium fixture checks once; no extra local browser repetition was
+done for these server-only changes. Manifest's general hosted worker/source
+upload/submission capabilities remain false.
+
+Next three tasks: (1) save/open stacked PR, deploy pinned protected Preview and
+verify one actual hosted read-only run; (2) implement a protected durable consented
+source/receipt store and recovery before participant submission; (3) verify full
+live transfer using an actual supplied source and recipient scope. Factual
+records for this form have not been supplied. The standalone agent prompt is in
+`docs/AGENT_TRIAL_PROMPT.md`.

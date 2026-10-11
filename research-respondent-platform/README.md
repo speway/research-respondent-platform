@@ -1,5 +1,10 @@
 # Research Respondent Platform
 
+Hosted read-only Preview execution is described in
+[docs/HOSTED_READ_ONLY_WORKFLOW.md](docs/HOSTED_READ_ONLY_WORKFLOW.md).
+The copyable external-agent trial prompt is in
+[docs/AGENT_TRIAL_PROMPT.md](docs/AGENT_TRIAL_PROMPT.md).
+
 A source-backed research data platform: it registers pseudonymous participants,
 stores what documented source documents actually say, scores versioned
 instruments, evaluates cohort eligibility, maps documented values onto
