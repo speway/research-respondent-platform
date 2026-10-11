@@ -372,3 +372,18 @@ deployments, corrected alias mapping and proof screenshots. The site's cabinet
 now generates a project-scoped agent prompt and supplies saved originals. Do not
 require reattaching files once that project key is supplied. Actual dataset and
 external submission grant remain necessary; no source rows were invented.
+
+### 22. Respondent bank versions and agent readiness (2026-10-11)
+
+Continues checked PR #15 head `3275ee2de69ab2ffe4fe74ed8447646c3d171be9` on
+`feat/respondent-bank-versions`. The cabinet now prepares literal source merges
+and exact participant profile joins, blocks conflicting/ambiguous records,
+supports session keys and publishes immutable, hashed source/lineage versions
+with replay-safe approval. Scoped agents get readiness counts, original source
+and lineage downloads. Header-only CSV templates, authenticated file downloads
+and machine contract/site guide are included. No existing executor/migration
+rewrite, participant fabrication or real external submission. Local 234 tests,
+20 HTTP checks, lint/types/build passed; Chromium absent locally, new UI scenario
+awaits installed-browser CI. Current evidence and deployment status belong in
+WORK_CONTINUATION.md; historical claims above remain historical. Global registry,
+relational migration, consent evidence integration and hosted sending remain open.

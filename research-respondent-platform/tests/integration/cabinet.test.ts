@@ -7,6 +7,7 @@ import { reserveCabinetAttempt, type CabinetStore } from "../../lib/services/cab
 import { hashPassword } from "../../lib/services/password.ts";
 import { workspaceFromTask } from "../../lib/domain/agent-workbench.ts";
 import { validateUpload } from "../../lib/domain/cabinet.ts";
+import { bankSpecSchema } from "../../lib/domain/respondent-bank.ts";
 
 const password = "isolated-cabinet-fixture-password";
 const accounts = [ { id: "owner", login: "owner", label: "Owner", password: hashPassword(password) },
@@ -104,4 +105,77 @@ it("saving criteria creates an immutable revision using stored answers, never br
   assert.equal((await f.cabinet.bundle(f.owner, f.project.id)).project.criteria.length, 1);
   await assert.rejects(f.cabinet.saveSnapshot(f.owner, f.project.id, { ...settings, checksum: "0".repeat(64) }), { status: 400 });
   await assert.rejects(f.cabinet.saveSnapshot(f.owner, f.project.id, { ...settings, dataset: workspace.dataset }));
+});
+
+async function bankFixture() {
+  const f = await projectFixture();
+  const addition = await f.cabinet.upload(f.owner, { kind: "source", name: "addition.csv", reference: "Isolated addition v1", rights: "test-only",
+    base64: encoded("participant_id,group,answer\nTEST-B,two,4\nTEST-C,three,0\n") });
+  const spec = bankSpecSchema.parse({ mode: "merge", leftId: f.source.id, rightId: addition.id, leftIdHeader: "participant_id", rightIdHeader: "participant_id", name: "Isolated bank", reference: "fixture v1", rights: "test-only" });
+  return { ...f, addition, spec };
+}
+it("bank preview is read-only and an approved commit persists a replay-safe version with lineage", async () => {
+  const f = await bankFixture(); const originalKeys = [...f.records.keys()];
+  const preview = await f.cabinet.previewBank(f.owner, f.spec);
+  assert.deepEqual([...f.records.keys()], originalKeys); assert.equal(preview.summary.conflicts, 0);
+  const result = await f.cabinet.commitBank(f.owner, f.spec, preview.previewHash);
+  const replay = await f.cabinet.commitBank(f.owner, f.spec, preview.previewHash);
+  assert.equal(result.id, replay.id); assert.equal(result.records, 3);
+  assert.equal((await f.cabinet.catalog(f.owner)).assets.length, 4);
+  const reopened = new Cabinet(cabinetConfiguration({ RRP_CABINET_STORE_ID: "store_fixture", RRP_CABINET_ACCOUNTS: JSON.stringify(accounts) })!, f.store);
+  const lineage = await reopened.lineage(f.owner, result.id);
+  assert.equal(lineage.resultSha256, result.sha256); assert.equal(lineage.parents[0]!.sha256, f.source.sha256);
+  assert.deepEqual(lineage.rows[1]!.origins, [{ source: "left", line: 3 }, { source: "right", line: 2 }]);
+  assert.equal((await reopened.bundle(f.owner, f.project.id)).source.id, f.source.id);
+});
+it("stale previews, conflicts, account crossing and unknown persistence do not publish a bank version", async () => {
+  const f = await bankFixture(); const preview = await f.cabinet.previewBank(f.owner, f.spec);
+  await assert.rejects(f.cabinet.commitBank(f.owner, { ...f.spec, name: "changed" }, preview.previewHash), { status: 409 });
+  const team = (await f.cabinet.session((await f.cabinet.login("team", password)).token))!;
+  await assert.rejects(f.cabinet.previewBank(team, f.spec), { status: 404 });
+  const conflict = await f.cabinet.upload(f.owner, { kind: "source", name: "conflict.csv", reference: "fixture", rights: "test-only", base64: encoded("participant_id,group,answer\nTEST-A,one,9\n") });
+  const badSpec = { ...f.spec, rightId: conflict.id }; const blocked = await f.cabinet.previewBank(f.owner, badSpec);
+  assert.ok(blocked.summary.conflicts); await assert.rejects(f.cabinet.commitBank(f.owner, badSpec, blocked.previewHash), { status: 409 });
+  const originalWrite = f.store.write; f.store.write = async (path, value, etag) => {
+    if (path.includes("/lineage/")) throw new Error("uncertain lineage persistence");
+    await originalWrite(path, value, etag);
+  };
+  await assert.rejects(f.cabinet.commitBank(f.owner, f.spec, preview.previewHash), /uncertain/);
+  await assert.rejects(f.cabinet.commitBank(f.owner, f.spec, preview.previewHash), { status: 409 });
+  assert.equal((await f.cabinet.catalog(f.owner)).assets.some((a) => !!a.derivation), false);
+});
+it("concurrent bank commits publish at most one version for an approved preview", async () => {
+  const f = await bankFixture(); const preview = await f.cabinet.previewBank(f.owner, f.spec);
+  const results = await Promise.allSettled(Array.from({ length: 6 }, () => f.cabinet.commitBank(f.owner, f.spec, preview.previewHash)));
+  assert.ok(results.some((r) => r.status === "fulfilled"));
+  assert.equal((await f.cabinet.catalog(f.owner)).assets.filter((a) => !!a.derivation).length, 1);
+  const replay = await f.cabinet.commitBank(f.owner, f.spec, preview.previewHash);
+  assert.equal(replay.id, (await f.cabinet.catalog(f.owner)).assets.find((a) => !!a.derivation)!.id);
+});
+it("an agent receives readiness and scoped lineage, without gaining parent file or other project access", async () => {
+  const f = await bankFixture(); const preview = await f.cabinet.previewBank(f.owner, f.spec);
+  const result = await f.cabinet.commitBank(f.owner, f.spec, preview.previewHash);
+  const project = await f.cabinet.createProject(f.owner, { name: "Bank fixture", sourceId: result.id, questionnaireIds: [], formUrl: f.project.formUrl, purpose: "test-only", idHeader: "participant_id", criteria: [] });
+  const key = await f.cabinet.agentKey(f.owner, project.id);
+  const bundle = await f.cabinet.forAgent(key.token);
+  assert.equal(bundle.sourceChecks.readyForFormObservation, true); assert.equal(bundle.sourceChecks.selectedRecords, 3);
+  assert.equal(bundle.lineage!.sha256, result.derivation!.lineageSha256);
+  assert.equal((await f.cabinet.forAgentLineage(key.token, result.id)).parents.length, 2);
+  await assert.rejects(f.cabinet.forAgentFile(key.token, f.source.id), { status: 404 });
+  await assert.rejects(f.cabinet.forAgentLineage(key.token, f.source.id), { status: 404 });
+  assert.equal(bundle.permissions.maySubmitExternalResponse, false);
+  const path = [...f.records.keys()].find((p) => p.endsWith(`/lineage/${result.id}.json`))!;
+  const record = f.records.get(path)!; const tampered = JSON.parse(record.body); tampered.rows[0].outputLine = 99;
+  f.records.set(path, { ...record, body: JSON.stringify(tampered) });
+  await assert.rejects(f.cabinet.forAgentLineage(key.token, result.id), /checksum/);
+});
+it("agent readiness reports repeated participant IDs instead of claiming a repeated-session source is ready", async () => {
+  const f = await projectFixture();
+  const source = await f.cabinet.upload(f.owner, { kind: "source", name: "sessions.csv", reference: "Isolated fixture", rights: "test-only",
+    base64: encoded("participant_id,response_id,answer\nTEST-A,one,2\nTEST-A,two,4\n") });
+  const project = await f.cabinet.createProject(f.owner, { name: "Repeated sessions", sourceId: source.id, questionnaireIds: [], formUrl: f.project.formUrl,
+    purpose: "test-only", idHeader: "participant_id", criteria: [] });
+  const bundle = await f.cabinet.bundle(f.owner, project.id);
+  assert.equal(bundle.sourceChecks.readyForFormObservation, false); assert.equal(bundle.sourceChecks.duplicateIds, 1);
+  assert.deepEqual(bundle.sourceChecks.blockers, ["duplicate_participant_id"]);
 });

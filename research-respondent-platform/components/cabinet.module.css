@@ -31,4 +31,14 @@
 .file span, .key span { color: #87758f; font-size: 12px; }
 .key { display: flex; gap: 15px; justify-content: space-between; align-items: center; padding: 12px 0; }
 .panel textarea { margin: 8px 0 15px; font-size: 12px; }
+.bankFields { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
+.bankFields label { display: grid; gap: 7px; font-size: 12px; min-width: 0; }
+.bankReport { margin-top: 20px; overflow-wrap: anywhere; }
+.bankReport h3 { font-size: 15px; font-weight: 600; }
+.bankReport dl { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 15px 0; }
+.bankReport dl > div { border: 1px solid #eee8f4; border-radius: 8px; padding: 12px; }
+.bankReport dt { color: #87758f; font-size: 12px; }
+.bankReport dd { font-size: 24px; margin: 5px 0 0; }
+.bankReport ul { font-size: 12px; padding-left: 20px; margin: 12px 0; }
+@media(max-width:720px) { .bankFields { grid-template-columns: 1fr; } .bankReport dl { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 @media(max-width:720px) { .grid { grid-template-columns: 1fr; } .items article { align-items: start; flex-direction: column; } .header { flex-wrap: wrap; } .metrics > div { padding: 13px; } .heading h1 { font-size: 25px; } }

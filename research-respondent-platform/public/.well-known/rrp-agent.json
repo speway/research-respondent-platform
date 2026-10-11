@@ -6,7 +6,7 @@
   "entry": "window.respondentWorkbench.execute(command)",
   "protocol": "rrp.workbench-agent.v1",
   "sourceRepository": "https://github.com/speway/research-respondent-platform",
-  "sourceRef": "feat/shared-scenario-cabinet",
+  "sourceRef": "feat/respondent-bank-versions",
   "guide": "research-respondent-platform/docs/AGENT_AUTOMATION.md",
   "schemas": {
     "task": "/.well-known/rrp-agent-task.schema.json",
@@ -71,7 +71,11 @@
     "labeledMatrices": true,
     "dropdowns": true,
     "reuseConfiguredSourceByLink": true,
-    "requiresCabinetAuthentication": true
+    "requiresCabinetAuthentication": true,
+    "versionedSourceMerge": true,
+    "exactParticipantJoin": true,
+    "sourceReadinessReport": true,
+    "scopedLineageRead": true
   },
   "dataPolicy": {
     "missingAnswers": "ask_participant",
@@ -94,6 +98,24 @@
       "txt",
       "pdf",
       "docx"
-    ]
+    ],
+    "bank": {
+      "catalogEndpoint": "/api/cabinet/catalog",
+      "commandSchema": "/.well-known/rrp-bank-command.schema.json",
+      "commands": [
+        "bank_preview",
+        "bank_commit"
+      ],
+      "authentication": "issued cabinet session; project read keys cannot upload, merge or mutate",
+      "commit": "recomputes immutable sources; requires matching previewHash; conflicts block; one preview creates at most one version",
+      "join": "exact ID left join; unmatched answers preserved; no fuzzy matching",
+      "lineage": "project-scoped downloadPath in bundle; parent file access is not granted",
+      "limits": {
+        "bytes": 2097152,
+        "records": 5000,
+        "cells": 250000,
+        "headers": 2000
+      }
+    }
   }
 }

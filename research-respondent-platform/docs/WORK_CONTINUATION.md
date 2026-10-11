@@ -652,3 +652,57 @@ No factual source dataset for the supplied Google Form has been provided. Issue
 the earlier stacked PR. Next three tasks: integrate source-bound consent/receipt
 persistence with execution; verify a complete live transfer after actual records
 and recipient scope are provided; complete relational migration and per-user roles.
+
+## 2026-10-11 — respondent bank accumulation and agent source readiness
+
+Checked starting commit: `3275ee2de69ab2ffe4fe74ed8447646c3d171be9`, PR #15
+open/mergeable. Task branch `feat/respondent-bank-versions` continues it; no
+project restart, migration/checksum changes or participant data. The owner asks
+for accumulating previous respondents and easier agent access, then explicitly
+steers toward improvements to site functionality and agent interaction.
+
+Added pure `respondent-bank.ts` planning: exact merge, profile left join, stable
+participant/session tuple keys, identical intra-file deduplication, explicit
+conflicts, missingness preservation and combined limits. Existing importer is
+reused. Private service commits reload original source bytes and bind the preview
+hash to specification/parent hashes/result. One create-only approval reservation
+publishes at most one version. Successful replay returns it; uncertain incomplete
+publication stops. Original files/projects stay immutable. Lineage is persisted,
+hashed/read back before indexing, scoped to the selected source for agent reads;
+parent files are not granted. Original downloads require cabinet authentication.
+
+New cabinet bank component supports file/ID/session-key selection, preview counts,
+conflict blockers and immutable creation, selects the result for a new project,
+with CSV header-only templates. The file list allows downloads/history. Agent
+bundles add readiness counts/blocker codes, source download and lineage links.
+Public manifest/JSON schema/site guide and RESPONDENT_BANK.md describe contract,
+formats and boundaries. The existing browser executor is preserved, including
+per-section observation, exact mapping, source-bound grants and receipt rules.
+
+Actual local results: `pnpm install --frozen-lockfile` exit 0; standalone types
+exit 0; final lint exit 0; 234/234 unit/integration tests exit 0, no skips/failures;
+production build exit 0, 30 routes; 20/20 HTTP tests exit 0, no skips/failures.
+Initial lint found browser-test globals and redundant test string escapes, fixed.
+Initial new unit assertion expected an empty CSV string, but existing importer
+correctly represents empty cells as null; assertion corrected, importer preserved.
+New integration cases prove preview no writes, exact provenance/reopened readback,
+conflict/stale/account refusal, failure before publication, concurrent replay-safe
+commit, agent scope and tampered lineage refusal. New Chromium UI scenario covers
+upload/merge/edit-invalidation/project/agent/conflicts/profile join/mobile. Local
+launch was blocked before UI by absent Chromium; CI installs its pinned browser.
+No claim of a local browser pass, deployed merge pass or live form submission.
+
+New files: domain planner, UI component, public command schema/two templates,
+RESPONDENT_BANK.md, unit suite and browser scenario. Modified: private cabinet
+service/domain/API, cabinet UI/CSS, agent manifest/guide, HTTP/integration suites,
+CI browser step and continuation/handoff documents. Final tiny prompt change and
+documentation are being validated by the pending exact-head CI; do not interpret
+these local counts as proof of a later unchecked Git head.
+
+The bank is immutable versioned tabular files, not a global editable participant
+registry or PostgreSQL migration. No factual response base has been supplied in
+this coding turn. Individual invitations, document extraction, verified consent,
+full live response transfer and always-running submission remain unimplemented;
+Issue #4 stays open. Next three tasks: verify exact-head CI and Preview, release
+the checked application to the existing site, then integrate consent/receipts
+with hosted execution after documented actual responses and recipient scope.

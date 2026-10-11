@@ -1,0 +1,169 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Respondent bank cabinet commands",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "spec"
+      ],
+      "properties": {
+        "command": {
+          "const": "bank_preview"
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "leftId",
+            "rightId",
+            "leftIdHeader",
+            "rightIdHeader",
+            "name",
+            "reference",
+            "rights"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "merge",
+                "join"
+              ]
+            },
+            "leftId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "rightId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "leftIdHeader": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "rightIdHeader": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "additionalKeyHeaders": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "maxItems": 2,
+              "uniqueItems": true,
+              "default": []
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "rights": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "spec",
+        "previewHash"
+      ],
+      "properties": {
+        "command": {
+          "const": "bank_commit"
+        },
+        "spec": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "mode",
+            "leftId",
+            "rightId",
+            "leftIdHeader",
+            "rightIdHeader",
+            "name",
+            "reference",
+            "rights"
+          ],
+          "properties": {
+            "mode": {
+              "enum": [
+                "merge",
+                "join"
+              ]
+            },
+            "leftId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "rightId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "leftIdHeader": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "rightIdHeader": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 2000
+            },
+            "additionalKeyHeaders": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 2000
+              },
+              "maxItems": 2,
+              "uniqueItems": true,
+              "default": []
+            },
+            "name": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 200
+            },
+            "reference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "rights": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            }
+          }
+        },
+        "previewHash": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    }
+  ]
+}

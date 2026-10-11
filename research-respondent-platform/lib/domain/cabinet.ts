@@ -20,7 +20,9 @@ export const cabinetSettingsSchema = z.object({ checksum: z.string().regex(/^[a-
 export type CabinetProject = z.output<typeof projectSchema> & { id: string; createdAt: string };
 export interface CabinetAsset { id: string; kind: "source" | "questionnaire"; name: string;
   reference: string; rights: string; sha256: string; bytes: number; createdAt: string;
-  headers?: string[]; records?: number; }
+  headers?: string[]; records?: number;
+  derivation?: { schema: "rrp.bank-lineage.v1"; mode: "merge" | "join"; lineageSha256: string;
+    parents: Array<{ id: string; sha256: string; name: string; reference: string; rights: string }> }; }
 export interface AssetBody { base64: string }
 export function validateUpload(input: unknown) {
   const file = uploadSchema.parse(input);

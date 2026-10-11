@@ -96,3 +96,17 @@ enforcement on external export, relational database migration, full live transfe
 and background participant filling remain future work. Issue #4 remains open.
 No real participant source was provided during this coding stage; production
 deployment contains the cabinet implementation and empty account catalogs.
+
+## Respondent bank versions (2026-10-11 continuation)
+
+The existing cabinet now supports server-recomputed `bank_preview`/`bank_commit`
+commands: literal source merge, exact participant profile left join, optional
+session keys, conflict refusal and immutable result versions. A provider
+create-only reservation allows at most one published version per approved plan;
+uncertain/incomplete results block automatic replay. Source bytes and lineage are
+read back and hashed before publication. An approved preview never writes data.
+Scoped agent bundles include source readiness counters, authenticated source and
+lineage download paths; parent source access does not expand with the key.
+Authenticated owners can download originals/history. See RESPONDENT_BANK.md for
+formats, provenance and limitations. This does not complete the legacy relational
+migration, consent verification or general hosted participant execution.
