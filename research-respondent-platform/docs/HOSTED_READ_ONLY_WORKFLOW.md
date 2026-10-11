@@ -51,3 +51,16 @@ Do not log tokens, private URLs, source rows or psychological answers. The VM
 timeout bounds execution even if the calling Function dies before cleanup.
 Actual provider run status and cleanup evidence must be recorded separately
 from local lifecycle fixtures and build success.
+
+## Verified provider run — 2026-10-11 UTC
+
+Source `bbdbf0d819d7b9f76e472df72b3e2c2a2143bcbd`, PR #14, CI 38119160588
+successful including three Chromium checks. Protected Preview:
+https://research-respondent-platform-irw1ibrds-spw1.vercel.app/cloud/setup .
+One actual managed Workflow completed after the launching browser tab was closed.
+A newly opened HTML setup page read back completion: section 2, six questions.
+Official runtime and Sandbox activity independently confirm success and cleanup
+of one ephemeral VM after 45 seconds, with no mounted drives or response writes.
+See WORK_CONTINUATION and `evidence/hosted-workflow-proof.jpg` for the observed
+provider identifiers and details. Raw JSON browser navigation was blocked by
+browser protocol policy and was not retried; it is not claimed as verified.

@@ -341,3 +341,11 @@ Actual restored-source checks: frozen install, lint, types, build exit 0;
 is pending; no participant records were supplied or sent. Consult current
 WORK_CONTINUATION and HOSTED_READ_ONLY_WORKFLOW rather than assuming readiness
 from a successful build. External-agent prompt is in AGENT_TRIAL_PROMPT.md.
+
+Actual continuation: PR #14 source bbdbf0d819d7b9f76e472df72b3e2c2a2143bcbd has
+successful CI including canonical Chromium checks and READY protected Preview.
+The managed Workflow completed a live read of section 2/six questions after the
+launch tab was closed; official provider confirms its ephemeral VM stopped
+successfully after 45 seconds. Read WORK_CONTINUATION for exact run/deployment
+IDs, times, screenshot and remaining source/consent storage boundaries. No actual
+participant response was generated, entered or submitted.

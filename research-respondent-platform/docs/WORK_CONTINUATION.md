@@ -503,3 +503,50 @@ source/receipt store and recovery before participant submission; (3) verify full
 live transfer using an actual supplied source and recipient scope. Factual
 records for this form have not been supplied. The standalone agent prompt is in
 `docs/AGENT_TRIAL_PROMPT.md`.
+
+### Actual hosted execution and cleanup
+
+Checked official application SHA `bbdbf0d819d7b9f76e472df72b3e2c2a2143bcbd`;
+Git tree `0e4704de84e68d0ef97638650640852dfde2c743` exactly matches the locally
+tested source. Ordinary git push could not access username credentials; no token
+was requested or copied. Published this same tree through the connected GitHub
+create-tree/commit/ref tools, then opened PR #14 stacked on #13:
+https://github.com/speway/research-respondent-platform/pull/14 .
+The initial PR/deployment attempts before that official publication were rejected
+as no commits/unknown SHA; corrected publication, not an unchanged retry.
+
+CI run 38119160588 SUCCESS; actual jobs readback confirms every step including
+locked/native install, lint/types/212 tests/build/18 HTTP and all three canonical
+Chromium scripts. Protected Preview `dpl_GYUvrEMwkF1dN5DXG9okGJjcTs5x` READY,
+target null, pinned to the same SHA:
+https://research-respondent-platform-irw1ibrds-spw1.vercel.app/cloud/setup .
+Official Settings UI confirmed System Environment Variables enabled. The owner
+browser read persisted private store evidence and `not_started`, clicked launch
+once, then read `pending` and closed the launch tab. No auth bypass was used.
+
+Official runtime logs register `wrun_41M4MVJA5T0GYDSD337QJP5V9K` at
+2026-10-11T06:49:23.258Z, start the queue-driven step at 06:49:24.563Z and
+complete it at 06:50:11.250Z with section=2/questions=6. A new browser tab after
+closure read the persisted receipt/managed run and rendered `completed`, section
+2, six questions. The controlled reader returns externalSubmission=false and
+never receives actual source records. This verifies live hosted SDK/OIDC read
+of the supplied Google Form independently of browser tab lifetime.
+
+Provider Sandbox detail shows `olive-thirsty-raven-Au65tE`, Stopped, ephemeral,
+IAD1, one CPU/2 GiB, five-minute timeout, 45-second total duration, 38-second CPU
+time, no mounted drives; its activity records requested stop and successful
+completion at 06:50:09Z, before the Workflow's return. No repeat allocation was
+made. Screenshot `docs/evidence/hosted-workflow-proof.jpg` records only operational
+status, no source rows, secrets or private Blob URLs.
+
+An attempt to open the raw JSON result in Cloud Browser was blocked by its URL
+protocol policy. It was not retried via a workaround or alternate transport.
+Do not claim that raw JSON navigation was verified. The HTML summary and official
+runtime/Sandbox readbacks above are the observed result and cleanup evidence.
+
+General hosted filling, source/consent storage, participant database recovery and
+full live submissions remain unresolved; Issue #4 stays open. Main public panel
+is unchanged and accessible without registration; no production participant
+data was deployed. Next three tasks: durable protected source/consent/receipt
+integration; authenticated source selection plus scoped multi-section execution;
+complete live transfer once actual source records/recipient consent are provided.
