@@ -88,6 +88,7 @@ export function Workbench({ initialTask, projectId }: { initialTask?: AgentTask;
     try {
       const response = await fetch("/api/cabinet/catalog", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ command: "snapshot", projectId,
         settings: { checksum: workspace.checksum, formUrl: workspace.formUrl, purpose: workspace.purpose,
+          ...(workspace.sourceRows ? { sourceRows: workspace.sourceRows } : {}),
           idHeader: workspace.idColumn !== null ? workspace.dataset?.headers[workspace.idColumn] : "", match: workspace.match,
           criteria: workspace.rules.map((rule) => ({ header: workspace.dataset?.headers[rule.column], op: rule.op, value: rule.value, label: rule.label })) } }) });
       const result = await response.json();

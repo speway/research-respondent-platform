@@ -406,3 +406,14 @@ at observation; none were changed or submitted. Browser visibly shows the new
 bank controls. This is not evidence of verified source consent or live transfer.
 Operational screenshot contains unselected controls, no source data. Evidence-only
 follow-up does not change the tested application or require a repeated full CI.
+
+### 23. Cabinet cloud form execution (2026-10-12)
+
+Branch feat/cabinet-form-automation continues verified PR #16; adds durable
+one-participant preparation/fill/submit jobs, cancellation/progress, source-row
+scope, JSON task handoff and a shared pre-submit receipt. See FORM_AUTOMATION.md
+and the latest WORK_CONTINUATION entry for exact boundaries and pending checks.
+246 unit/integration tests pass. Cloud execution and live Google Forms sending
+are not yet claimed verified at this implementation checkpoint. Production
+writes require evidence and operator confirmations; these do not independently
+prove participant consent. No respondent generation or outcome adjustment.

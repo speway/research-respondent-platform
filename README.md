@@ -57,3 +57,15 @@ file catalog, not a completed migration of legacy SQLite. See
 [verified continuation](research-respondent-platform/docs/WORK_CONTINUATION.md).
 Application PR #15 has successful CI plus actual provider/public-access checks;
 production account catalogs were verified empty.
+
+## Cabinet automation (2026-10-12)
+
+The existing cabinet now includes a bounded cloud form executor and JSON task
+handoff. Start with preparation, then source-backed filling and explicitly
+confirmed sending. Jobs have saved status/cancellation and a shared pre-send
+receipt; unknown results do not automatically retry. See
+[the automation contract](research-respondent-platform/docs/FORM_AUTOMATION.md)
+and the current continuation for deployment and real verification status.
+The October 11 empty-catalog observation above is historical: the owner's
+subsequent uploads are preserved in private storage. Their presence is not
+proof of consent or compatibility with any new questionnaire.

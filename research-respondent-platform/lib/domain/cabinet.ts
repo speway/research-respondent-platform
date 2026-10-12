@@ -11,11 +11,13 @@ export const uploadSchema = z.object({ kind: z.enum(["source", "questionnaire"])
 export const projectSchema = z.object({ name: label, sourceId: cabinetId,
   questionnaireIds: z.array(cabinetId).max(20), formUrl: taskSchema.shape.formUrl,
   purpose: label, idHeader: label, match: taskSchema.shape.match,
+  sourceRows: taskSchema.shape.sourceRows,
   criteria: taskSchema.shape.criteria,
 }).strict().refine((p) => new Set(p.questionnaireIds).size === p.questionnaireIds.length, "Повтор опросника.");
 export type CabinetProjectInput = z.input<typeof projectSchema>;
 export const cabinetSettingsSchema = z.object({ checksum: z.string().regex(/^[a-f0-9]{64}$/),
   formUrl: taskSchema.shape.formUrl, purpose: label, idHeader: label,
+  sourceRows: taskSchema.shape.sourceRows,
   match: taskSchema.shape.match, criteria: taskSchema.shape.criteria }).strict();
 export type CabinetProject = z.output<typeof projectSchema> & { id: string; createdAt: string };
 export interface CabinetAsset { id: string; kind: "source" | "questionnaire"; name: string;
@@ -51,7 +53,9 @@ export async function cabinetTask(project: CabinetProject, asset: CabinetAsset, 
   const task = taskSchema.parse({ schema: "rrp.agent-task.v1", source: { name: asset.name,
     text: new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(Buffer.from(body.base64, "base64")) },
   reference: asset.reference, purpose: project.purpose, formUrl: project.formUrl,
-  idHeader: project.idHeader, match: project.match, criteria: project.criteria });
+  idHeader: project.idHeader, match: project.match, criteria: project.criteria,
+  ...(project.sourceRows ? { sourceRows: project.sourceRows } : {}) });
+  if (Buffer.byteLength(JSON.stringify(task)) > 3 * 1024 * 1024) throw new TypeError("Пакет проекта превышает 3 МБ. Разделите базу или критерии.");
   await workspaceFromTask(task); // Existing importer, ID and criterion checks, no new interpretation.
   return task;
 }

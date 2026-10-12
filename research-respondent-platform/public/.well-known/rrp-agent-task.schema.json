@@ -42,6 +42,16 @@
       "minLength": 1,
       "maxLength": 20000
     },
+    "sourceRows": {
+      "minItems": 1,
+      "maxItems": 5000,
+      "type": "array",
+      "items": {
+        "type": "integer",
+        "minimum": 1,
+        "maximum": 9007199254740991
+      }
+    },
     "match": {
       "default": "all",
       "type": "string",

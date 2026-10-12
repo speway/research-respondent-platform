@@ -247,12 +247,15 @@ async function executeFormTask({ workbenchPage, formPage, task = null, formUrl =
     await exactOne(submitButton(formPage), "Submit button");
     if (!grant.maySubmit) return { status: "filled_not_submitted", sectionsVerified: sectionNumber, externalSubmission: false };
     if (Date.parse(grant.expiresAt) <= Date.now()) throw new Error("Grant expired before submission.");
+    // A question/description containing confirmation words is not a submission receipt.
+    for (const marker of await recorded(formPage).all()) if (await marker.isVisible()) throw new Error("Confirmation text already present before submission; inspect the form.");
     const receiptKey = createHash("sha256").update(JSON.stringify([recipient, participantRef, status.source.sha256])).digest("hex");
     if (!await journal.claim(receiptKey)) throw new Error("Submission already reserved. Verify its receipt; never resubmit automatically.");
     // The reservation survives a crash and is never cleared to permit an automatic retry.
     try {
       await submitButton(formPage).click();
       await recorded(formPage).waitFor({ state: "visible", timeout: 10000 });
+      if (await submitButton(formPage).count()) throw new Error("Confirmation is ambiguous while submission controls remain.");
       const receipt = { status: "response_recorded", externalSubmission: true, sectionsVerified: sectionNumber, observedAt: new Date().toISOString(), evidence: "visible_response_recorded" };
       await journal.finish(receiptKey, receipt);
       return receipt;

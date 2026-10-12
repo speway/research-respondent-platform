@@ -776,3 +776,58 @@ Issue #4 remains open. Next three tasks: inspect/document uploaded source schema
 and instrument versions without inferring answers; prepare a compatible scoped
 project and consent/receipt persistence; verify a bounded live transfer only with
 actual source-backed answers and evidenced recipient/participant authorization.
+
+### 2026-10-12 — Cabinet cloud form automation (implementation checkpoint)
+
+Continues PR #16 documentation head `28798e7b29dc7ea765c6eb7e5db8832c38e8ef9e`
+on `feat/cabinet-form-automation`; preserves existing bank, workbench, migrations,
+private Blob/OIDC configuration and original source files. Adds authenticated
+cabinet automation API/UI, durable Workflow execution (only account/job IDs in
+workflow arguments), one-participant Sandbox browser worker, persisted status,
+cancellation and progress. Preparation never enters answers. Fill/submit require
+linked questionnaire evidence, explicit participant/recipient confirmation and
+production write activation. Operator attestation is not independently verified
+participant consent. Preview cannot write to external forms.
+
+One source row is intersected with the original cohort; original bytes/SHA remain
+unchanged. JSON task downloads and scoped agent job reads avoid repeated file
+handoffs. A global canonical-form/participant receipt is privately reserved and
+read back before Submit; uncertain dispatch/send is not retried automatically.
+The runner rejects pre-existing success text and requires a new confirmation
+without a remaining submit control. No direct Google formResponse POST, account
+bypass, generated respondent answers, Cronbach-alpha adjustment or new SQL migration.
+
+Pilot bounds: one selected participant per job, five-minute/one-CPU ephemeral VM,
+three dispatches per UTC day/environment, 100 historical jobs/account. Every VM
+is stopped in finally. Network switches from pinned browser installation to the
+fixed public workbench, exact form destination and Google static assets; provider
+credentials are never placed in the browser VM. Fill-only creates a temporary
+browser draft; it cannot resume as a later submission. Preparation audits the
+first available question section, not the complete form. See FORM_AUTOMATION.md.
+
+Modified code: cabinet/workbench contracts, authenticated catalog/agent routes,
+new form-automation service/domain/route/panel/workflow and cloud runner/policy;
+public machine schemas/guide, existing browser runner confirmation checks and
+unit/integration/HTTP/Chromium scenarios. Tests use isolated fixtures, not actual
+participant submissions. Locked install passed; 246 unit/integration tests passed
+with no skips/failures, lint and TypeScript completed. Earlier TypeScript fixture
+annotation was repaired. One build failed on a corrupted generated Turbopack
+cache; moving that generated cache aside restored the build. A subsequent
+literal-path file trace fix removes the whole-project trace warning. 21 HTTP
+checks passed on the built server before final progress/UI refinements. Final
+head build/HTTP, actual Chromium CI, exact-SHA deployment and one read-only live
+cloud launch are still pending at this checkpoint; do not claim they happened.
+
+Next three tasks: complete exact-head checks and publish a stacked PR; release
+the checked application through official Vercel authorization and verify the
+primary alias; perform one read-only live cloud preparation and record actual
+status/limitations without entering source answers. Issue #4 remains open.
+
+Final local verification on the recovered implementation (2026-10-12): lint,
+TypeScript and production build exit 0; 246 unit/integration tests pass with no
+skips. A pnpm HTTP run returned an incomplete log and is not counted as proof.
+The direct Node HTTP run with test concurrency 1 completed: 21/21 pass, no skips,
+exit 0. No further full local repeats are needed absent code changes. Reviewed
+React effects, accessible labels, active-only polling and authenticated routes.
+Browser CI, provider launch and production release remain to be recorded against
+the commit created from this working tree. No live Google response was sent.
