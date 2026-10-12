@@ -881,3 +881,47 @@ release the tested application SHA through official Vercel access and read back
 the primary alias; perform one read-only cabinet cloud run after browser access
 is available, then an explicitly authorized source-backed transfer if complete
 answers/basis exist. Issue #4 and the relational migration remain open.
+
+
+### Owner-authorized production automation release (2026-10-12)
+
+Owner explicitly approved the release and production fill/send activation in
+response to the prior exact approval question. This authorization persists;
+do not ask again for this same release/capability. Both flags are now configured
+as 1 for production; Preview remains read-only. The activation and deployment
+passed automatic review after that authorization.
+
+Two Git-sourced production requests (`dpl_G7NXghR9idVwxutP6XtyHvX4Gfx1` by SHA,
+`dpl_4w5fpVGgCYgDUSsDwkbefH8ggJQL` by pinned release branch) failed before build
+with `git_info_fail`, without changing the primary alias. A release branch
+`release/cabinet-automation-20261012` pins the tested application commit and has
+not changed main. Official redeployment of the successful Preview source with
+production target and production environment variables succeeded:
+`dpl_9ihFdPUBpr3A6X2e11i3sHtfBZTX`, READY, application SHA
+`068720c5d246a05d51619434308b2e232949e19d` (same checked code). Build log reports
+Build Completed and Deployment completed. Primary alias assignment replaced
+`dpl_9LtUDFDRKwptSYr6ZczXMkNs8u6Y`; independent alias readback confirms the new
+production deployment at https://research-respondent-platform.vercel.app/cabinet .
+
+Actual public HTTPS verification completed with exit 0: cabinet/workbench,
+manifest, automation command schema and agent guide 200; automation/catalog/agent
+APIs deny anonymous access with 401/no-store; foreign-Origin launch 403;
+anonymous same-Origin launch 401; provider proof route 404. The initial probe
+incorrectly expected root additionalProperties rather than oneOf member rules;
+only that verifier expectation was corrected. Application code/build/CI was
+unchanged, and the completed verification is the passing evidence. Flags were
+independently read back by metadata only; no password hashes were decrypted or
+changed. No source files, projects, participant answers or live forms were written.
+
+The native browser still refuses observation after its prior credential delivery,
+including its documented same-browser runtime recovery. Production authenticated
+launch and the new live cloud task remain unverified; this is not a site-served
+bot block and does not invalidate the successful public HTTPS checks. Existing
+fixture CI evidence remains valid, but no actual Google response-recorded receipt
+exists for this new cabinet workflow. Do not claim an end-to-end live send.
+No further full tests were repeated for this deployment or docs-only record.
+
+Next three tasks: complete one authenticated read-only cloud cabinet launch once
+the native browser is available; verify an exact instrument-item/source map and
+participant/destination basis; execute one explicitly permitted compatible
+source-backed response and retain its visible receipt before expanding batches.
