@@ -831,3 +831,53 @@ exit 0. No further full local repeats are needed absent code changes. Reviewed
 React effects, accessible labels, active-only polling and authenticated routes.
 Browser CI, provider launch and production release remain to be recorded against
 the commit created from this working tree. No live Google response was sent.
+
+
+### Verified automation checkpoint and release boundary (2026-10-12)
+
+Application commit `068720c5d246a05d51619434308b2e232949e19d` / tree
+`11f605ba50fda4c389ec2477cab85a83dcfcd5eb` is saved in PR #17, stacked on
+PR #16. Local staged tree matched the connector-created GitHub tree exactly;
+local branch was aligned to that fetched commit without overwriting files.
+CI run `38254885718`, job `114830278146` completed SUCCESS. Every step passed,
+including locked/native install, lint, types, 246 unit/integration tests,
+build, 21 HTTP checks and four actual Chromium scenarios. Browser log explicitly
+verified two-section source-backed fixture fill/verification, durable receipt and
+uncertain-send refusal; cabinet fixture verified launch/replay and persisted
+result. No live research response was involved.
+
+Protected Preview `dpl_BoPvwjcMyP8FZxt2cvYesXb85ESQ` is READY on that exact
+application SHA and branch, at
+https://research-respondent-platform-53mp0fcag-spw1.vercel.app/cabinet . Initial
+SHA-only Preview request created `dpl_683T1R1y9R7qEaMUh8MySmGtd6vB` without the
+branch-scoped configuration. It was replaced by the correctly branch-scoped
+request; cancellation returned 400 because the initial build was no longer
+cancelable. Only the branch-scoped Preview above is the verification target.
+
+Official browser entry passed Vercel protection. Secure browserAuth sign-in
+returned submitted and a fresh visible cabinet state positively showed sign-in,
+zero Preview assets/projects and the automation panel. A later file-chooser
+operation was rejected before execution by retained native-credential protection.
+The tool-directed fresh tab and fresh runtime recovery remained unavailable.
+No fixture was uploaded, no project/job was created and no live cloud form task
+was launched by this batch. Do not claim an actual cabinet cloud run or Google
+Forms fill/send from successful CI or the signed-in page. No screenshot could be
+captured after the browser protection block.
+
+Automatic permission review rejected production fill/send activation and the
+production deployment, each because exact production authorization was not
+explicit in the current request. No alternative release/alias/security bypass
+was attempted. A materially safer read-only production feature flag
+`RRP_FORM_AUTOMATION=1` was accepted; metadata readback confirms the production
+write flag is absent. The current deployed production application ignores this
+new flag, so the primary website remains on the previous application version.
+Preview has read-only automation enabled. Existing accounts/source files are
+unchanged. New release remains pending explicit owner authorization, and actual
+external entry/send additionally needs a verified compatible source and
+participant/destination basis. Docs-only evidence follow-up uses [skip ci].
+
+Next three tasks: obtain explicit release and production-write authorization;
+release the tested application SHA through official Vercel access and read back
+the primary alias; perform one read-only cabinet cloud run after browser access
+is available, then an explicitly authorized source-backed transfer if complete
+answers/basis exist. Issue #4 and the relational migration remain open.
