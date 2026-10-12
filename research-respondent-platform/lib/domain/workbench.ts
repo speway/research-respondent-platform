@@ -6,6 +6,7 @@ export interface FieldMapping { question: string; column: number | null; require
 export interface Workspace {
   version: 1; dataset: Dataset | null; checksum: string; reference: string; purpose: string;
   rules: Rule[]; match: "all" | "any"; formUrl: string; fields: FieldMapping[]; idColumn: number | null;
+  sourceRows?: number[];
 }
 export const MAX_FILE_BYTES = 5 * 1024 * 1024;
 const MAX_ROWS = 5000;
@@ -75,7 +76,8 @@ export function matchesRule(values: Cell[], rule: Rule): boolean {
   return Number.isFinite(number) && Number.isFinite(expected) && (rule.op === "gte" ? number >= expected : number <= expected);
 }
 export function selectedRows(workspace: Workspace) {
-  return workspace.dataset?.rows.filter((row) => !workspace.rules.length || (workspace.match === "all" ? workspace.rules.every((r) => matchesRule(row.values, r)) : workspace.rules.some((r) => matchesRule(row.values, r)))) ?? [];
+  const scope = workspace.sourceRows ? new Set(workspace.sourceRows) : null;
+  return workspace.dataset?.rows.filter((row) => (!scope || scope.has(row.line)) && (!workspace.rules.length || (workspace.match === "all" ? workspace.rules.every((r) => matchesRule(row.values, r)) : workspace.rules.some((r) => matchesRule(row.values, r))))) ?? [];
 }
 export function validFormUrl(raw: string): boolean {
   try { const url = new URL(raw); return url.protocol === "https:" && !url.username && !url.password && (url.hostname === "forms.gle" || (url.hostname === "docs.google.com" && url.pathname.startsWith("/forms/"))); } catch { return false; }
@@ -132,6 +134,8 @@ export function restoreWorkspace(text: string): Workspace {
     validateDataset(raw.dataset);
   }
   const columns = raw.dataset?.headers.length ?? 0;
+  if (raw.sourceRows !== undefined && (!raw.dataset || !Array.isArray(raw.sourceRows) || !raw.sourceRows.length || raw.sourceRows.length > MAX_ROWS
+    || new Set(raw.sourceRows).size !== raw.sourceRows.length || raw.sourceRows.some((line) => !Number.isSafeInteger(line) || !raw.dataset!.rows.some((r) => r.line === line)))) throw new Error("Некорректный список исходных строк.");
   const columnValid = (c: unknown) => Number.isInteger(c) && Number(c) >= 0 && Number(c) < columns;
   if (raw.idColumn !== null && !columnValid(raw.idColumn)) throw new Error("Некорректный столбец ID.");
   if (raw.fields.some((f) => !f || typeof f.question !== "string" || typeof f.required !== "boolean" || (f.column !== null && !columnValid(f.column)))) throw new Error("Некорректная карта вопросов.");

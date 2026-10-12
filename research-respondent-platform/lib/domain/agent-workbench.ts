@@ -27,6 +27,7 @@ export type ObservedQuestion = FormObservation["questions"][number];
 export const taskSchema = z.object({
   schema: z.literal("rrp.agent-task.v1"), source: z.object({ name: label, text: z.string() }).strict(),
   reference: label, purpose: label, formUrl, idHeader: label.optional(),
+  sourceRows: z.array(z.number().int().min(1)).min(1).max(5000).optional(),
   match: z.enum(["all", "any"]).default("all"),
   criteria: z.array(z.object({ header: label, op: z.enum(["eq", "ne", "contains", "gte", "lte", "present", "missing"]), value: z.string(), label: z.string() }).strict()).max(100).default([]),
 }).strict();
@@ -53,6 +54,7 @@ export async function workspaceFromTask(input: unknown): Promise<Workspace> {
   if (ids.length !== 1) throw new Error("Неоднозначный ID: передайте точный idHeader.");
   const hash = await crypto.subtle.digest("SHA-256", bytes);
   const workspace: Workspace = { ...emptyWorkspace(), dataset, checksum: [...new Uint8Array(hash)].map((b) => b.toString(16).padStart(2, "0")).join(""), reference: task.reference, purpose: task.purpose, formUrl: task.formUrl, idColumn: ids[0]!, match: task.match,
+    ...(task.sourceRows ? { sourceRows: task.sourceRows } : {}),
     rules: task.criteria.map((rule) => {
       const column = dataset.headers.indexOf(rule.header);
       if (column < 0) throw new Error(`Нет столбца критерия: ${rule.header}.`);

@@ -8,6 +8,7 @@ import { URL } from "node:url";
 import { log } from "node:console";
 import { BlobPreconditionFailedError } from "@vercel/blob";
 import { Cabinet, cabinetConfiguration } from "../../lib/services/cabinet.ts";
+import { FormAutomation } from "../../lib/services/form-automation.ts";
 import { hashPassword } from "../../lib/services/password.ts";
 import { httpGet, removeTempDb, requireNextBuild, startTestServer } from "../helpers/server.ts";
 
@@ -16,7 +17,7 @@ const { chromium } = await import(process.env.PLAYWRIGHT_MODULE ?? "playwright")
 const accounts = [{ id: "owner", login: "fixture", label: "Isolated browser cabinet", password: hashPassword("isolated-browser-only-password") }];
 const env = { RRP_CABINET_STORE_ID: "store_isolatedBrowser", RRP_CABINET_ACCOUNTS: JSON.stringify(accounts) };
 const config = cabinetConfiguration(env), records = new Map(); let generation = 0;
-const cabinet = new Cabinet(config, {
+const store = {
   async read(path) { return records.get(path) ?? null; },
   async write(path, value, etag) {
     const previous = records.get(path);
@@ -24,7 +25,8 @@ const cabinet = new Cabinet(config, {
     records.set(path, { body: JSON.stringify(value), etag: `"browser-${++generation}"` });
   },
   async paths(prefix) { return [...records.keys()].filter((p) => p.startsWith(prefix)); },
-});
+};
+const cabinet = new Cabinet(config, store), automation = new FormAutomation(config, store);
 const owner = config.accounts[0];
 const server = await startTestServer({ env: { ...env, VERCEL: "1", VERCEL_ENV: "preview" } });
 let browser; let activePage;
@@ -37,6 +39,22 @@ try {
     let body, status = 200;
     try {
       if (url.pathname.endsWith("/session")) body = { account: { id: owner.id, label: owner.label } };
+      else if (url.pathname.endsWith("/automation")) {
+        if (request.method() === "GET") {
+          body = url.searchParams.has("project") ? await automation.candidates(owner, url.searchParams.get("project")) : url.searchParams.has("job") ? await automation.view(owner.id, url.searchParams.get("job")) : { flags: { enabled: true, writes: false }, jobs: await automation.list(owner) };
+        } else {
+          assert.equal(request.headers().origin, server.baseUrl); const input = request.postDataJSON();
+          if (input.command === "cancel") body = await automation.cancel(owner, input.jobId);
+          else {
+            const job = await automation.reserve(owner, input.request, false);
+            body = await automation.dispatch(job, async (accountId, jobId) => {
+              const input = await automation.begin(accountId, jobId, false); assert.equal(input.grant, null);
+              await automation.finish(input.job, { status: "prepared", externalSubmission: false, sectionNumber: 1, observedAt: new Date().toISOString() });
+              return "wrun_isolated_browser";
+            }); status = 202;
+          }
+        }
+      }
       else if (request.method() === "GET") body = await cabinet.catalog(owner);
       else {
         assert.equal(request.headers().origin, server.baseUrl);
@@ -99,6 +117,15 @@ try {
   const bundle = await cabinet.forAgent(token);
   assert.equal(bundle.source.id, saved.id); assert.equal(bundle.sourceChecks.selectedRecords, 3);
   assert.equal((await cabinet.forAgentLineage(token, saved.id)).parents.length, 2);
+  const automationPanel = page.getByRole("region", { name: "Автоматическое заполнение" });
+  await automationPanel.getByLabel("Проект для автоматизации").selectOption(bundle.project.id);
+  await automationPanel.getByLabel("Участник для запуска").selectOption("TEST-C");
+  await automationPanel.getByRole("button", { name: "Запустить исполнителя" }).click();
+  await automationPanel.getByText(/Первый раздел проверен/).waitFor();
+  assert.equal((await automation.list(owner)).length, 1);
+  await automationPanel.getByRole("button", { name: "Запустить исполнителя" }).click();
+  assert.equal((await automation.list(owner)).length, 1, "Same UI request cannot allocate a duplicate run.");
+  assert.equal((await automation.agentJobs(await cabinet.agentProjectScope(token))).length, 1);
   // Source changes with a conflicting answer keep the save button disabled.
   await upload("conflict.csv", "participant_id,answer\nTEST-A,9\n");
   const conflict = (await cabinet.catalog(owner)).assets.find((a) => a.name === "conflict.csv");
@@ -116,7 +143,7 @@ try {
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
   assert.deepEqual(errors, []);
-  log("Cabinet browser: upload → preview invalidation → durable bank version → project → scoped agent/lineage; conflicts and exact profile join; mobile passed.");
+  log("Cabinet browser: upload → bank version → project → scoped agent/lineage → idempotent automation request and persisted result; conflicts/profile join/mobile passed. Isolated service fixture only.");
 } catch (error) {
   if (activePage) log("Isolated fixture cabinet failure before returning an agent key:", (await activePage.locator("body").innerText()).replace(/Bearer [A-Za-z0-9_-]+/g, "Bearer [redacted]"));
   throw error;

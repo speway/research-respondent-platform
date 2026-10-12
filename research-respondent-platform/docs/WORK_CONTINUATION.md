@@ -776,3 +776,152 @@ Issue #4 remains open. Next three tasks: inspect/document uploaded source schema
 and instrument versions without inferring answers; prepare a compatible scoped
 project and consent/receipt persistence; verify a bounded live transfer only with
 actual source-backed answers and evidenced recipient/participant authorization.
+
+### 2026-10-12 — Cabinet cloud form automation (implementation checkpoint)
+
+Continues PR #16 documentation head `28798e7b29dc7ea765c6eb7e5db8832c38e8ef9e`
+on `feat/cabinet-form-automation`; preserves existing bank, workbench, migrations,
+private Blob/OIDC configuration and original source files. Adds authenticated
+cabinet automation API/UI, durable Workflow execution (only account/job IDs in
+workflow arguments), one-participant Sandbox browser worker, persisted status,
+cancellation and progress. Preparation never enters answers. Fill/submit require
+linked questionnaire evidence, explicit participant/recipient confirmation and
+production write activation. Operator attestation is not independently verified
+participant consent. Preview cannot write to external forms.
+
+One source row is intersected with the original cohort; original bytes/SHA remain
+unchanged. JSON task downloads and scoped agent job reads avoid repeated file
+handoffs. A global canonical-form/participant receipt is privately reserved and
+read back before Submit; uncertain dispatch/send is not retried automatically.
+The runner rejects pre-existing success text and requires a new confirmation
+without a remaining submit control. No direct Google formResponse POST, account
+bypass, generated respondent answers, Cronbach-alpha adjustment or new SQL migration.
+
+Pilot bounds: one selected participant per job, five-minute/one-CPU ephemeral VM,
+three dispatches per UTC day/environment, 100 historical jobs/account. Every VM
+is stopped in finally. Network switches from pinned browser installation to the
+fixed public workbench, exact form destination and Google static assets; provider
+credentials are never placed in the browser VM. Fill-only creates a temporary
+browser draft; it cannot resume as a later submission. Preparation audits the
+first available question section, not the complete form. See FORM_AUTOMATION.md.
+
+Modified code: cabinet/workbench contracts, authenticated catalog/agent routes,
+new form-automation service/domain/route/panel/workflow and cloud runner/policy;
+public machine schemas/guide, existing browser runner confirmation checks and
+unit/integration/HTTP/Chromium scenarios. Tests use isolated fixtures, not actual
+participant submissions. Locked install passed; 246 unit/integration tests passed
+with no skips/failures, lint and TypeScript completed. Earlier TypeScript fixture
+annotation was repaired. One build failed on a corrupted generated Turbopack
+cache; moving that generated cache aside restored the build. A subsequent
+literal-path file trace fix removes the whole-project trace warning. 21 HTTP
+checks passed on the built server before final progress/UI refinements. Final
+head build/HTTP, actual Chromium CI, exact-SHA deployment and one read-only live
+cloud launch are still pending at this checkpoint; do not claim they happened.
+
+Next three tasks: complete exact-head checks and publish a stacked PR; release
+the checked application through official Vercel authorization and verify the
+primary alias; perform one read-only live cloud preparation and record actual
+status/limitations without entering source answers. Issue #4 remains open.
+
+Final local verification on the recovered implementation (2026-10-12): lint,
+TypeScript and production build exit 0; 246 unit/integration tests pass with no
+skips. A pnpm HTTP run returned an incomplete log and is not counted as proof.
+The direct Node HTTP run with test concurrency 1 completed: 21/21 pass, no skips,
+exit 0. No further full local repeats are needed absent code changes. Reviewed
+React effects, accessible labels, active-only polling and authenticated routes.
+Browser CI, provider launch and production release remain to be recorded against
+the commit created from this working tree. No live Google response was sent.
+
+
+### Verified automation checkpoint and release boundary (2026-10-12)
+
+Application commit `068720c5d246a05d51619434308b2e232949e19d` / tree
+`11f605ba50fda4c389ec2477cab85a83dcfcd5eb` is saved in PR #17, stacked on
+PR #16. Local staged tree matched the connector-created GitHub tree exactly;
+local branch was aligned to that fetched commit without overwriting files.
+CI run `38254885718`, job `114830278146` completed SUCCESS. Every step passed,
+including locked/native install, lint, types, 246 unit/integration tests,
+build, 21 HTTP checks and four actual Chromium scenarios. Browser log explicitly
+verified two-section source-backed fixture fill/verification, durable receipt and
+uncertain-send refusal; cabinet fixture verified launch/replay and persisted
+result. No live research response was involved.
+
+Protected Preview `dpl_BoPvwjcMyP8FZxt2cvYesXb85ESQ` is READY on that exact
+application SHA and branch, at
+https://research-respondent-platform-53mp0fcag-spw1.vercel.app/cabinet . Initial
+SHA-only Preview request created `dpl_683T1R1y9R7qEaMUh8MySmGtd6vB` without the
+branch-scoped configuration. It was replaced by the correctly branch-scoped
+request; cancellation returned 400 because the initial build was no longer
+cancelable. Only the branch-scoped Preview above is the verification target.
+
+Official browser entry passed Vercel protection. Secure browserAuth sign-in
+returned submitted and a fresh visible cabinet state positively showed sign-in,
+zero Preview assets/projects and the automation panel. A later file-chooser
+operation was rejected before execution by retained native-credential protection.
+The tool-directed fresh tab and fresh runtime recovery remained unavailable.
+No fixture was uploaded, no project/job was created and no live cloud form task
+was launched by this batch. Do not claim an actual cabinet cloud run or Google
+Forms fill/send from successful CI or the signed-in page. No screenshot could be
+captured after the browser protection block.
+
+Automatic permission review rejected production fill/send activation and the
+production deployment, each because exact production authorization was not
+explicit in the current request. No alternative release/alias/security bypass
+was attempted. A materially safer read-only production feature flag
+`RRP_FORM_AUTOMATION=1` was accepted; metadata readback confirms the production
+write flag is absent. The current deployed production application ignores this
+new flag, so the primary website remains on the previous application version.
+Preview has read-only automation enabled. Existing accounts/source files are
+unchanged. New release remains pending explicit owner authorization, and actual
+external entry/send additionally needs a verified compatible source and
+participant/destination basis. Docs-only evidence follow-up uses [skip ci].
+
+Next three tasks: obtain explicit release and production-write authorization;
+release the tested application SHA through official Vercel access and read back
+the primary alias; perform one read-only cabinet cloud run after browser access
+is available, then an explicitly authorized source-backed transfer if complete
+answers/basis exist. Issue #4 and the relational migration remain open.
+
+
+### Owner-authorized production automation release (2026-10-12)
+
+Owner explicitly approved the release and production fill/send activation in
+response to the prior exact approval question. This authorization persists;
+do not ask again for this same release/capability. Both flags are now configured
+as 1 for production; Preview remains read-only. The activation and deployment
+passed automatic review after that authorization.
+
+Two Git-sourced production requests (`dpl_G7NXghR9idVwxutP6XtyHvX4Gfx1` by SHA,
+`dpl_4w5fpVGgCYgDUSsDwkbefH8ggJQL` by pinned release branch) failed before build
+with `git_info_fail`, without changing the primary alias. A release branch
+`release/cabinet-automation-20261012` pins the tested application commit and has
+not changed main. Official redeployment of the successful Preview source with
+production target and production environment variables succeeded:
+`dpl_9ihFdPUBpr3A6X2e11i3sHtfBZTX`, READY, application SHA
+`068720c5d246a05d51619434308b2e232949e19d` (same checked code). Build log reports
+Build Completed and Deployment completed. Primary alias assignment replaced
+`dpl_9LtUDFDRKwptSYr6ZczXMkNs8u6Y`; independent alias readback confirms the new
+production deployment at https://research-respondent-platform.vercel.app/cabinet .
+
+Actual public HTTPS verification completed with exit 0: cabinet/workbench,
+manifest, automation command schema and agent guide 200; automation/catalog/agent
+APIs deny anonymous access with 401/no-store; foreign-Origin launch 403;
+anonymous same-Origin launch 401; provider proof route 404. The initial probe
+incorrectly expected root additionalProperties rather than oneOf member rules;
+only that verifier expectation was corrected. Application code/build/CI was
+unchanged, and the completed verification is the passing evidence. Flags were
+independently read back by metadata only; no password hashes were decrypted or
+changed. No source files, projects, participant answers or live forms were written.
+
+The native browser still refuses observation after its prior credential delivery,
+including its documented same-browser runtime recovery. Production authenticated
+launch and the new live cloud task remain unverified; this is not a site-served
+bot block and does not invalidate the successful public HTTPS checks. Existing
+fixture CI evidence remains valid, but no actual Google response-recorded receipt
+exists for this new cabinet workflow. Do not claim an end-to-end live send.
+No further full tests were repeated for this deployment or docs-only record.
+
+Next three tasks: complete one authenticated read-only cloud cabinet launch once
+the native browser is available; verify an exact instrument-item/source map and
+participant/destination basis; execute one explicitly permitted compatible
+source-backed response and retain its visible receipt before expanding batches.

@@ -31,6 +31,8 @@
 .file span, .key span { color: #87758f; font-size: 12px; }
 .key { display: flex; gap: 15px; justify-content: space-between; align-items: center; padding: 12px 0; }
 .panel textarea { margin: 8px 0 15px; font-size: 12px; }
+.panel p, .items strong { overflow-wrap: anywhere; }
+.items article > div { min-width: 0; }
 .bankFields { grid-template-columns: repeat(2, minmax(0, 1fr)); min-width: 0; }
 .bankFields label { display: grid; gap: 7px; font-size: 12px; min-width: 0; }
 .bankReport { margin-top: 20px; overflow-wrap: anywhere; }

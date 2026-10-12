@@ -6,7 +6,7 @@
   "entry": "window.respondentWorkbench.execute(command)",
   "protocol": "rrp.workbench-agent.v1",
   "sourceRepository": "https://github.com/speway/research-respondent-platform",
-  "sourceRef": "feat/respondent-bank-versions",
+  "sourceRef": "feat/cabinet-form-automation",
   "guide": "research-respondent-platform/docs/AGENT_AUTOMATION.md",
   "schemas": {
     "task": "/.well-known/rrp-agent-task.schema.json",
@@ -63,7 +63,7 @@
     "automaticExactMapping": true,
     "literalAnswerValidation": true,
     "browserAdapter": true,
-    "hostedBackgroundWorker": false,
+    "hostedBackgroundWorker": true,
     "serverSourceUpload": true,
     "serverSubmission": false,
     "introductoryPages": true,
@@ -75,7 +75,10 @@
     "versionedSourceMerge": true,
     "exactParticipantJoin": true,
     "sourceReadinessReport": true,
-    "scopedLineageRead": true
+    "scopedLineageRead": true,
+    "durableCabinetFormRuns": true,
+    "sharedSubmissionJournal": true,
+    "sourceRowRestriction": true
   },
   "dataPolicy": {
     "missingAnswers": "ask_participant",
@@ -116,6 +119,28 @@
         "cells": 250000,
         "headers": 2000
       }
-    }
+    },
+    "automation": {
+      "endpoint": "/api/cabinet/automation",
+      "schema": "/.well-known/rrp-automation-command.schema.json",
+      "agentJobStatus": "/api/cabinet/agent?jobs=1",
+      "transport": "on-demand Workflow + ephemeral cloud browser; visible UI only, no Google Forms response API",
+      "modes": [
+        "prepare",
+        "fill",
+        "submit"
+      ],
+      "authentication": "issued cabinet session and same Origin for start/cancel; project keys read only their project job summaries",
+      "activation": "RRP_FORM_AUTOMATION=1; fill/submit additionally require production RRP_FORM_AUTOMATION_WRITE=1",
+      "authorization": "one exact participant/project/source/recipient, linked evidence file and explicit operator confirmations; source rights text alone is insufficient",
+      "limits": {
+        "participantsPerRun": 1,
+        "minutesPerRun": 5,
+        "dailyRuns": 3
+      },
+      "retryUnknownSubmission": false,
+      "liveSubmissionVerified": false
+    },
+    "taskDownload": "/api/cabinet/agent?task=1"
   }
 }

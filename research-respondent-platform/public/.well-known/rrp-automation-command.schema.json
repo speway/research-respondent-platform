@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Cabinet form automation commands",
+  "oneOf": [
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "request"
+      ],
+      "properties": {
+        "command": {
+          "const": "start"
+        },
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "requestId",
+            "projectId",
+            "participantRef",
+            "mode"
+          ],
+          "properties": {
+            "requestId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "projectId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "participantRef": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 500
+            },
+            "mode": {
+              "enum": [
+                "prepare",
+                "fill",
+                "submit"
+              ]
+            },
+            "evidenceAssetId": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "evidenceReference": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            },
+            "consentConfirmed": {
+              "type": "boolean",
+              "default": false
+            },
+            "recipientConfirmed": {
+              "type": "boolean",
+              "default": false
+            }
+          },
+          "allOf": [
+            {
+              "if": {
+                "properties": {
+                  "mode": {
+                    "enum": [
+                      "fill",
+                      "submit"
+                    ]
+                  }
+                }
+              },
+              "then": {
+                "required": [
+                  "evidenceAssetId",
+                  "evidenceReference",
+                  "consentConfirmed",
+                  "recipientConfirmed"
+                ],
+                "properties": {
+                  "consentConfirmed": {
+                    "const": true
+                  },
+                  "recipientConfirmed": {
+                    "const": true
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "jobId"
+      ],
+      "properties": {
+        "command": {
+          "const": "cancel"
+        },
+        "jobId": {
+          "type": "string",
+          "format": "uuid"
+        }
+      }
+    }
+  ]
+}

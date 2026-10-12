@@ -13,6 +13,8 @@ const command = z.discriminatedUnion("command", [
 ]);
 export async function GET(request: Request) {
   try { const { cabinet, account } = await requireCabinetAccount(); const params = new URL(request.url).searchParams;
+    if (params.get("task")) return Response.json((await cabinet.bundle(account, params.get("task")!)).task,
+      { headers: { ...privateHeaders, "Content-Disposition": 'attachment; filename="rrp-agent-task.json"' } });
     if (params.get("asset")) {
       const file = await cabinet.asset(account, params.get("asset")!);
       return new Response(Buffer.from(file.body.base64, "base64"), { headers: { ...privateHeaders,

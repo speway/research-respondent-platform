@@ -76,6 +76,10 @@ try {
   assert.equal(JSON.stringify(stored).includes("literal, answer"), false);
   await assert.rejects(runFormTask({ workbenchPage: panel, formPage: form, task, participantRef: "fixture-1", grant: { ...grant, maySubmit: true }, journal }), /already reserved/);
   assert.equal((await form.evaluate(() => window.fixtureStats)).submits, 0, "Repeat task must not make another submit click.");
+  const spoofUrl = `${fixtureUrl}?spoof=1`;
+  await form.route(spoofUrl, (route) => route.fulfill({ status: 200, contentType: "text/html", body: html.replace('<main></main>', '<p>Your response has been recorded.</p><main></main>') }));
+  await assert.rejects(runFormTask({ workbenchPage: panel, formPage: form, task: { ...task, formUrl: spoofUrl }, participantRef: "fixture-1", grant: { ...grant, formUrl: spoofUrl, maySubmit: true }, journal }), /already present before submission/);
+  assert.equal((await form.evaluate(() => window.fixtureStats)).submits, 0);
   const uncertainUrl = `${fixtureUrl}?uncertain=1`;
   await form.route(uncertainUrl, (route) => route.fulfill({ status: 200, contentType: "text/html", body: html.replace("Your response has been recorded.", "Processing…") }));
   const uncertainTask = { ...task, formUrl: uncertainUrl };
@@ -97,7 +101,7 @@ try {
   assert.equal(await panel.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
   const manifest = await httpGet(server.baseUrl, "/.well-known/rrp-agent.json");
   assert.equal(manifest.status, 200);
-  assert.equal(JSON.parse(manifest.body).capabilities.hostedBackgroundWorker, false);
+  assert.equal(JSON.parse(manifest.body).capabilities.hostedBackgroundWorker, true);
   assert.deepEqual(errors, []);
   assert.deepEqual(posts, []);
   assert.equal(server.db.prepare("SELECT COUNT(*) AS count FROM participant").get().count, 0);

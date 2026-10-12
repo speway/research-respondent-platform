@@ -65,7 +65,7 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     assert.equal(response.status, 200);
     const manifest = JSON.parse(response.body);
     assert.equal(manifest.protocol, "rrp.workbench-agent.v1");
-    assert.equal(manifest.capabilities.hostedBackgroundWorker, false);
+    assert.equal(manifest.capabilities.hostedBackgroundWorker, true);
     assert.equal(manifest.capabilities.serverSourceUpload, true);
     assert.equal(response.body.includes("preview@example.test"), false);
     assert.equal("source" in manifest, false);
@@ -98,6 +98,14 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     const blocked = await fetch(`${server.baseUrl}/api/cabinet/catalog`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://untrusted.test" }, body: '{"command":"bank_preview","spec":{}}' });
     assert.equal(blocked.status, 403); await blocked.body?.cancel();
     assert.equal((await httpGet(server.baseUrl, "/api/cabinet/agent?lineage=11111111-1111-4111-8111-111111111111")).status, 401);
+  });
+  it("automation discovery is public, while job reads and launch remain authenticated and origin-bound", async () => {
+    const schema = await httpGet(server.baseUrl, "/.well-known/rrp-automation-command.schema.json");
+    assert.equal(schema.status, 200); assert.equal(JSON.parse(schema.body).oneOf.length, 2);
+    assert.equal((await httpGet(server.baseUrl, "/api/cabinet/automation")).status, 503);
+    assert.equal((await httpGet(server.baseUrl, "/api/cabinet/agent?jobs=1")).status, 401);
+    const denied = await fetch(`${server.baseUrl}/api/cabinet/automation`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://untrusted.test" }, body: '{"command":"start","request":{}}' });
+    assert.equal(denied.status, 403); await denied.body?.cancel();
   });
 
   it("a real create-study POST remains refused even with a valid file-database cookie", async () => {
