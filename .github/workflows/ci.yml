@@ -76,3 +76,4 @@ jobs:
           node --experimental-strip-types tests/browser/agent-controls.mjs
           node --experimental-strip-types tests/browser/cabinet-bank.mjs
           node --experimental-strip-types tests/browser/quorum.mjs
+          node --experimental-strip-types tests/browser/persona-bank.mjs

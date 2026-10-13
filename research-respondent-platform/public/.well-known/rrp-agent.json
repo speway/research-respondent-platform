@@ -83,7 +83,8 @@
     "readOnlyReliabilityDiagnostics": true,
     "humanSurveyExchange": true,
     "blindIndividualComparison": true,
-    "consentBoundAgentProfiles": true
+    "consentBoundAgentProfiles": true,
+    "modeledPersonaBank": true
   },
   "dataPolicy": {
     "missingAnswers": "ask_participant",
@@ -184,5 +185,24 @@
     "evaluation": "actual N, item agreement/error/coverage, participant-weighted paired baseline comparison and participant bootstrap; no alpha-as-imitation claim",
     "hostedModel": "optional default-off production AI Gateway adapter, explicit owner start; 5 attempts/day and one per arm, receipt metadata; external supplied JSON is attestation",
     "externalFormSubmission": false
+  },
+  "psychologicalPersonas": {
+    "endpoint": "/api/cabinet/personas",
+    "modelSchema": "/api/personas/schema",
+    "commandSchema": "/.well-known/rrp-persona-command.schema.json",
+    "guide": "/agent-personas.md",
+    "contract": "rrp.modeled-personas.v1",
+    "modelVersion": "1.0.0",
+    "transport": "Workflow -> pinned Python in network-disabled ephemeral Sandbox",
+    "activation": "RRP_PERSONA_WORKER=1; explicit authenticated start",
+    "agentAccess": "One full original envelope, separate expiring revocable read key",
+    "observedParticipants": 0,
+    "liveCloudWorkerVerified": false,
+    "limits": {
+      "profiles": 100,
+      "bytes": 2097152,
+      "secondsPerRun": 90,
+      "runsPerEnvironmentUtcDay": 5
+    }
   }
 }

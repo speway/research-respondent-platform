@@ -6,6 +6,7 @@ import styles from "./cabinet.module.css";
 import { RespondentBank } from "./respondent-bank.tsx";
 import { QuorumAdminPanel } from "./quorum-admin.tsx";
 import { SimulationLabPanel } from "./simulation-lab.tsx";
+import { PersonaBankPanel } from "./persona-bank.tsx";
 import { FormAutomationPanel } from "./form-automation.tsx";
 interface AgentKey { keyId: string; projectId: string; expiresAt: string; revoked: boolean }
 interface Catalog { assets: CabinetAsset[]; projects: CabinetProject[]; keys: AgentKey[] }
@@ -87,6 +88,7 @@ export function CabinetView({ configured }: { configured: boolean }) {
       {account.id === "owner" ? <QuorumAdminPanel /> : null}
       <FormAutomationPanel projects={catalog.projects} />
       <SimulationLabPanel assets={catalog.assets} onSaved={refresh} />
+      <PersonaBankPanel />
       {prompt ? <section className={styles.panel}><h2>Готовая инструкция для отдельного агента</h2><textarea className="input" aria-label="Инструкция и ключ проекта для агента" readOnly rows={12} value={prompt} /><button className="btn" onClick={() => void navigator.clipboard.writeText(prompt).then(() => setNotice("Инструкция скопирована.")).catch(() => setError("Выделите инструкцию и скопируйте вручную."))}>Скопировать</button><button className="btn" onClick={() => setPrompt("")}>Скрыть ключ</button></section> : null}
       <section className={styles.panel}><h2>Доступы агентов</h2>{catalog.keys.length ? catalog.keys.map((key) => <div className={styles.key} key={key.keyId}><span>Проект {catalog.projects.find((p) => p.id === key.projectId)?.name ?? key.projectId} · до {new Date(key.expiresAt).toLocaleString("ru-RU")} · {key.revoked ? "отозван" : Date.parse(key.expiresAt) <= Date.now() ? "истёк" : "активен"}</span><button className="btn" disabled={busy || key.revoked} onClick={() => void perform(async () => { await api("/api/cabinet/catalog", { command: "revoke_key", keyId: key.keyId }); await refresh(); setPrompt(""); setNotice("Ключ отозван."); })}>Отозвать</button></div>) : <p>Ключ открывает агенту один выбранный проект на 24 часа и разрешает чтение.</p>}</section>
       <section className={styles.panel}><h2>Файлы кабинета</h2>{catalog.assets.map((asset) => <div className={styles.file} key={asset.id}><strong>{asset.name}</strong><span>{asset.kind === "source" ? "База" : asset.kind === "simulation" ? "Тестовый набор" : "Опросник"} · {asset.reference} · {Math.ceil(asset.bytes / 1024)} КБ</span><small>SHA-256: {asset.sha256}</small>{asset.derivation ? <small>Версия банка · {asset.derivation.mode === "merge" ? "пополнение" : "характеристики по ID"} · источники: {asset.derivation.parents.map((p) => p.name).join(" + ")}</small> : null}<div className={styles.actions}><a className="btn" href={`/api/cabinet/catalog?asset=${asset.id}`} download>Скачать файл</a>{asset.derivation ? <a className="btn" href={`/api/cabinet/catalog?lineage=${asset.id}`} target="_blank" rel="noreferrer">История объединения</a> : null}</div></div>)}</section>
