@@ -20,7 +20,7 @@ export function QuorumParticipantView({ configured }: { configured: boolean }) {
   async function run(action: () => Promise<void>) { setBusy(true); setError(""); setNotice(""); try { await action(); } catch(e) { setError(e instanceof Error ? e.message : "Операция не завершена."); } finally { setBusy(false); } }
   async function signIn(e: FormEvent<HTMLFormElement>) {
     e.preventDefault(); const f = new FormData(e.currentTarget);
-    await run(async () => { await quorumRequest("/api/quorum/session", activation ? { command: "activate", invitationToken: invite, password: f.get("password"), age18: true, terms: true } : { command: "login", login: f.get("login"), password: f.get("password") }); setInvite(""); await refresh(); });
+    await run(async () => { await quorumRequest("/api/quorum/session", activation ? { command: "activate", invitationToken: invite, password: f.get("password"), age18: true, terms: true } : { command: "login", login: f.get("login"), password: f.get("password") }); setInvite(""); setActivation(false); await refresh(); });
   }
   async function createStudy(e: FormEvent<HTMLFormElement>) {
     e.preventDefault(); const f = new FormData(e.currentTarget);

@@ -63,7 +63,9 @@ try {
   await admin.getByLabel("Логин участника", { exact: true }).fill("author-fixture");
   await admin.getByLabel("Псевдоним", { exact: true }).fill("Author fixture");
   await admin.getByLabel("Группа участника", { exact: true }).fill("fixture-group");
+  const invitationResponse = ownerPage.waitForResponse(r => r.url().endsWith("/api/cabinet/quorum") && r.request().method() === "POST");
   await admin.getByRole("button", { name: "Создать приглашение", exact: true }).click();
+  const invitationResult = await invitationResponse; assert.equal(invitationResult.status(), 200, (await invitationResult.json()).error);
   const invitation = await admin.getByLabel("Ссылка приглашения", { exact: true }).inputValue(), inviteToken = invitation.match(/#invite=([A-Za-z0-9_-]{43})/)[1];
   await personPage.goto(`${server.baseUrl}/quorum#invite=${inviteToken}`);
   await personPage.getByLabel("Придумайте пароль", { exact: true }).fill(fixturePassword);
