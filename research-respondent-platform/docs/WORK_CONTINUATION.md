@@ -1138,3 +1138,41 @@ Next three tasks: finish exact-head CI and deployment/readback; independently
 verify one bounded modeled-only live Python job/persistence (only after activation
 is accepted); attach a consented real-person protocol and run held-out/retest
 comparisons on actual participants before claiming predictive fidelity.
+
+
+#### Persona integration publication readback (2026-10-13)
+
+PR #20: https://github.com/speway/research-respondent-platform/pull/20 .
+Checked application `9cc14b8b542f2f0a3e233067696f6c34e81c9e23`; documented
+head `c5e68476c989f1569b4a31b68a3549c80242437c`. GitHub connector wrote a tree
+identical to local checked source (`f990be5b102303565d0997e4a0e9985ae7fb17cb`),
+after direct Git push lacked credentials. Local checkout is synchronized to
+connector history; no forced remote ref or main change. PR is mergeable.
+
+Exact-head CI 38391692366 / job 115276783871 SUCCESS on every step: frozen
+install/native SQLite/lint/types/283 tests/build/24 HTTP/all SIX actual Chromium
+flows, including new persona generation/reload/adaptation/full-envelope grant/
+revocation/import/mobile. No skipped or weakened state assertions.
+
+Protected Preview dpl_32btMQDUPA1mrpUmCDRSGVPLfKtZ READY at exact documented head,
+https://research-respondent-platform-kjg6vukmr-spw1.vercel.app . Authorized provider
+HTTPS reads: public model/guide/manifest 200, 17 groups/model v1.0.0, no persona
+data in public dictionary. Private persona endpoint returns 503/no-store because
+this Preview has no configured cabinet accounts/store. No successful private
+Preview persistence/session is claimed; local/CI exercise isolated service routes.
+The existing production cabinet remains separate and unchanged.
+
+NATIVE AUTOMATIC APPROVAL REVIEW REJECTED BOTH actions:
+1. Setting RRP_PERSONA_WORKER=1 for preview/production: exact production cloud
+execution/resource activation approval absent. Flag was not enabled.
+2. Redeploying checked Preview to production: exact approval for this production
+release absent. No alternate deployment/alias path attempted.
+No live Python VM/Workflow/provider write, paid model, recruitment or form
+submission was performed. The Quorum Gateway flag remains untouched.
+
+All unaffected code/validation/PR/Preview work is finished. Final approval is
+needed specifically for PR #20 production release and the bounded modeled-only
+Python worker (5 starts/environment/day, 90s/1vCPU, network disabled, explicit
+cabinet start). After that: deploy exact checked source and read back primary
+alias; activate this flag; independently verify one modeled-only live job and
+private save/read/adaptation. Do not retry rejected actions without exact approval.
