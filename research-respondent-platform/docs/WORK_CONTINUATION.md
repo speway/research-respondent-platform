@@ -1092,3 +1092,49 @@ Gateway activation/processing/spend approval; one consented real model pair with
 provider receipts and authenticated persistence check; first real invited cohort
 and held-out/retest evaluation before expanded recruitment or replacement claims.
 N=50 remains a planned pilot, not completed enrollment or proven imitation.
+
+
+### 2026-10-13 — durable psychological persona integration
+
+Checked application commit `9cc14b8b542f2f0a3e233067696f6c34e81c9e23`, task branch
+`feat/persona-workflow-integration`, based on PR #19 head `5cf79c25...`.
+PR #6 model/domain/worker snapshot brought forward without merging its conflicting
+historical continuation/HTTP files; model dictionary identical SHA-256
+`e03bf1bba6064fb36c00574541649d5c2e444469c0c41241e97a65365c68357f`.
+
+Added private `rrp/modeled_personas/v1/<environment>/accounts/<account>/` immutable
+full JSON envelopes and small catalog indexes, exact parent ID/checksum, imports,
+separate 24h read/revoke grants, ID-bound one-time dispatch/execution leases, five
+cloud starts/day across the environment, ID-only Workflow, pinned network-disabled
+Python Sandbox (90s, 1 vCPU, no dependency install) and cabinet UI. The prediction
+adapter retains original envelope and reuses Quorum exact question/value validation
+while baseline receives no profile. Modeled receipts have observedParticipants=0.
+No modeled participant/profile/forecast is imported into empirical or human tables.
+
+Changed components: persona domain/bank/prediction, private bank/worker services,
+Workflow and API routes, cabinet component, model dictionary and machine guide/
+command schema, tracing, schema exporter, snapshot files and integration/HTTP/
+Chromium tests plus CI registration. SQLite migration history is untouched.
+
+Actual local checks: frozen install exit 0; lint exit 0; typecheck exit 0;
+283 unit/integration tests pass, 0 fail/skip; production build exit 0;
+24 HTTP tests pass, 0 fail/skip. Actual Chromium persona flow passed generation,
+reload, adaptation with stable IDs/seeds/core/history, read key/revocation,
+exported-envelope import, source catalog exclusion and 390px layout. Actual older
+cabinet-bank Chromium regression also passed. Real Python is used by these tests,
+with isolated in-memory store/provider/browser routing; no live paid VM/model or
+respondent/form writes. First build failed on workspace node_modules symlink,
+fixed by using an actual dependency directory, without changing lockfile/config.
+First UI check selected hidden option instead of visible stored-version label;
+locator corrected without weakening the state assertions.
+
+Cloud worker activation requires `RRP_PERSONA_WORKER=1` and explicit authenticated
+start; current live activation/provisioning/Workflow persistence have not yet been
+verified. Existing optional Quorum Gateway flag remains untouched and its prior
+native approval rejection is not bypassed. GitHub CI and deployed-source readback
+are pending at this checkpoint. Source/code publication is authorized by the owner.
+
+Next three tasks: finish exact-head CI and deployment/readback; independently
+verify one bounded modeled-only live Python job/persistence (only after activation
+is accepted); attach a consented real-person protocol and run held-out/retest
+comparisons on actual participants before claiming predictive fidelity.
