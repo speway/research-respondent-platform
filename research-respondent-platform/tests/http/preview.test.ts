@@ -117,6 +117,17 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     const denied = await fetch(`${server.baseUrl}/api/cabinet/lab`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://untrusted.test" }, body: '{"command":"generate","config":{"seed":"fixture"}}' });
     assert.equal(denied.status, 403); await denied.body?.cancel();
   });
+  it("Quorum page/contracts are public and participant/operator writes are authenticated and origin-bound", async () => {
+    const page = await httpGet(server.baseUrl, "/quorum"); assert.equal(page.status, 200); assert.match(page.body, /Кворум/);
+    assert.equal((await httpGet(server.baseUrl, "/agent-quorum.md")).status, 200);
+    for (const name of ["quorum-student-command", "quorum-admin-command", "quorum-agent-prediction", "quorum-study", "quorum-experiment"]) assert.equal((await httpGet(server.baseUrl, `/.well-known/${name}.schema.json`)).status, 200);
+    assert.equal((await httpGet(server.baseUrl, "/api/quorum/agent")).status, 401);
+    assert.equal((await httpGet(server.baseUrl, "/api/quorum")).status, 503);
+    for (const path of ["/api/quorum", "/api/quorum/session", "/api/cabinet/quorum"]) {
+      const denied = await fetch(`${server.baseUrl}${path}`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://untrusted.test" }, body: '{}' });
+      assert.equal(denied.status, 403); assert.match(denied.headers.get("cache-control") ?? "", /no-store/); await denied.body?.cancel();
+    }
+  });
   it("a real create-study POST remains refused even with a valid file-database cookie", async () => {
     const ref = serverActionRefsFromBuild().find((entry) => entry.exportedName === "createStudyAction");
     assert.ok(ref);

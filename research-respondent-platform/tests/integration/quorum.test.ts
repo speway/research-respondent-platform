@@ -32,7 +32,8 @@ it("escrow and reviewed responses conserve credits; retries cannot duplicate res
   await f.q.adminCommand("owner",{command:"review_response",responseId:"responseId" in second ? second.responseId : "",accepted:true,reason:"Appeal accepted"});
   const exported=await f.q.exportStudy(author.id,id);assert.equal(exported.records.length,2);assert.equal(parseSource("observed.json",JSON.stringify(exported.records)).rows.length,2);
   await assert.rejects(f.q.exportStudy(a.id,id),{status:404});await f.q.studentCommand(author.id,{command:"close_study",studyId:id});
-  const admin=await f.q.admin("owner");assert.equal(admin.issuedCredits,15);assert.equal(admin.students.reduce((n,p)=>n+p.balance,0)+admin.studies.reduce((n,t)=>n+t.escrow,0),15);
+  await f.q.studentCommand(a.id,{command:"withdraw_response",responseId:"responseId" in first ? first.responseId : ""});assert.equal((await f.q.exportStudy(author.id,id)).records.length,1);assert.equal((await f.q.dashboard(a.id)).person.balance,6);
+  const admin=await f.q.admin("owner");assert.equal(admin.responses.find(r=>r.participantId===a.id)!.status,"withdrawn");assert.deepEqual(admin.responses.find(r=>r.participantId===a.id)!.answers,{});assert.equal(admin.issuedCredits,15);assert.equal(admin.students.reduce((n,p)=>n+p.balance,0)+admin.studies.reduce((n,t)=>n+t.escrow,0),15);
 });
 it("concurrent first writes/last study slots fail closed rather than losing balances",async()=>{
   const f=quorumFixture();const first=await Promise.allSettled([f.q.adminCommand("owner",{command:"invite",login:"one",label:"one",group:"g",starterCredits:5}),f.q.adminCommand("owner",{command:"invite",login:"two",label:"two",group:"g",starterCredits:5})]);

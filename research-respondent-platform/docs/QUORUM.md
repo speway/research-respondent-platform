@@ -90,3 +90,9 @@ illustrate why matching aggregate distributions is insufficient for individual
 prediction and multivariate structure. N=50 is a proposed pilot, not proof that
 agents can replace respondents across tasks. Current platform is profile-based
 conditioning and evaluation; it does not claim fine-tuned model weights.
+
+The portable JS client `tools/quorum-agent/client.mjs` reads a scoped task and
+invokes a caller-supplied model callback exactly once before committing. It rejects
+unexpected permission expansion, baseline profile leaks, credentials in URLs,
+redirects and hidden human/retest fields; it does not evaluate code from a task.
+Use secrets in process/session memory, not command arguments or committed files.
