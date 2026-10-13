@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "reference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "reviewRules": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 1000
+    },
+    "consentText": {
+      "type": "string",
+      "minLength": 20,
+      "maxLength": 2000
+    },
+    "durationMinutes": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 120
+    },
+    "eligibleGroups": {
+      "default": [],
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 100
+      }
+    },
+    "target": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100
+    },
+    "reward": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 10
+    },
+    "questions": {
+      "minItems": 1,
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "kind": {
+                "type": "string",
+                "const": "scale"
+              },
+              "low": {
+                "type": "integer",
+                "minimum": -100,
+                "maximum": 100
+              },
+              "high": {
+                "type": "integer",
+                "minimum": -100,
+                "maximum": 100
+              },
+              "required": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "kind",
+              "low",
+              "high"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "kind": {
+                "type": "string",
+                "const": "choice"
+              },
+              "options": {
+                "minItems": 2,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1000
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "label"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "kind",
+              "options"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "kind": {
+                "type": "string",
+                "const": "text"
+              },
+              "maxLength": {
+                "default": 1000,
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2000
+              },
+              "required": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "kind"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    }
+  },
+  "required": [
+    "title",
+    "purpose",
+    "reference",
+    "reviewRules",
+    "consentText",
+    "durationMinutes",
+    "target",
+    "reward",
+    "questions"
+  ],
+  "additionalProperties": false
+}

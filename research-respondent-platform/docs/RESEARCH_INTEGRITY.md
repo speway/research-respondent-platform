@@ -269,3 +269,16 @@ Note: the platform's refusals were exercised by the tests that pass - for exampl
 the append-only triggers reject UPDATE and DELETE, consent status gates
 eligibility as `indeterminate`, and the mapping preflight keeps a documented
 missing source out of the payload while still producing a dry-run report.
+
+## Quorum invited pilot (2026-10-13)
+
+The hosted Quorum flow stores native participant self-reports with declared
+study/review/consent versions and receipts in private storage, separately from
+legacy SQLite and modeled predictions. Individual/password/account scopes and
+owner-reviewed virtual-credit escrow are bounded to the invited pilot. Separate
+profile and per-model experiment consent is required before agent access. Both
+predictions freeze before new human responses; baseline receives no profile.
+Withdrawal erases stored response/comparison content and excludes it from future
+exports; credit/audit metadata remain. See QUORUM.md for the exact implementation
+and boundaries. Native attestation and operator review do not establish perfect
+identity or honesty, and comparisons do not establish a 1:1 replicated person.

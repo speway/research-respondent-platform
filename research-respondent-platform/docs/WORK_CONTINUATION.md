@@ -1002,3 +1002,23 @@ Next three tasks after this completed batch: one authenticated production lab
 save/reopen/revoke when the browser can observe credentials safely; verify exact
 instrument versions/keys; execute only a separately authorized external test or
 source-backed transfer with an exact count/accounting method and visible receipt.
+
+### Quorum implementation checkpoint (2026-10-13)
+
+User explicitly asked to implement the proposed human survey exchange, profiles
+and blind comparison on the existing site, rewriting incomplete/unneeded flows.
+Task branch feat/quorum-pilot starts from PR #18 docs head ebb03d9e1436600af8a421da5aa9f284287f1d40. Main unchanged.
+Added bounded private CAS state, invitation/student sessions, study escrow/review,
+one-time rewards/appeals/source exports/withdrawal, separately consented profiles
+and per-experiment model consent, frozen personal/baseline grants and forecasts,
+gated human/retest, actual-N/common-item comparison/participant uncertainty.
+Optional production AI Gateway adapter has no artificial noise/tools/retry loop,
+one attempt/arm and five/day, actual execution receipts; default off. Native
+Quorum UI/API, owner tools and public machine/agent contracts replace five-for-
+fifty/two-day guarantees. Existing bank/form automation/demo lab are preserved.
+Twelve focused domain/service tests pass; typecheck initially caught narrowed
+subset and env/test metadata types being corrected. Full CI/browser/release
+remain pending at this checkpoint. No participant invitation/data/model request
+or external submission was made outside isolated fixtures. Next three tasks:
+complete Chromium/HTTP scenarios; pass exact-head checks and persist corrections;
+release verified code and record actual limits/results.

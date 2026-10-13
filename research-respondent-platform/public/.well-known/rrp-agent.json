@@ -1,12 +1,12 @@
 {
   "schema": "rrp.agent-manifest.v1",
-  "name": "Respondent Lab browser workbench",
+  "name": "Кворум · Respondent Lab",
   "workbench": "/workbench",
   "transport": "same_tab_javascript",
   "entry": "window.respondentWorkbench.execute(command)",
   "protocol": "rrp.workbench-agent.v1",
   "sourceRepository": "https://github.com/speway/research-respondent-platform",
-  "sourceRef": "feat/cohort-simulation-lab",
+  "sourceRef": "feat/quorum-pilot",
   "guide": "research-respondent-platform/docs/AGENT_AUTOMATION.md",
   "schemas": {
     "task": "/.well-known/rrp-agent-task.schema.json",
@@ -80,7 +80,10 @@
     "sharedSubmissionJournal": true,
     "sourceRowRestriction": true,
     "simulationLab": true,
-    "readOnlyReliabilityDiagnostics": true
+    "readOnlyReliabilityDiagnostics": true,
+    "humanSurveyExchange": true,
+    "blindIndividualComparison": true,
+    "consentBoundAgentProfiles": true
   },
   "dataPolicy": {
     "missingAnswers": "ask_participant",
@@ -161,5 +164,25 @@
       "attempts": 500,
       "generationsPerAccountUtcDay": 20
     }
+  },
+  "quorum": {
+    "page": "/quorum",
+    "operatorEndpoint": "/api/cabinet/quorum",
+    "participantEndpoint": "/api/quorum",
+    "agentEndpoint": "/api/quorum/agent",
+    "guide": "/agent-quorum.md",
+    "schemas": {
+      "student": "/.well-known/quorum-student-command.schema.json",
+      "admin": "/.well-known/quorum-admin-command.schema.json",
+      "prediction": "/.well-known/quorum-agent-prediction.schema.json",
+      "study": "/.well-known/quorum-study.schema.json",
+      "experiment": "/.well-known/quorum-experiment.schema.json"
+    },
+    "credits": "target × reward escrow, reviewed one-time transfer, explicit startup issuance, no completion-time guarantee",
+    "profiles": "participant self-report plus separate per-experiment consent; frozen version; withdrawal erases stored comparison data",
+    "blinding": "one participant/experiment/arm per key; baseline receives no profile; neither receives human/retest answers; both predictions locked before human",
+    "evaluation": "actual N, item agreement/error/coverage, participant-weighted paired baseline comparison and participant bootstrap; no alpha-as-imitation claim",
+    "hostedModel": "optional default-off production AI Gateway adapter, explicit owner start; 5 attempts/day and one per arm, receipt metadata; external supplied JSON is attestation",
+    "externalFormSubmission": false
   }
 }

@@ -48,10 +48,10 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     assert.match(action.location ?? "", /\/workbench/);
   });
 
-  it("preview home opens the browser workbench without application sign-in", async () => {
+  it("preview home opens Quorum participation without exposing private data", async () => {
     const home = await httpGet(server.baseUrl, "/");
     assert.ok([302, 303, 307, 308].includes(home.status));
-    assert.match(home.location ?? "", /\/workbench/);
+    assert.match(home.location ?? "", /\/quorum/);
     const panel = await httpGet(server.baseUrl, "/workbench");
     assert.equal(panel.status, 200);
     assert.match(panel.body, /Respondent Lab/);
@@ -136,7 +136,7 @@ it("Vercel production refuses SQLite database health until durable hosting is co
     assert.equal(health.body.includes(production.dbFile), false);
     const home = await httpGet(production.baseUrl, "/");
     assert.ok([302, 303, 307, 308].includes(home.status));
-    assert.match(home.location ?? "", /\/workbench/);
+    assert.match(home.location ?? "", /\/quorum/);
     const panel = await httpGet(production.baseUrl, "/workbench");
     assert.equal(panel.status, 200);
     assert.match(panel.body, /Respondent Lab/);

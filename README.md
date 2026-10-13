@@ -1,4 +1,4 @@
-# Research Respondent Platform
+# Кворум · Research Respondent Platform
 
 A research operations workspace for managing documented participant records, consent, psychometric scoring, cohort selection, external form mappings, and auditable agent tasks.
 
@@ -69,3 +69,13 @@ and the current continuation for deployment and real verification status.
 The October 11 empty-catalog observation above is historical: the owner's
 subsequent uploads are preserved in private storage. Their presence is not
 proof of consent or compatibility with any new questionnaire.
+
+## Quorum invited pilot
+
+The hosted public entry is now `/quorum`: individual participant invitations,
+native questionnaire exchange with reserved virtual credits, separately consented
+profiles and blind personal/baseline agent comparison. Existing cabinet/bank,
+workbench, Google Forms executor and simulation lab remain accessible.
+See [QUORUM.md](research-respondent-platform/docs/QUORUM.md) for exact limits,
+model configuration and consent/measurement boundaries. No five-for-fifty or
+completion-time guarantee, fine-tuned-model or identity-replication claim.

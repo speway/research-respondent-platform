@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "hypothesis": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "holdoutReference": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "modelId": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "promptVersion": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "settings": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1000
+    },
+    "retestDays": {
+      "default": 14,
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 30
+    },
+    "participantIds": {
+      "minItems": 1,
+      "maxItems": 100,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "format": "uuid",
+        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+      }
+    },
+    "questions": {
+      "minItems": 1,
+      "maxItems": 50,
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "kind": {
+                "type": "string",
+                "const": "scale"
+              },
+              "low": {
+                "type": "integer",
+                "minimum": -100,
+                "maximum": 100
+              },
+              "high": {
+                "type": "integer",
+                "minimum": -100,
+                "maximum": 100
+              },
+              "required": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "kind",
+              "low",
+              "high"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "kind": {
+                "type": "string",
+                "const": "choice"
+              },
+              "options": {
+                "minItems": 2,
+                "maxItems": 20,
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "code": {
+                      "type": "string",
+                      "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+                    },
+                    "label": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1000
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "label"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "required": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "kind",
+              "options"
+            ],
+            "additionalProperties": false
+          },
+          {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "pattern": "^[A-Za-z][A-Za-z0-9_]{0,63}$"
+              },
+              "label": {
+                "type": "string",
+                "minLength": 1,
+                "maxLength": 1000
+              },
+              "kind": {
+                "type": "string",
+                "const": "text"
+              },
+              "maxLength": {
+                "default": 1000,
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 2000
+              },
+              "required": {
+                "default": true,
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "id",
+              "label",
+              "kind"
+            ],
+            "additionalProperties": false
+          }
+        ]
+      }
+    },
+    "holdoutConfirmed": {
+      "type": "boolean",
+      "const": true
+    }
+  },
+  "required": [
+    "title",
+    "hypothesis",
+    "holdoutReference",
+    "modelId",
+    "promptVersion",
+    "settings",
+    "participantIds",
+    "questions",
+    "holdoutConfirmed"
+  ],
+  "additionalProperties": false
+}

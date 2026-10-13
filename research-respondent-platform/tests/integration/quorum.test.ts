@@ -1,0 +1,76 @@
+import assert from "node:assert/strict";
+import { randomUUID } from "node:crypto";
+import { it } from "node:test";
+import { Cabinet } from "../../lib/services/cabinet.ts";
+import { Quorum } from "../../lib/services/quorum.ts";
+import { parseSource } from "../../lib/domain/workbench.ts";
+import { quorumFixture, addPerson, addExperiment, scopedKey, fixturePrediction, fixtureQuestions, fixturePassword } from "../helpers/quorum-fixture.ts";
+const studySpec = () => ({ title:"Fixture study",purpose:"Isolated verification",reference:"fixture-v1",reviewRules:"Declared completeness and eligibility fixture rules",consentText:"Isolated fixture consent only, not a real participant study",durationMinutes:5,eligibleGroups:["fixture-group"],target:2,reward:1,questions:fixtureQuestions });
+it("invitations activate once, issue transparent credits, store no raw token and keep cabinet scope separate",async()=>{
+  const f=quorumFixture(),p=await addPerson(f,"fixture-a");assert.equal((await f.q.dashboard(p.id)).person.balance,5);
+  await assert.rejects(f.q.activate("invitationToken" in p.invitation ? p.invitation.invitationToken as string : "",fixturePassword,true,true),{status:401});
+  assert.equal((await new Quorum(f.config,f.store,f.now).session(p.token))!.id,p.id);
+  assert.equal([...f.records.values()].some(r=>r.body.includes(p.token)),false);
+  assert.equal(await new Cabinet(f.config,f.store,f.now).session(p.token),null);
+  await assert.rejects(f.q.admin("team"),{status:403}); await f.q.logout(p.token);assert.equal(await f.q.session(p.token),null);
+});
+it("escrow and reviewed responses conserve credits; retries cannot duplicate response or payment",async()=>{
+  const f=quorumFixture(),author=await addPerson(f,"author"),a=await addPerson(f,"person-a"),b=await addPerson(f,"person-b"),id=randomUUID();
+  await f.q.studentCommand(author.id,{command:"study",requestId:id,study:studySpec()});
+  await f.q.studentCommand(author.id,{command:"study",requestId:id,study:studySpec()});assert.equal((await f.q.dashboard(author.id)).person.balance,3);
+  await f.q.adminCommand("owner",{command:"review_study",studyId:id,accepted:true,reason:"Eligible isolated fixture"});
+  await assert.rejects(f.q.studentCommand(author.id,{command:"submit",studyId:id,answers:{q1:2,q2:"A"},consent:true,humanAttestation:true}),{status:409});
+  const first=await f.q.studentCommand(a.id,{command:"submit",studyId:id,answers:{q1:2,q2:"A"},consent:true,humanAttestation:true});
+  const repeated=await f.q.studentCommand(a.id,{command:"submit",studyId:id,answers:{q1:2,q2:"A"},consent:true,humanAttestation:true});assert.deepEqual(first,repeated);
+  await f.q.adminCommand("owner",{command:"review_response",responseId:"responseId" in first ? first.responseId : "",accepted:true,reason:"Declared verification passed"});
+  await f.q.adminCommand("owner",{command:"review_response",responseId:"responseId" in first ? first.responseId : "",accepted:true,reason:"Same review request"});assert.equal((await f.q.dashboard(a.id)).person.balance,6);
+  await assert.rejects(f.q.studentCommand(a.id,{command:"submit",studyId:id,answers:{q1:4,q2:"A"},consent:true,humanAttestation:true}),{status:409});
+  const second=await f.q.studentCommand(b.id,{command:"submit",studyId:id,answers:{q1:3,q2:"B"},consent:true,humanAttestation:true});
+  await assert.rejects(f.q.studentCommand(author.id,{command:"close_study",studyId:id}),{status:409});
+  await f.q.adminCommand("owner",{command:"review_response",responseId:"responseId" in second ? second.responseId : "",accepted:false,reason:"Fixture rejection, not opinion based"});
+  await f.q.studentCommand(b.id,{command:"appeal",responseId:"responseId" in second ? second.responseId : "",reason:"Please review the fixture evidence"});
+  await f.q.adminCommand("owner",{command:"review_response",responseId:"responseId" in second ? second.responseId : "",accepted:true,reason:"Appeal accepted"});
+  const exported=await f.q.exportStudy(author.id,id);assert.equal(exported.records.length,2);assert.equal(parseSource("observed.json",JSON.stringify(exported.records)).rows.length,2);
+  await assert.rejects(f.q.exportStudy(a.id,id),{status:404});await f.q.studentCommand(author.id,{command:"close_study",studyId:id});
+  const admin=await f.q.admin("owner");assert.equal(admin.issuedCredits,15);assert.equal(admin.students.reduce((n,p)=>n+p.balance,0)+admin.studies.reduce((n,t)=>n+t.escrow,0),15);
+});
+it("concurrent first writes/last study slots fail closed rather than losing balances",async()=>{
+  const f=quorumFixture();const first=await Promise.allSettled([f.q.adminCommand("owner",{command:"invite",login:"one",label:"one",group:"g",starterCredits:5}),f.q.adminCommand("owner",{command:"invite",login:"two",label:"two",group:"g",starterCredits:5})]);
+  assert.equal(first.filter(r=>r.status==="fulfilled").length,1);assert.equal((await f.q.admin("owner")).students.length,1);
+  const author=await addPerson(f,"author"),a=await addPerson(f,"person-a"),b=await addPerson(f,"person-b"),id=randomUUID();
+  await f.q.studentCommand(author.id,{command:"study",requestId:id,study:{...studySpec(),target:1}});await f.q.adminCommand("owner",{command:"review_study",studyId:id,accepted:true,reason:"fixture"});
+  const results=await Promise.allSettled([a,b].map(p=>f.q.studentCommand(p.id,{command:"submit",studyId:id,answers:{q1:2,q2:"A"},consent:true,humanAttestation:true})));
+  assert.equal(results.filter(r=>r.status==="fulfilled").length,1);assert.equal((await f.q.admin("owner")).responses.length,1);
+});
+it("blind comparison requires per-model consent, freezes versions, hides target answers and locks predictions",async()=>{
+  const f=quorumFixture(),p=await addPerson(f,"person-a"),experimentId=await addExperiment(f,[p.id]);
+  const personal=await scopedKey(f,experimentId,p.id,"personal"),baseline=await scopedKey(f,experimentId,p.id,"baseline");
+  assert.ok((await f.q.agentTask(personal.token)).profile);assert.equal("profile" in await f.q.agentTask(baseline.token),false);
+  await assert.rejects(f.q.studentCommand(p.id,{command:"human",experimentId,phase:"first",answers:{q1:3,q2:"A"},consent:true,humanAttestation:true}),{status:409});
+  await f.q.studentCommand(p.id,{command:"profile",profile:{narrative:"A second distinct isolated profile version to test freezing; never a real human record.",reference:"fixture-v2",consentModeling:true,excludesHoldoutAnswers:true}});
+  assert.equal((await f.q.agentTask(personal.token)).profile!.version,1);
+  await f.q.predict(personal.token,fixturePrediction({q1:3,q2:"A"}));await f.q.predict(baseline.token,fixturePrediction({q1:1,q2:"B"}));
+  await assert.rejects(f.q.predict(personal.token,fixturePrediction({q1:4,q2:"A"})),{status:409});
+  const first=await f.q.studentCommand(p.id,{command:"human",experimentId,phase:"first",answers:{q1:3,q2:"A"},consent:true,humanAttestation:true});assert.ok("receiptSha256" in first);
+  const task=JSON.stringify(await f.q.agentTask(personal.token));assert.equal(task.includes("humanReceipt"),false);assert.equal(task.includes("retest"),false);assert.equal(task.includes("fixturePrediction"),false);
+  assert.equal((await f.q.report("owner",experimentId)).actualN,1);assert.equal((await f.q.report("owner",experimentId)).perParticipant[0]!.personal.exactRate,1);
+  await assert.rejects(f.q.studentCommand(p.id,{command:"human",experimentId,phase:"retest",answers:{q1:3,q2:"A"},consent:true,humanAttestation:true}),{status:409});
+  f.advance(86400001);await f.q.studentCommand(p.id,{command:"human",experimentId,phase:"retest",answers:{q1:4,q2:"A"},consent:true,humanAttestation:true});
+  const report=await f.q.report("owner",experimentId);assert.equal(report.retestN,1);assert.equal(report.perParticipant[0]!.relativeToRetest,2);assert.equal(report.aggregate.errorCI,null);
+  await f.q.studentCommand(p.id,{command:"withdraw_profile"});assert.equal((await f.q.report("owner",experimentId)).actualN,0);assert.equal((await f.q.report("owner",experimentId)).withdrawn,1);await assert.rejects(f.q.agentTask(personal.token));
+  const body=[...f.records.values()].map(r=>r.body).join(" ");assert.equal(body.includes("Isolated self-description fixture"),false);assert.equal(body.includes("A second distinct isolated profile"),false);
+});
+it("no experimental key is issued before consent; revocation/expiry/disable invalidate access",async()=>{
+  const f=quorumFixture(),p=await addPerson(f,"person-a");await f.q.studentCommand(p.id,{command:"profile",profile:{narrative:"An isolated self-description long enough for consent and scope tests only.",reference:"test",consentModeling:true,excludesHoldoutAnswers:true}});
+  const id=randomUUID();await f.q.adminCommand("owner",{command:"experiment",requestId:id,experiment:{title:"test",hypothesis:"test",holdoutReference:"test",modelId:"fixture/model",promptVersion:"fixture-v1",settings:"fixture-fixed",participantIds:[p.id],questions:fixtureQuestions,holdoutConfirmed:true}});
+  await assert.rejects(scopedKey(f,id,p.id,"personal"),{status:404});await f.q.studentCommand(p.id,{command:"consent_experiment",experimentId:id,consent:true});
+  const key=await scopedKey(f,id,p.id,"personal");await f.q.adminCommand("owner",{command:"revoke_key",keyId:key.keyId});await assert.rejects(f.q.agentTask(key.token),{status:401});
+  const next=await scopedKey(f,id,p.id,"baseline");f.advance(86400001);await assert.rejects(f.q.agentTask(next.token),{status:401});
+  const login=await f.q.login(p.login,fixturePassword);await f.q.adminCommand("owner",{command:"disable",participantId:p.id});assert.equal(await f.q.session(login.token),null);
+});
+it("corrupt saved receipt or balance fails closed; invalid/missing answers cannot consume credits",async()=>{
+  const f=quorumFixture(),author=await addPerson(f,"author"),p=await addPerson(f,"person-a"),id=randomUUID();
+  await f.q.studentCommand(author.id,{command:"study",requestId:id,study:studySpec()});await f.q.adminCommand("owner",{command:"review_study",studyId:id,accepted:true,reason:"fixture"});
+  await assert.rejects(f.q.studentCommand(p.id,{command:"submit",studyId:id,answers:{q1:9,q2:"A"},consent:true,humanAttestation:true}));assert.equal((await f.q.admin("owner")).responses.length,0);
+  const path=[...f.records.keys()].find(k=>k.endsWith("state.json"))!,r=f.records.get(path)!,value=JSON.parse(r.body);value.students[0].balance+=1;f.records.set(path,{...r,body:JSON.stringify(value)});await assert.rejects(f.q.dashboard(p.id),/conservation/);
+});
