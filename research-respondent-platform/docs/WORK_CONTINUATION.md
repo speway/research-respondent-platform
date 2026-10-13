@@ -1022,3 +1022,73 @@ remain pending at this checkpoint. No participant invitation/data/model request
 or external submission was made outside isolated fixtures. Next three tasks:
 complete Chromium/HTTP scenarios; pass exact-head checks and persist corrections;
 release verified code and record actual limits/results.
+
+### Quorum verified release and activation boundary (2026-10-13)
+
+User asked to implement all three proposed modules on the existing site. Checked
+application SHA 0c1f0e216fd8bbd0cb0c1228938c983ab4cba910, tree
+b0e863ba97c45d60c17097e327446ff3baeaf978, PR #19 ready for review, stacked on
+PR #18. Main unchanged; GitHub tree/commit/ref leases match checked local trees.
+
+Implemented: invited participant accounts and own passwords; native study builder,
+eligibility/consent/review rules, target × reward escrow, single response/reward,
+appeals, observed exports and withdrawal; separately consented versioned profiles
+and per-model/experiment consent; frozen personal/baseline arms committed before
+human answers, gated retest, actual N, coverage, common-item paired errors and
+participant-level bootstrap. Public machine schemas/agent guide and typed portable
+JS client are published. Optional Gateway adapter records actual execution receipts
+and bounds one attempt/arm, five/day, 40 seconds, no artificial noise or retry loop.
+Existing private source bank/Google Forms worker/demo laboratory remain available.
+No five-for-fifty/two-day guarantee, model-weight training or 1:1 identity claim.
+
+Local frozen install/lint/types/build exit 0; 267 unit/integration tests pass.
+Local HTTP exit 0 had incomplete captured output; use completed CI for all 23.
+Normal local browser was absent/download invalid; isolated @sparticuz/chromium
+153.0.0 was installed outside the repo. Unpack hit environment chown EINVAL;
+ownership-safe standard Node Brotli/Python tar extraction fixed fixture QA, with
+no dependency/lockfile changes. Full actual local Quorum Chromium flow passed.
+The native credential-protected browser was not recovered or probed again.
+
+Earlier CI ecd330... / 38380195766 passed 267/build/23 HTTP but old workbench
+browser test opened root and expected the old landing. Fixed explicit /workbench.
+31c2b7... / 38381031678 passed all four older browser flows then new invitation
+field lookup failed. Fixed explicit accessible labels and activation-to-normal-
+login state, with response-status diagnostic. No skipped/weakened assertion.
+Final exact-head CI 38382173787 / job 115245034686: EVERY STEP SUCCESS, frozen
+install/native SQLite/lint/types/267 tests/build/23 HTTP/FIVE real Chromium flows.
+New flow covers invitation/own password, reserve/publication/response/review/reward,
+profile/per-model consent, blind scope/locks, human/retest/session/reload, report
+actual N, withdrawal and mobile. All records/stores/model transports are fixtures;
+no live provider generation or real respondent write follows from those tests.
+
+Preview dpl_GosT2HbQkrUJei1Xbns8qPc2HhmT READY at exact checked SHA. Existing
+owner production-release authorization persists. Redeployment from that exact
+source to production gave dpl_6RuxfhmpqpVBEejsyLdkqVmhH1h1 READY; Git SHA readback
+matches. Primary research-respondent-platform.vercel.app assigned and independently
+read back to that deployment, replacing dpl_6F9orZapFxCpg5BwmxdoQGAZoQgW.
+Main public entry is now https://research-respondent-platform.vercel.app/quorum .
+Actual HTTPS verifier exit 0: Quorum/cabinet/workbench/guide/manifest/five schemas
+200; root 307 /quorum; participant/session/operator/agent/catalog anonymous APIs
+401/no-store; foreign-Origin participant/session/operator POST 403; same-Origin
+anonymous participant/operator POST 401; agent POST without key 401.
+
+NATIVE AUTOMATIC APPROVAL REVIEW rejected production RRP_QUORUM_AI=1 activation:
+it enables external profile processing/potential spend without explicit approval
+of this exact capability. No alternative flag/default-on code/indirect call,
+credential creation or budget change was attempted. Non-decrypted project metadata
+confirms RRP_QUORUM_AI ABSENT. Hosted model code is delivered but inactive;
+manual scoped external-agent handoff and every unaffected feature are deployed.
+Only exact optional activation/external-processing/Gateway-spend approval remains;
+do not ask again for broad site release. No paid/live model or provider-log proof.
+No actual invitations, profiles, responses, recruitment, model calls or Google
+Form sends occurred in this batch. Existing source files/account passwords remain.
+New authenticated production state writes have not been claimed verified through
+the credential-blocked browser; the previously proven private adapter is reused.
+
+Final documentation was synchronized via GitHub connector after local executor
+reads stalled; this is an evidence-only [skip ci] follow-up, not new application
+code or a reason for repeating full checks. Next three tasks: exact optional
+Gateway activation/processing/spend approval; one consented real model pair with
+provider receipts and authenticated persistence check; first real invited cohort
+and held-out/retest evaluation before expanded recruitment or replacement claims.
+N=50 remains a planned pilot, not completed enrollment or proven imitation.
