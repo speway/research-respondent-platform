@@ -117,6 +117,14 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     const denied = await fetch(`${server.baseUrl}/api/cabinet/lab`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://untrusted.test" }, body: '{"command":"generate","config":{"seed":"fixture"}}' });
     assert.equal(denied.status, 403); await denied.body?.cancel();
   });
+  it("persona dictionary has no private data; bank reads and cloud launches remain gated", async () => {
+    const model=await httpGet(server.baseUrl,"/api/personas/schema");assert.equal(model.status,200);
+    const contract=JSON.parse(model.body);assert.equal(contract.model_version,"1.0.0");assert.equal(Object.keys(contract.groups).length,17);assert.equal("personas" in contract,false);
+    assert.equal((await httpGet(server.baseUrl,"/agent-personas.md")).status,200);
+    const schema=await httpGet(server.baseUrl,"/.well-known/rrp-persona-command.schema.json");assert.equal(schema.status,200);assert.equal(JSON.parse(schema.body).oneOf.length,6);
+    const denied=await fetch(`${server.baseUrl}/api/cabinet/personas`);assert.equal(denied.status,503);assert.match(denied.headers.get("cache-control")??"",/no-store/);await denied.body?.cancel();
+    const origin=await fetch(`${server.baseUrl}/api/cabinet/personas`,{method:"POST",headers:{"Content-Type":"application/json",Origin:"https://untrusted.test"},body:'{}'});assert.equal(origin.status,403);await origin.body?.cancel();
+  });
   it("Quorum page/contracts are public and participant/operator writes are authenticated and origin-bound", async () => {
     const page = await httpGet(server.baseUrl, "/quorum"); assert.equal(page.status, 200); assert.match(page.body, /Кворум/);
     assert.equal((await httpGet(server.baseUrl, "/agent-quorum.md")).status, 200);

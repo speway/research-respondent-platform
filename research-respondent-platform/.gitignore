@@ -27,3 +27,7 @@ coverage/
 .DS_Store
 Thumbs.db
 /.swc
+
+# Python worker caches
+__pycache__/
+*.pyc

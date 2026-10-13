@@ -450,3 +450,24 @@ was rejected by native automatic approval review for absent exact external-
 processing/spend approval, and remains absent. No bypass. All unaffected work was
 completed/deployed before asking that narrow permission. Exact evidence and next
 three tasks are in WORK_CONTINUATION.md.
+
+
+### 26. Durable psychological persona integration (2026-10-13)
+
+Task branch feat/persona-workflow-integration brings pinned PR #6 model v1.0.0
+forward onto Quorum PR #19; checked application `9cc14b8b542f2f0a3e233067696f6c34e81c9e23`.
+Full private persona envelopes, parent versions, separate read keys, bounded
+Python Sandbox Workflow, cabinet generation/adaptation/import and modeled
+prediction bridge are implemented. Local 283 tests, 24 HTTP, lint/types/build and
+actual persona/cabinet Chromium checks passed. Isolated transports only; live
+cloud activation/VM execution/provider persistence remain unverified. Read
+WORK_CONTINUATION and PSYCHOLOGICAL_PERSONAS.md for exact limits/proof. Original
+empirical/Quorum human datasets and Gateway activation boundary are preserved.
+
+
+PR #20 publication evidence: exact-head CI 38391692366 SUCCESS on 283 tests,
+24 HTTP and all six actual Chromium flows. Protected Preview READY at c5e68476,
+public model/guide/manifest checked 200; private bank is 503/no-store in this
+unconfigured Preview. Native automatic review rejected both production release
+and RRP_PERSONA_WORKER cloud activation for missing exact approvals. No bypass;
+main production and Quorum Gateway unchanged. See latest WORK_CONTINUATION.
