@@ -1,11 +1,12 @@
 import { z } from "zod";
+import { validateSimulation } from "./simulation-lab.ts";
 import { taskSchema, workspaceFromTask } from "./agent-workbench.ts";
 import { parseSource } from "./workbench.ts";
 
 export const CABINET_FILE_BYTES = 2 * 1024 * 1024;
 export const cabinetId = z.string().uuid();
 const label = z.string().trim().min(1).max(500);
-export const uploadSchema = z.object({ kind: z.enum(["source", "questionnaire"]), name: label,
+export const uploadSchema = z.object({ kind: z.enum(["source", "questionnaire", "simulation"]), name: label,
   reference: label, rights: label, base64: z.string().max(Math.ceil(CABINET_FILE_BYTES / 3) * 4),
 }).strict();
 export const projectSchema = z.object({ name: label, sourceId: cabinetId,
@@ -20,7 +21,7 @@ export const cabinetSettingsSchema = z.object({ checksum: z.string().regex(/^[a-
   sourceRows: taskSchema.shape.sourceRows,
   match: taskSchema.shape.match, criteria: taskSchema.shape.criteria }).strict();
 export type CabinetProject = z.output<typeof projectSchema> & { id: string; createdAt: string };
-export interface CabinetAsset { id: string; kind: "source" | "questionnaire"; name: string;
+export interface CabinetAsset { id: string; kind: "source" | "questionnaire" | "simulation"; name: string;
   reference: string; rights: string; sha256: string; bytes: number; createdAt: string;
   headers?: string[]; records?: number;
   derivation?: { schema: "rrp.bank-lineage.v1"; mode: "merge" | "join"; lineageSha256: string;
@@ -33,8 +34,12 @@ export function validateUpload(input: unknown) {
   const bytes = Buffer.from(file.base64, "base64");
   if (!bytes.length || bytes.length > CABINET_FILE_BYTES || bytes.toString("base64") !== file.base64) throw new Error("Файл должен быть от 1 байта до 2 МБ.");
   const extension = file.name.split(".").at(-1)?.toLowerCase();
-  const allowed = file.kind === "source" ? ["csv", "tsv", "json"] : ["json", "csv", "tsv", "txt", "pdf", "docx"];
+  const allowed = file.kind === "source" ? ["csv", "tsv", "json"] : file.kind === "simulation" ? ["json"] : ["json", "csv", "tsv", "txt", "pdf", "docx"];
   if (!extension || !allowed.includes(extension)) throw new Error("Неподдерживаемый формат файла.");
+  if (file.kind === "simulation") {
+    const cohort = validateSimulation(JSON.parse(new TextDecoder("utf-8", { fatal: true }).decode(bytes)));
+    return { file, bytes, headers: [], records: cohort.rows.length };
+  }
   if (file.kind === "source") {
     const text = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes);
     const dataset = parseSource(file.name, text);
@@ -49,7 +54,7 @@ export function validateUpload(input: unknown) {
   return { file, bytes };
 }
 export async function cabinetTask(project: CabinetProject, asset: CabinetAsset, body: AssetBody) {
-  if (asset.kind !== "source" || asset.id !== project.sourceId) throw new Error("Источник проекта не совпадает.");
+  if (asset.kind !== "source" || asset.id !== project.sourceId) throw new TypeError("Проект требует базу фактических ответов.");
   const task = taskSchema.parse({ schema: "rrp.agent-task.v1", source: { name: asset.name,
     text: new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(Buffer.from(body.base64, "base64")) },
   reference: asset.reference, purpose: project.purpose, formUrl: project.formUrl,

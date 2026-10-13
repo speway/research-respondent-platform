@@ -1,0 +1,175 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "const": "generate"
+        },
+        "config": {
+          "type": "object",
+          "properties": {
+            "seed": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 100
+            },
+            "count": {
+              "default": 50,
+              "type": "integer",
+              "minimum": 10,
+              "maximum": 250
+            },
+            "conditionOnAlpha": {
+              "default": false,
+              "type": "boolean"
+            },
+            "minAlpha": {
+              "default": 0.5,
+              "type": "number",
+              "minimum": -5,
+              "maximum": 1
+            },
+            "maxAlpha": {
+              "default": 0.7,
+              "type": "number",
+              "minimum": -5,
+              "maximum": 1
+            },
+            "maxAttempts": {
+              "default": 250,
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 500
+            }
+          },
+          "required": [
+            "seed"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "command",
+        "config"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "const": "reliability"
+        },
+        "request": {
+          "type": "object",
+          "properties": {
+            "sourceId": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            },
+            "scales": {
+              "minItems": 1,
+              "maxItems": 50,
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "minLength": 1,
+                    "maxLength": 200
+                  },
+                  "columns": {
+                    "minItems": 2,
+                    "maxItems": 2000,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1000
+                    }
+                  },
+                  "reverseColumns": {
+                    "default": [],
+                    "maxItems": 2000,
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "minLength": 1,
+                      "maxLength": 1000
+                    }
+                  },
+                  "low": {
+                    "type": "number"
+                  },
+                  "high": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "name",
+                  "columns",
+                  "low",
+                  "high"
+                ],
+                "additionalProperties": false
+              }
+            }
+          },
+          "required": [
+            "sourceId",
+            "scales"
+          ],
+          "additionalProperties": false
+        }
+      },
+      "required": [
+        "command",
+        "request"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "const": "agent_key"
+        },
+        "assetId": {
+          "type": "string",
+          "format": "uuid",
+          "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+        }
+      },
+      "required": [
+        "command",
+        "assetId"
+      ],
+      "additionalProperties": false
+    },
+    {
+      "type": "object",
+      "properties": {
+        "command": {
+          "type": "string",
+          "const": "revoke_key"
+        },
+        "keyId": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      },
+      "required": [
+        "command",
+        "keyId"
+      ],
+      "additionalProperties": false
+    }
+  ]
+}

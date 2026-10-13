@@ -6,7 +6,7 @@
   "entry": "window.respondentWorkbench.execute(command)",
   "protocol": "rrp.workbench-agent.v1",
   "sourceRepository": "https://github.com/speway/research-respondent-platform",
-  "sourceRef": "feat/cabinet-form-automation",
+  "sourceRef": "feat/cohort-simulation-lab",
   "guide": "research-respondent-platform/docs/AGENT_AUTOMATION.md",
   "schemas": {
     "task": "/.well-known/rrp-agent-task.schema.json",
@@ -78,7 +78,9 @@
     "scopedLineageRead": true,
     "durableCabinetFormRuns": true,
     "sharedSubmissionJournal": true,
-    "sourceRowRestriction": true
+    "sourceRowRestriction": true,
+    "simulationLab": true,
+    "readOnlyReliabilityDiagnostics": true
   },
   "dataPolicy": {
     "missingAnswers": "ask_participant",
@@ -142,5 +144,22 @@
       "liveSubmissionVerified": false
     },
     "taskDownload": "/api/cabinet/agent?task=1"
+  },
+  "simulationLab": {
+    "endpoint": "/api/cabinet/lab",
+    "commandSchema": "/.well-known/rrp-lab-command.schema.json",
+    "cohortSchema": "/.well-known/rrp-simulation-cohort.schema.json",
+    "guide": "/agent-simulation-lab.md",
+    "data_origin": "modeled",
+    "generation": "Seeded demonstration, optional explicitly recorded conditioning on alpha",
+    "agentAccess": "Separate expiring revocable read grant for one cohort, no observed-source or submission access",
+    "scaleKeys": "Unverified demo keys, no clinical or empirical interpretation",
+    "empiricalAnalysis": "Exact columns, complete cases, declared reverse keys, no source mutation",
+    "liveFormSubmissionEnabledByLab": false,
+    "limits": {
+      "profiles": 250,
+      "attempts": 500,
+      "generationsPerAccountUtcDay": 20
+    }
   }
 }

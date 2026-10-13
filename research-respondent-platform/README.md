@@ -378,3 +378,9 @@ literal merges and exact participant profile joins, refuses conflicts and saves
 immutable versions with source/row lineage for agents. CSV templates and download
 controls are included. See [RESPONDENT_BANK.md](docs/RESPONDENT_BANK.md) for formats,
 limits and unchanged execution/consent requirements.
+
+## Simulation laboratory
+
+The cabinet now includes seeded demonstration cohorts, separate agent read keys
+and read-only reliability diagnostics for actual sources. See
+[SIMULATION_LAB.md](docs/SIMULATION_LAB.md) for exact limits and provenance.

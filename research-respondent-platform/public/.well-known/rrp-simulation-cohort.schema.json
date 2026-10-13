@@ -1,0 +1,410 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "properties": {
+    "schema": {
+      "type": "string",
+      "const": "rrp.simulation-cohort.v1"
+    },
+    "data_origin": {
+      "type": "string",
+      "const": "modeled"
+    },
+    "generatorVersion": {
+      "type": "string",
+      "const": "demo-battery-1"
+    },
+    "purpose": {
+      "type": "string",
+      "const": "isolated_software_simulation"
+    },
+    "config": {
+      "type": "object",
+      "properties": {
+        "seed": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100
+        },
+        "count": {
+          "default": 50,
+          "type": "integer",
+          "minimum": 10,
+          "maximum": 250
+        },
+        "conditionOnAlpha": {
+          "default": false,
+          "type": "boolean"
+        },
+        "minAlpha": {
+          "default": 0.5,
+          "type": "number",
+          "minimum": -5,
+          "maximum": 1
+        },
+        "maxAlpha": {
+          "default": 0.7,
+          "type": "number",
+          "minimum": -5,
+          "maximum": 1
+        },
+        "maxAttempts": {
+          "default": 250,
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 500
+        }
+      },
+      "required": [
+        "seed"
+      ],
+      "additionalProperties": false
+    },
+    "attempts": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 500
+    },
+    "targetReached": {
+      "type": [
+        "boolean",
+        "null"
+      ]
+    },
+    "rows": {
+      "minItems": 10,
+      "maxItems": 250,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^SIM-\\d{4}$"
+          },
+          "data_origin": {
+            "type": "string",
+            "const": "modeled"
+          },
+          "demographics": {
+            "type": "object",
+            "properties": {
+              "age": {
+                "type": "integer",
+                "minimum": 22,
+                "maximum": 58
+              },
+              "gender": {
+                "type": "string",
+                "enum": [
+                  "female",
+                  "male"
+                ]
+              },
+              "industryCode": {
+                "type": "string",
+                "pattern": "^industry_[1-9]$"
+              },
+              "totalTenureYears": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 40
+              },
+              "currentTenureYears": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 40
+              },
+              "positionCode": {
+                "type": "string",
+                "pattern": "^position_[1-4]$"
+              }
+            },
+            "required": [
+              "age",
+              "gender",
+              "industryCode",
+              "totalTenureYears",
+              "currentTenureYears",
+              "positionCode"
+            ],
+            "additionalProperties": false
+          },
+          "answers": {
+            "type": "object",
+            "propertyNames": {
+              "type": "string"
+            },
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "integer",
+                  "minimum": -9007199254740991,
+                  "maximum": 9007199254740991
+                },
+                {
+                  "type": "string",
+                  "enum": [
+                    "A",
+                    "B",
+                    "C",
+                    "D"
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        "required": [
+          "id",
+          "data_origin",
+          "demographics",
+          "answers"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "reports": {
+      "minItems": 6,
+      "maxItems": 6,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "alpha": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "reason": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "insufficient_rows",
+                  "zero_total_variance"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "items": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "inputRows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "completeRows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "missingRows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "invalidRows": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 9007199254740991
+          },
+          "constantColumns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "reverseColumns": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "missingPolicy": {
+            "type": "string",
+            "const": "complete_cases"
+          }
+        },
+        "required": [
+          "name",
+          "alpha",
+          "reason",
+          "items",
+          "inputRows",
+          "completeRows",
+          "missingRows",
+          "invalidRows",
+          "constantColumns",
+          "reverseColumns",
+          "missingPolicy"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "scaleDefinitions": {
+      "minItems": 6,
+      "maxItems": 6,
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 200
+          },
+          "columns": {
+            "minItems": 2,
+            "maxItems": 2000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            }
+          },
+          "reverseColumns": {
+            "default": [],
+            "maxItems": 2000,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 1000
+            }
+          },
+          "low": {
+            "type": "number"
+          },
+          "high": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "name",
+          "columns",
+          "low",
+          "high"
+        ],
+        "additionalProperties": false
+      }
+    },
+    "modelParameters": {
+      "type": "object",
+      "properties": {
+        "sokolLoading": {
+          "type": "number",
+          "const": 0.36
+        },
+        "commitmentLoading": {
+          "type": "number",
+          "const": 0.46
+        },
+        "generalSd": {
+          "type": "number",
+          "const": 0.65
+        },
+        "sokolFactorResidualSd": {
+          "type": "number",
+          "const": 0.55
+        },
+        "commitmentFactorResidualSd": {
+          "type": "number",
+          "const": 0.65
+        },
+        "continuationFactorSd": {
+          "type": "number",
+          "const": 0.85
+        },
+        "cultureDominantProbability": {
+          "type": "number",
+          "const": 0.65
+        },
+        "cultureSecondaryProbability": {
+          "type": "number",
+          "const": 0.2
+        },
+        "itemMeans": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "type": "number",
+              "const": 3.3
+            },
+            {
+              "type": "number",
+              "const": 3.4
+            },
+            {
+              "type": "number",
+              "const": 3.5
+            },
+            {
+              "type": "number",
+              "const": 4.2
+            },
+            {
+              "type": "number",
+              "const": 4
+            },
+            {
+              "type": "number",
+              "const": 4.1
+            }
+          ],
+          "items": false,
+          "minItems": 6,
+          "maxItems": 6
+        }
+      },
+      "required": [
+        "sokolLoading",
+        "commitmentLoading",
+        "generalSd",
+        "sokolFactorResidualSd",
+        "commitmentFactorResidualSd",
+        "continuationFactorSd",
+        "cultureDominantProbability",
+        "cultureSecondaryProbability",
+        "itemMeans"
+      ],
+      "additionalProperties": false
+    },
+    "limitations": {
+      "minItems": 1,
+      "maxItems": 20,
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 1000
+      }
+    }
+  },
+  "required": [
+    "schema",
+    "data_origin",
+    "generatorVersion",
+    "purpose",
+    "config",
+    "attempts",
+    "targetReached",
+    "rows",
+    "reports",
+    "scaleDefinitions",
+    "modelParameters",
+    "limitations"
+  ],
+  "additionalProperties": false
+}

@@ -64,6 +64,7 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     const response = await httpGet(server.baseUrl, "/.well-known/rrp-agent.json");
     assert.equal(response.status, 200);
     const manifest = JSON.parse(response.body);
+    assert.equal(manifest.capabilities.simulationLab, true);
     assert.equal(manifest.protocol, "rrp.workbench-agent.v1");
     assert.equal(manifest.capabilities.hostedBackgroundWorker, true);
     assert.equal(manifest.capabilities.serverSourceUpload, true);
@@ -108,6 +109,14 @@ describe("isolated Vercel preview policy over HTTP", { skip: requireNextBuild() 
     assert.equal(denied.status, 403); await denied.body?.cancel();
   });
 
+  it("lab discovery is public; reads require cabinet and mutations are origin-bound", async () => {
+    assert.equal((await httpGet(server.baseUrl, "/agent-simulation-lab.md")).status, 200);
+    const schema = await httpGet(server.baseUrl, "/.well-known/rrp-lab-command.schema.json");
+    assert.equal(schema.status, 200); assert.equal(JSON.parse(schema.body).oneOf.length, 4);
+    assert.equal((await httpGet(server.baseUrl, "/api/cabinet/lab")).status, 503);
+    const denied = await fetch(`${server.baseUrl}/api/cabinet/lab`, { method: "POST", headers: { "Content-Type": "application/json", Origin: "https://untrusted.test" }, body: '{"command":"generate","config":{"seed":"fixture"}}' });
+    assert.equal(denied.status, 403); await denied.body?.cancel();
+  });
   it("a real create-study POST remains refused even with a valid file-database cookie", async () => {
     const ref = serverActionRefsFromBuild().find((entry) => entry.exportedName === "createStudyAction");
     assert.ok(ref);
