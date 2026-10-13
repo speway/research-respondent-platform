@@ -8,6 +8,7 @@ import { URL } from "node:url";
 import { log } from "node:console";
 import { BlobPreconditionFailedError } from "@vercel/blob";
 import { Cabinet, cabinetConfiguration } from "../../lib/services/cabinet.ts";
+import { SimulationLab } from "../../lib/services/simulation-lab.ts";
 import { FormAutomation } from "../../lib/services/form-automation.ts";
 import { hashPassword } from "../../lib/services/password.ts";
 import { httpGet, removeTempDb, requireNextBuild, startTestServer } from "../helpers/server.ts";
@@ -26,7 +27,7 @@ const store = {
   },
   async paths(prefix) { return [...records.keys()].filter((p) => p.startsWith(prefix)); },
 };
-const cabinet = new Cabinet(config, store), automation = new FormAutomation(config, store);
+const cabinet = new Cabinet(config, store), automation = new FormAutomation(config, store), lab = new SimulationLab(config, store);
 const owner = config.accounts[0];
 const server = await startTestServer({ env: { ...env, VERCEL: "1", VERCEL_ENV: "preview" } });
 let browser; let activePage;
@@ -53,6 +54,15 @@ try {
               return "wrun_isolated_browser";
             }); status = 202;
           }
+        }
+      }
+      else if (url.pathname.endsWith("/lab")) {
+        if (request.method() === "GET") body = url.searchParams.has("asset") ? await lab.cohort(owner, url.searchParams.get("asset")) : { grants: await lab.grants(owner) };
+        else { assert.equal(request.headers().origin, server.baseUrl); const input = request.postDataJSON();
+          if (input.command === "generate") body = await lab.generate(owner, input.config);
+          else if (input.command === "reliability") body = await lab.measure(owner, input.request);
+          else if (input.command === "agent_key") body = await lab.key(owner, input.assetId);
+          else { await lab.revoke(owner, input.keyId); body = { revoked: true }; }
         }
       }
       else if (request.method() === "GET") body = await cabinet.catalog(owner);
@@ -140,10 +150,35 @@ try {
   await bank.getByRole("button", { name: "Проверить объединение" }).click();
   await bank.getByText(/Ответов без профиля: 0/).waitFor();
   assert.equal(await bank.getByRole("button", { name: "Сохранить версию банка" }).isDisabled(), false);
+  const labPanel = page.getByRole("region", { name: "Лаборатория тестовых наборов" });
+  await labPanel.getByLabel("Условная симуляция с отбором по заданной альфе").check();
+  await labPanel.getByRole("button", { name: "Создать и сохранить тестовый набор" }).click();
+  await labPanel.getByRole("status").filter({ hasText: "Целевой диапазон достигнут" }).waitFor();
+  const simulation = (await cabinet.catalog(owner)).assets.find(a => a.kind === "simulation");
+  assert.equal(simulation.records, 50); assert.equal((await lab.cohort(owner, simulation.id)).cohort.attempts, 88);
+  assert.equal(await project.getByLabel("База", { exact: true }).locator(`option[value="${simulation.id}"]`).count(), 0);
+  await labPanel.getByRole("button", { name: "Дать тестовый набор агенту" }).click();
+  const labPrompt = await labPanel.getByLabel("Инструкция агента лаборатории").inputValue();
+  const labToken = labPrompt.match(/Authorization: Bearer ([A-Za-z0-9_-]{43})/)[1];
+  assert.equal((await lab.forAgent(labToken)).cohort.data_origin, "modeled");
+  await assert.rejects(cabinet.forAgent(labToken), { status: 401 });
+  await labPanel.getByRole("button", { name: "Отозвать ключ лаборатории" }).click();
+  await labPanel.getByText(/отозван/).waitFor(); await assert.rejects(lab.forAgent(labToken), { status: 401 });
+  await upload("scale.csv", "participant_id,a,b\nTEST-X,1,5\nTEST-Y,2,4\nTEST-Z,3,3\n");
+  const scale = (await cabinet.catalog(owner)).assets.find(a => a.name === "scale.csv");
+  await labPanel.getByLabel("База для расчёта").selectOption(scale.id);
+  await labPanel.getByLabel("a", { exact: true }).check(); await labPanel.getByLabel("b", { exact: true }).check();
+  await labPanel.getByLabel("Обратный: b", { exact: true }).check();
+  await labPanel.getByRole("button", { name: "Рассчитать надёжность" }).click();
+  await labPanel.getByRole("cell", { name: "1.0000", exact: true }).waitFor();
+  assert.equal((await cabinet.asset(owner, scale.id)).meta.sha256, scale.sha256);
+  await page.reload(); await page.getByRole("heading", { name: owner.label, exact: true }).waitFor();
+  await labPanel.getByLabel("Сохранённый тестовый набор").selectOption(simulation.id);
+  await labPanel.getByRole("status").filter({ hasText: "Целевой диапазон достигнут" }).waitFor();
   await page.setViewportSize({ width: 390, height: 844 });
   assert.equal(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth), true);
   assert.deepEqual(errors, []);
-  log("Cabinet browser: upload → bank version → project → scoped agent/lineage → idempotent automation request and persisted result; conflicts/profile join/mobile passed. Isolated service fixture only.");
+  log("Cabinet browser: upload → bank version → project → scoped agent/lineage → idempotent automation request and persisted result; conflicts/profile join, simulation persistence/revocation, read-only reliability and mobile passed. Isolated service fixture only.");
 } catch (error) {
   if (activePage) log("Isolated fixture cabinet failure before returning an agent key:", (await activePage.locator("body").innerText()).replace(/Bearer [A-Za-z0-9_-]+/g, "Bearer [redacted]"));
   throw error;

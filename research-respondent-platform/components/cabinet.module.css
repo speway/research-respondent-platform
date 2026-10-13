@@ -44,3 +44,9 @@
 .bankReport ul { font-size: 12px; padding-left: 20px; margin: 12px 0; }
 @media(max-width:720px) { .bankFields { grid-template-columns: 1fr; } .bankReport dl { grid-template-columns: repeat(2, minmax(0,1fr)); } }
 @media(max-width:720px) { .grid { grid-template-columns: 1fr; } .items article { align-items: start; flex-direction: column; } .header { flex-wrap: wrap; } .metrics > div { padding: 13px; } .heading h1 { font-size: 25px; } }
+
+.labTable { overflow-x: auto; margin: 16px 0; }
+.labTable table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.labTable th, .labTable td { padding: 8px; border-bottom: 1px solid #dbe3e9; text-align: left; }
+.labColumns { max-height: 280px; overflow: auto; }
+.labColumns > div { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; }
