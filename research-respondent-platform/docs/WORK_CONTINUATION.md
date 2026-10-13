@@ -925,3 +925,80 @@ Next three tasks: complete one authenticated read-only cloud cabinet launch once
 the native browser is available; verify an exact instrument-item/source map and
 participant/destination basis; execute one explicitly permitted compatible
 source-backed response and retain its visible receipt before expanding batches.
+
+### Simulation laboratory restored and verified (2026-10-13)
+
+The environment reset removed the prior uncommitted laboratory working copy;
+old scratch logs survived but are not used as current-code evidence. Restored
+on `feat/cohort-simulation-lab` from saved PR #17 head
+`4a1c184c9fac733f1da954b59b78bccaa860756b`; persisted application commit
+`adff430c459bcc59dc37d83e37502ab6dce48b2e`, tree
+`dc7a03fd68f4affa26e14b1391a242c676cbc2e3`, PR #18 (base PR #17 branch).
+Direct git push lacked credentials; official GitHub tree/commit/branch tools
+persisted exactly the locally checked tree, then local HEAD was aligned.
+No main edits or force-pushes. Existing account files/empirical projects unchanged.
+
+Modified: lab domain/service/API/client, cabinet simulation asset validation and
+UI integration/CSS, public machine schemas/manifest/guide, schema export script,
+unit/service/HTTP/Chromium verification, SIMULATION_LAB and README. Agent rules
+and this historical handoff receive an evidence-only documentation follow-up.
+Seed 20261012 / 50 profiles / conditioned alpha .50–.70 achieves six scales on
+attempt 88; exhausted search returns false, unconditioned returns null. This is
+an uncalibrated mathematical demo, not population validity or verified method keys.
+
+Current local commands: first frozen install exited 1 on environment fchown
+failure while node-gyp extracted Node headers. Extracted exact Node 24.19.0 headers
+with Python and repeated frozen install using npm_config_nodedir: exit 0. No lock
+or dependency changes. First tests exposed a Node strip-only parameter-property
+syntax incompatibility; replaced with explicit class fields. Final lint, typecheck,
+253 tests and build each exited 0. The local HTTP command reported exit 0 but
+its captured log contains only five completed checks and no suite summary;
+do not count it as a complete local HTTP proof. The independent CI below
+provides the completed 22-check HTTP result. An earlier concurrent build is
+not used in place of the final exact-code build. No local Chromium claim.
+
+Independent CI `38347877283`, job `115133373755`, exact application SHA above:
+all steps SUCCESS, including frozen install/native binding/lint/types/253 tests,
+build/22 HTTP and four actual Chromium flows. New flow proves generation/save,
+reopen after reload, simulation exclusion from source projects, separate agent
+key read/revocation, actual-source alpha 1.0000 and unchanged source checksum,
+plus mobile width and no page errors. Existing exact-mapping/branching/dropdown,
+write-grant/default denial and unknown-send receipt tests remain passing.
+
+Preview `dpl_5r1vaYdjdFq55qJTtser7jFAjnQc` READY at the checked SHA. Previously
+explicit owner release authorization persists. Production redeploy from this
+exact Preview source requested as `dpl_6F9orZapFxCpg5BwmxdoQGAZoQgW`; final
+production/alias/HTTPS results follow below after independent readback.
+
+No Google form entries or sends, actual respondent writes, source alteration,
+password/account changes or relational database migrations. The lab itself has
+no external submission path. Native credential-protected browser observation
+remains unavailable from the previous session; its repeated recovery attempts
+are historical, not repeated here. CI uses isolated records and storage transport;
+new authenticated production generation/provider persistence has not been claimed
+live verified. Existing cabinet upload uses the previously proven private provider
+adapter and checksum readback. Issue #4 / legacy SQLite migration remain open.
+
+Next three tasks: finish production alias/readback and public HTTPS verification;
+when authenticated browser access is available, run one production lab save/reopen
+and revoke demonstration; obtain exact instrument keys and an external-form-specific
+count/accounting/authority before any separately requested live test run.
+
+Production completion: `dpl_6F9orZapFxCpg5BwmxdoQGAZoQgW` READY, target production,
+Git metadata independently confirms checked application SHA `adff430...`.
+Build log reports Deployment completed. Assigned existing main alias
+https://research-respondent-platform.vercel.app/cabinet ; independent alias
+readback resolves to that exact deployment, replacing `dpl_9ihFd...`.
+Public HTTPS verifier exited 0: cabinet/workbench/guide/manifest/both new schemas
+200; manifest advertises lab and no lab submission capability; command schema
+has four strict branches; lab/catalog/automation deny anonymous reads 401 with
+no-store; malformed lab key 401; foreign-Origin lab POST 403; same-Origin anonymous
+POST 401; provider proof route 404. No authenticated writes were made by these
+checks. No renewed permission question or native credential recovery attempt.
+Evidence-only follow-up uses [skip ci]; application code remains the CI-tested
+and deployed commit. PR #18 remains stacked over PR #17; main is unchanged.
+
+Next three tasks after this completed batch: one authenticated production lab
+save/reopen/revoke when the browser can observe credentials safely; verify exact
+instrument versions/keys; execute only a separately authorized external test or
+source-backed transfer with an exact count/accounting method and visible receipt.

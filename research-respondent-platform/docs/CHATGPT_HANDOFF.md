@@ -417,3 +417,20 @@ and the latest WORK_CONTINUATION entry for exact boundaries and pending checks.
 are not yet claimed verified at this implementation checkpoint. Production
 writes require evidence and operator confirmations; these do not independently
 prove participant consent. No respondent generation or outcome adjustment.
+
+### 24. Saved simulation laboratory and reliability diagnostics (2026-10-13)
+
+PR #18 / feat/cohort-simulation-lab continues PR #17. Application commit
+`adff430c459bcc59dc37d83e37502ab6dce48b2e` adds seeded, explicitly conditioned
+mathematical demo cohorts, isolated saved simulation assets, separate expiring
+revocable agent read keys and actual-source read-only reliability diagnostics.
+See SIMULATION_LAB.md and /agent-simulation-lab.md. The supplied script's guessed
+DOM mapping/random unknown answers/clamping/force clicks/false success reporting
+are not adopted. Original scale keys and norms remain unverified demonstrations.
+
+CI `38347877283` / job `115133373755` passed locked install, native SQLite,
+lint/types, 253 unit/integration tests, build, 22 HTTP checks and all four real
+Chromium flows. The new browser flow verifies save/reload, project exclusion,
+agent scope/revocation and actual-source alpha with unchanged checksum. These
+are isolated fixture proofs, not live Google submissions. Current deployment
+and exact operational boundaries are recorded in WORK_CONTINUATION.md.
