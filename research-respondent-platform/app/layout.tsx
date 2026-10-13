@@ -3,9 +3,9 @@ import "./globals.css";
 import { SiteNav } from "../components/site-nav.tsx";
 
 export const metadata: Metadata = {
-  title: "Research Respondent Platform",
+  title: "Кворум · Исследования и участие",
   description:
-    "Source-backed participant registry, psychometric assessment, cohort engine, form mapping and multi-agent task orchestration for documented research data.",
+    "Обмен опросами, подтверждённые человеческие ответы и слепая проверка персонального агента.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

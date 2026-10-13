@@ -1,0 +1,31 @@
+.shell { max-width: 1180px; margin: 0 auto; color: #2a2536; }
+.header { display: flex; justify-content: space-between; align-items: center; gap: 20px; padding: 20px 0; border-bottom: 1px solid #e3dcec; flex-wrap: wrap; }
+.brand { font-size: 27px; font-weight: 700; color: #6950a1; text-decoration: none; }
+.brand span { display: block; font-size: 11px; color: #7a7087; font-weight: 400; }
+.header nav { display: flex; flex-wrap: wrap; gap: 16px; font-size: 12px; }
+.hero { padding: 30px 0 15px; max-width: 800px; }
+.hero h1 { font-size: 28px; font-weight: 650; margin-bottom: 12px; }
+.hero p, .card p, .card small { font-size: 13px; line-height: 1.8; color: #756981; overflow-wrap: anywhere; }
+.card { min-width: 0; padding: 24px; margin: 20px 0; border: 1px solid #e3dcec; border-radius: 13px; background: #fff; overflow-wrap: anywhere; }
+.card h2 { font-size: 19px; font-weight: 650; margin-bottom: 12px; }
+.card h3 { font-size: 15px; font-weight: 600; margin: 15px 0 10px; }
+.card form { display: grid; gap: 14px; margin-top: 16px; }
+.card label, .builder label { display: grid; gap: 7px; font-size: 12px; min-width: 0; }
+.card .check, .builder .check { display: flex; align-items: center; gap: 9px; }
+.card fieldset { min-width: 0; border: 1px solid #e8e1ed; border-radius: 8px; padding: 15px; }
+.card legend { font-size: 12px; padding: 0 5px; }
+.grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; align-items: start; }
+.metrics { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 15px; margin: 20px 0; }
+.metrics > div { display: grid; gap: 8px; padding: 20px; background: #f6f2fa; border: 1px solid #e6dfef; border-radius: 10px; }
+.metrics strong { font-size: 25px; }.metrics span { font-size: 11px; color: #7e6e8d; }
+.actions { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.table { max-width: 100%; overflow-x: auto; margin: 15px 0; }
+.table table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.table th, .table td { text-align: left; border-bottom: 1px solid #e8e1ed; padding: 10px; }
+.item { border-top: 1px solid #e8e1ed; padding: 15px 0; }
+.questionEditor { display: grid; gap: 12px; margin: 14px 0; padding: 14px; background: #faf8fc; border-radius: 8px; }
+.builder { display: grid; gap: 8px; }
+.card pre { white-space: pre-wrap; overflow-wrap: anywhere; font-size: 12px; background: #f7f4fa; padding: 12px; border-radius: 8px; }
+.alert { padding: 12px; background: #fff3ed; border: 1px solid #efcdbb; border-radius: 8px; margin: 12px 0; font-size: 13px; }
+.status { padding: 12px; background: #f1f7ee; border: 1px solid #d4e2c9; border-radius: 8px; margin: 12px 0; font-size: 13px; overflow-wrap: anywhere; }
+@media(max-width:720px) { .grid { grid-template-columns: 1fr; }.card { padding: 16px; }.metrics { gap: 8px; }.metrics > div { padding: 12px; }.hero h1 { font-size: 23px; } }

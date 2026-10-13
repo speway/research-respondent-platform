@@ -19,7 +19,7 @@ const NAV_ITEMS: Array<{ href: string; label: string; hint: string }> = [
 export function SiteNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
-  if (pathname === "/workbench" || pathname === "/cabinet") return null;
+  if (pathname === "/workbench" || pathname === "/cabinet" || pathname === "/quorum") return null;
   const isActive = (href: string) => (href === "/" ? pathname === "/" : pathname.startsWith(href));
 
   return (

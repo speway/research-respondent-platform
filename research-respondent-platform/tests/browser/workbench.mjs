@@ -18,7 +18,7 @@ try {
   const errors = [], posts = [];
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("request", (request) => { if (request.method() === "POST") posts.push(request.url()); });
-  await page.goto(server.baseUrl);
+  await page.goto(`${server.baseUrl}/workbench`);
   await page.getByRole("heading", { name: "База ответов", exact: true }).waitFor();
   assert.match(page.url(), /\/workbench$/);
   const csv = 'participant_id,age,answer\nfixture-1,17,0\nfixture-2,22,"same, literal"\nfixture-3,31,\n';

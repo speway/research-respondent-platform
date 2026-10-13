@@ -8,6 +8,7 @@ import { URL } from "node:url";
 import { log } from "node:console";
 import { BlobPreconditionFailedError } from "@vercel/blob";
 import { Cabinet, cabinetConfiguration } from "../../lib/services/cabinet.ts";
+import { Quorum } from "../../lib/services/quorum.ts";
 import { SimulationLab } from "../../lib/services/simulation-lab.ts";
 import { FormAutomation } from "../../lib/services/form-automation.ts";
 import { hashPassword } from "../../lib/services/password.ts";
@@ -27,7 +28,7 @@ const store = {
   },
   async paths(prefix) { return [...records.keys()].filter((p) => p.startsWith(prefix)); },
 };
-const cabinet = new Cabinet(config, store), automation = new FormAutomation(config, store), lab = new SimulationLab(config, store);
+const cabinet = new Cabinet(config, store), automation = new FormAutomation(config, store), lab = new SimulationLab(config, store), quorum = new Quorum(config, store);
 const owner = config.accounts[0];
 const server = await startTestServer({ env: { ...env, VERCEL: "1", VERCEL_ENV: "preview" } });
 let browser; let activePage;
@@ -56,6 +57,7 @@ try {
           }
         }
       }
+      else if (url.pathname.endsWith("/quorum")) body = await quorum.admin(owner.id);
       else if (url.pathname.endsWith("/lab")) {
         if (request.method() === "GET") body = url.searchParams.has("asset") ? await lab.cohort(owner, url.searchParams.get("asset")) : { grants: await lab.grants(owner) };
         else { assert.equal(request.headers().origin, server.baseUrl); const input = request.postDataJSON();

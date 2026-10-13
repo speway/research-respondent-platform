@@ -384,3 +384,10 @@ limits and unchanged execution/consent requirements.
 The cabinet now includes seeded demonstration cohorts, separate agent read keys
 and read-only reliability diagnostics for actual sources. See
 [SIMULATION_LAB.md](docs/SIMULATION_LAB.md) for exact limits and provenance.
+
+## Quorum participant pilot
+
+Hosted entry: `/quorum`; owner controls: `/cabinet`. Invitation-based participant
+accounts, reserved credits, native surveys, per-experiment profile consent and
+blind comparison now form one bounded workflow. See [QUORUM.md](docs/QUORUM.md).
+This does not train model weights or prove identity replication.

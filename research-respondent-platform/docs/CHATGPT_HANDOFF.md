@@ -434,3 +434,19 @@ Chromium flows. The new browser flow verifies save/reload, project exclusion,
 agent scope/revocation and actual-source alpha with unchanged checksum. These
 are isolated fixture proofs, not live Google submissions. Current deployment
 and exact operational boundaries are recorded in WORK_CONTINUATION.md.
+
+### 25. Quorum human exchange and blind evaluation (2026-10-13)
+
+PR #19 continues #18. Checked application 0c1f0e216fd8bbd0cb0c1228938c983ab4cba910
+is deployed at https://research-respondent-platform.vercel.app/quorum . Native
+individual invitations/passwords, funded survey exchange/review/appeals/source
+exports/withdrawal, independently consented profiles/model experiments, frozen
+personal/baseline forecasts before human/retest and actual-N comparison are ready.
+See QUORUM.md, /agent-quorum.md and typed tools/quorum-agent/client.mjs.
+CI 38382173787 passed 267 tests, 23 HTTP and five real Chromium flows; production
+SHA/alias/public HTTPS readbacks passed. Fixtures only: no actual recruitment,
+respondent/model/Form writes. Optional hosted Gateway activation RRP_QUORUM_AI=1
+was rejected by native automatic approval review for absent exact external-
+processing/spend approval, and remains absent. No bypass. All unaffected work was
+completed/deployed before asking that narrow permission. Exact evidence and next
+three tasks are in WORK_CONTINUATION.md.
